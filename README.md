@@ -1,2 +1,2 @@
 # Gateway
-Harvesters that support and crea
+Harvesters and API code.
