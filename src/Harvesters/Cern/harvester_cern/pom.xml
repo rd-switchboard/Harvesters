@@ -2,7 +2,7 @@
 	     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.rd.switchboard.harvesters</groupId>
+  <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_cern</artifactId>
   <version>1.0.4</version>
   <name>CERN Harvester</name>
@@ -32,7 +32,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.rd.switchboard.harvesters.pmh.cern.App</mainClass>
+		      <mainClass>org.rdswitchboard.harvesters.pmh.cern.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
@@ -61,7 +61,7 @@
   
   <dependencies>
     <dependency>
-      <groupId>org.rd.switchboard.harvesters</groupId>
+      <groupId>org.rdswitchboard.harvesters</groupId>
       <artifactId>harvester_pmh</artifactId>
       <version>1.2.2</version>
     </dependency>

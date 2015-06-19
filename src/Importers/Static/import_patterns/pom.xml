@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.rd.switchboard.importers</groupId>
+  <groupId>org.rdswitchboard.importers</groupId>
   <artifactId>import_pattern</artifactId>
   <version>1.0.0</version>
      
@@ -30,7 +30,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.rd.switchboard.importers.patterns.App</mainClass>
+		      <mainClass>org.rdswitchboard.importers.patterns.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>

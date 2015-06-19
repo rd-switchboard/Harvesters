@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.rd.switchboard.harvesters</groupId>
+  <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_rda2</artifactId>
   <version>1.0.0</version>
   <name>RDA JSON harvester</name>
@@ -32,7 +32,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.rd.switchboard.harvesters.rda.App</mainClass>
+		      <mainClass>org.rdswitchboard.harvesters.rda.App</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
