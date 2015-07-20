@@ -1,0 +1,69 @@
+package org.rdswitchboard.importers.ands.s3.ddb;
+
+import java.util.concurrent.Semaphore;
+
+import org.rdswitchboard.crosswalks.rifcs.graph.Crosswalk;
+import org.rdswitchboard.importers.graph.ddb.Importer;
+
+import com.amazonaws.auth.AWSCredentials;
+
+public class ImportThread  extends Thread {
+
+	private Object lock = new Object();
+	private boolean canExit = false;
+	private final Semaphore semaphore;
+	private Crosswalk crosswalk;
+	private Importer importer;
+	
+	public ImportThread(Semaphore semaphore, AWSCredentials awsCredentials) {
+		this.semaphore = semaphore;
+		this.crosswalk = new Crosswalk();
+		this.importer = new Importer(awsCredentials);
+	}
+	
+	public boolean isFree() {
+		synchronized(lock) {
+			return true; //return null == this.matcher;
+		}
+	}
+	
+	public void processFile(String file) throws ImportThreadException {
+		synchronized(lock) {
+		//	if (null != this.matcher)
+		//		throw new ImportThreadException("The matcher tread is busy");
+		
+		//	this.matcher = matcher;
+			this.lock.notify();
+		}
+	}
+	
+	public synchronized void finishCurrentAndExit() {
+		synchronized(lock) {
+			
+			this.canExit = true;
+			this.lock.notify();
+		}
+	}
+	
+	@Override
+	public void run() {
+		try {
+			 for (;;) {
+				 synchronized(lock) {
+					 if (canExit)
+						 break;
+					 
+					 if (null == matcher) 
+						 lock.wait();
+				 }
+				 
+				 if (null != matcher) {
+					 matcher.run();
+					 matcher = null;
+					 semaphore.release();
+				 }
+			 }
+		} catch (InterruptedException e) {
+	    }
+    }
+} 

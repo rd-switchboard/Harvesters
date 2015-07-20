@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete 25 resources" deleteContents="false" description="Delete 25 resources" element1="/crossref" element10="/import_cern" element11="/import_corssref" element12="/import_dryad" element13="/import_figshare" element14="/import_graph" element15="/import_institutions" element16="/import_mets" element17="/import_nhmrc" element18="/import_orcid" element19="/import_pattern" element2="/graph_data" element20="/import_rda" element21="/import_rda2" element22="/import_rif" element23="/import_services" element24="/neo4j" element25="/orcid" element3="/harvester_cern" element4="/harvester_dryad" element5="/harvester_pmh" element6="/harvester_pmh_s3" element7="/harvester_rda" element8="/harvester_rda2" element9="/import_arc" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="25" stamp="1435898117149"/>
+</session>

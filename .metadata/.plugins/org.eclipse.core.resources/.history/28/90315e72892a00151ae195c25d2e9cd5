@@ -1,0 +1,12 @@
+package org.rdswitchboard.importers.ands.s3.ddb;
+
+import com.amazonaws.services.s3.AmazonS3;
+
+public class Importer {
+	private AmazonS3 s3client;
+	
+	
+	public void process() {
+		
+	}
+}

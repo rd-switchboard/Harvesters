@@ -1,0 +1,118 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * Class to store Record information
+ * 
+ * @author Dima Kudriavcev (dmitrij@kudriavcev.info)
+ * @date 2015-07-11
+ * @version 1.0.0
+ */
+
+public class Node extends Record {
+	private static final String PROPERTY_SOURCE = "source";
+	
+	private List<Relationship> relationships = null;
+	
+	/**
+	 * Default class constructor
+	 */
+	public Node() {
+		
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @param type
+	 */
+	public Node(String key, String type) {
+		super(key, type);
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @param type
+	 * @param source
+	 */
+	public Node(String key, String type, String source) {
+		super(key, type);
+		setSource(source);
+	}
+	
+	/**
+	 * 
+	 * @param key
+	 * @param type
+	 * @param properties
+	 */
+	public Node(String key, String type, Map<String, Object> properties) {
+		super(key, type, properties);
+	}
+
+	/**
+	 * 
+	 * @param key
+	 * @param type
+	 * @param properties
+	 */
+	public Node(String key, String type, String source, Map<String, Object> properties) {
+		super(key, type, properties);
+		setSource(source);
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public String getSource() {
+		return (String) getProperty(PROPERTY_SOURCE);
+	}
+
+	/**
+	 * 
+	 * @param source
+	 */
+	public void setSource(String source) {
+		setProperty(PROPERTY_SOURCE, source);
+	}
+	
+	/**
+	 * 
+	 * @param source
+	 * @return
+	 */
+	public Node withSource(String source) {
+		setSource(source);
+		return this;
+	}
+
+	public void addRelationship(Relationship relationship) {
+		if (null == relationships)
+			relationships = new ArrayList<Relationship>();
+		
+		relationships.add(relationship);
+	}
+	
+	public void addRelationships(List<Relationship> relationships) {
+		if (null == relationships)
+			relationships = new ArrayList<Relationship>();
+		
+		relationships.addall(relationship);
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return "Node " + properties;
+	}
+}

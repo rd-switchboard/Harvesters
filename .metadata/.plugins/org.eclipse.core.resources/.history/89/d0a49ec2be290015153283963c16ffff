@@ -1,0 +1,65 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class Record {
+	private static final String PROPERTY_KEY = "key";
+	private static final String PROPERTY_TYPE = "type";
+	private static final String PROPERTY_SOURCE = "source";
+	
+	protected Map<String, Object> indexes = null;
+	protected Map<String, Object> properties = null;
+	protected Map<String, Object> relationships = null;
+	
+	public Map<String, Object> getProperties() {
+		return properties;
+	}
+	
+	public void setProperties(Map<String, Object> properties) {
+		this.properties = properties;
+	}
+		
+	public Map<String, Object> getIndexes() {
+		return indexes;
+	}
+	
+	public void setIndexes(Map<String, Object> indexes) {
+		this.indexes = indexes;
+	}
+	
+	public Map<String, Object> getRelationships() {
+		return relationships;
+	}
+	
+	public void setRelationships(Map<String, Object> relationships) {
+		this.relationships = relationships;
+	}
+
+	public Object getProperty(String key) {
+		if (null == properties)
+			return null;
+		return properties.get(key);
+	}
+	
+	public void setProperty(String key, Object value) {
+		if (null == properties) 
+			properties = new HashMap<String, Object>();
+			
+		properties.put(key, value);
+	}
+
+	public void addProperty(String key, Object value) {
+		Object par = map.get(key);
+	}
+
+		
+	
+	
+	
+	
+	
+	
+	}

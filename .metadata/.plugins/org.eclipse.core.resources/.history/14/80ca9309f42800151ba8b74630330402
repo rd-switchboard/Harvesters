@@ -1,0 +1,5 @@
+package org.rdswitchboard.libraries.graph;
+
+public class Graph {
+
+}

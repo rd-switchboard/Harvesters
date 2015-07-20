@@ -1,0 +1,73 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class Graph {
+	private List<Node> nodes = null;
+	private List<Relationship> relationships = null;
+	
+	public Graph() {
+		
+	}
+	
+	public Graph(List<Node> nodes, List<Relationship> relationships) {
+		this.nodes = nodes;
+		this.relationships = relationships;
+	}
+	
+	public List<Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(List<Node> nodes) {
+		if (null == this.nodes)
+			this.nodes = nodes;
+		else
+			this.nodes.addAll(nodes);
+	}
+	
+	public Graph withNodes(List<Node> nodes) {
+		setNodes(nodes);
+		return this;
+	}
+	
+	public List<Relationship> getRelationships() {
+		return relationships;
+	}
+
+	public void setRelationships(List<Relationship> relationships) {
+		if (null == this.relationships)
+			this.relationships = relationships;
+		else
+			this.relationships.addAll(relationships);
+	}
+	
+	public Graph withRelationships(List<Relationship> Relationship) {
+		setRelationships(relationships);
+		return this;
+	}
+
+	public void addNode(Node node) {
+		if (null == nodes)
+			nodes = new ArrayList<Node>();
+		nodes.add(node);
+	}
+	
+	public Graph withNode(Node node) {
+		addNode(node);
+		return this;
+	}
+
+	public void addRelationship(Relationship relationship) {
+		if (null == relationships)
+			relationships = new ArrayList<Relationship>();
+		relationships.add(relationship);
+	}
+	
+	public Graph withRelationship(Relationship relationship) {
+		addRelationship(relationship);
+		return this;
+	}
+
+}

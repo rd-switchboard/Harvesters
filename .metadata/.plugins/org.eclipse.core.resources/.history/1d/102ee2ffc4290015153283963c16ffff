@@ -1,0 +1,13 @@
+package org.rdswitchboard.libraries.interfaces;
+
+import java.util.List;
+
+import org.rdswitchboard.libraries.graph.Node;
+import org.rdswitchboard.libraries.graph.Relationship;
+
+public interface ExtractGraph {
+	void addNode(Node record);
+	void addRelationship(Relationship relationship);
+	List<Node> getNodes();
+	List<Relationship> getRelationships();
+}

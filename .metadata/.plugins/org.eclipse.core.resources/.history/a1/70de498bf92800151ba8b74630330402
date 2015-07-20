@@ -1,0 +1,44 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.List;
+
+public class Graph {
+	private List<Node> nodes = null;
+	private List<Relationship> relationships = null;
+	
+	public Graph() {
+		
+	}
+	
+	public Graph(List<Node> nodes, List<Relationship> relationships) {
+		this.nodes = nodes;
+		this.relationships = relationships;
+	}
+	
+	public List<Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(List<Node> nodes) {
+		this.nodes = nodes;		
+	}
+	
+	public Graph withNodes(List<Node> nodes) {
+		setNodes(nodes);
+		return this;
+	}
+	
+	public List<Relationship> getRelationships() {
+		return relationships;
+	}
+
+	public void setRelationships(List<Relationship> relationships) {
+		this.relationships = relationships;
+	}
+
+	
+	public void withRelationships(List<Relationship> relationships) {
+		
+	}
+	
+}

@@ -1,0 +1,15 @@
+# General parameters
+
+source=187
+base.url=http://rd-switchboard.net/registry
+session.id=724e7tu43cphlmn0s6j8iec646
+
+# AWS
+
+aws.access.key=aa
+aws.secret.key=bb
+
+# S3
+
+s3.bucket=xml
+s3.prefix=rda

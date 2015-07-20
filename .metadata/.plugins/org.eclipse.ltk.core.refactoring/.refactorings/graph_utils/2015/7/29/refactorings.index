@@ -1,0 +1,14 @@
+1436665584552	Rename package 'org.rdswitchboard.libraries.records'
+1436665618613	Move compilation unit
+1436665627536	Rename type 'Record'
+1436665675481	Rename type 'Records'
+1436665707127	Rename type 'IGraph'
+1436792293318	Delete element
+1436832081081	Delete element
+1436832186826	Delete element
+1436832198961	Delete element
+1436835616664	Rename type 'HashMapSet'
+1436836169109	Delete element
+1436836178821	Delete element
+1436836183308	Delete element
+1436836484293	Rename package 'org.rdswitchboard.libraries.graph'

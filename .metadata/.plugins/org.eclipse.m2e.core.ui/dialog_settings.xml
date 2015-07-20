@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="MavenProjectWizardArchetypePage">
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+		</list>
+	</section>
+	<section name="org.eclipse.m2e.core.pom.overview">
+		<list key="issueManagementUrl">
+		</list>
+		<list key="issueManagementSystem">
+		</list>
+		<list key="ciManagementUrl">
+		</list>
+		<list key="ciManagementSystem">
+		</list>
+	</section>
+	<section name="org.eclipse.m2e.core.pom.dependencies">
+	</section>
+	<section name="MavenProjectWizardLocationPage">
+		<list key="location">
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Importers/ANDS/import_ands_s3_ddb"/>
+			<item value="/home/dima/Projects/Experements/Java/PostArray"/>
+			<item value="/home/dima/Projects/Experements/Java/SetClass"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Importers/DynamoDB/import_graph_ddb"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Crosswalks/process_rif"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Importers/RDA/importer_rif_s3/pom.xml"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+		</list>
+	</section>
+	<section name="Maven2ProjectWizardArchifactPage">
+		<list key="groupId">
+		</list>
+		<list key="package">
+		</list>
+		<list key="artifactId">
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+		</list>
+		<list key="version">
+			<item value="0.0.1-SNAPSHOT"/>
+		</list>
+	</section>
+	<section name="MavenProjectImportWizardPage">
+		<list key="rootDirectory">
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Crosswalks"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Libraries/graph_utils"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Libraries/records"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Importers/RDA"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Harvesters/OAI:PMH"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters/Importers/ARC/import_arc"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/Harvesters"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/Harvesters/OAI:PMH/harvester_pmh_s3"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/Importers/Static"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/Importers/Google/import_researcher"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/LIbraries/fuzzy_search"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/LIbraries/fuzzy"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/Importers/Web"/>
+			<item value="/home/dima/Projects/RD-Switchboard/Harvesters/src/Importers/Graph"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+		</list>
+	</section>
+	<section name="MavenProjectWizardArtifactPage">
+		<list key="groupId">
+			<item value="org.rdswitchboard.importes"/>
+			<item value="org.isbar_software"/>
+			<item value="org.rdswitchboard.importers"/>
+			<item value="org.rdswitchboard.crosswalks.rifcs"/>
+			<item value="org.rdswitchboard.libraries"/>
+			<item value="org.rdswitchboard"/>
+		</list>
+		<list key="name">
+			<item value="Import Graph into DynamoDB"/>
+			<item value="Records Libary"/>
+		</list>
+		<list key="artifactId">
+			<item value="import_ands_s3_ddb"/>
+			<item value="array_parameter"/>
+			<item value="set_class"/>
+			<item value="import_graph_ddb"/>
+			<item value="process_rif_cs"/>
+			<item value="records"/>
+			<item value="harvesters"/>
+		</list>
+		<list key="projectNameTemplate">
+			<item value="[artifactId]"/>
+			<item value="[artifactId]-TRUNK"/>
+			<item value="[artifactId]-[version]"/>
+			<item value="[groupId].[artifactId]"/>
+			<item value="[groupId].[artifactId]-[version]"/>
+		</list>
+		<list key="version">
+			<item value="0.0.1-SNAPSHOT"/>
+			<item value="1.0.0"/>
+			<item value="1.0"/>
+		</list>
+	</section>
+</section>

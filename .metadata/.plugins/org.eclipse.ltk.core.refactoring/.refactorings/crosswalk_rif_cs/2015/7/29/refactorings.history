@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename type &apos;org.rdswitchboard.crosswalks.rifcs.graph.Crosswalc&apos; to &apos;Crosswalk&apos;&#x0A;- Original project: &apos;process_rif_cs&apos;&#x0A;- Original element: &apos;org.rdswitchboard.crosswalks.rifcs.graph.Crosswalc&apos;&#x0A;- Renamed element: &apos;org.rdswitchboard.crosswalks.rifcs.graph.Crosswalk&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename type &apos;Crosswalc&apos;" flags="589830" id="org.eclipse.jdt.ui.rename.type" input="/src\/main\/java&lt;org.rdswitchboard.crosswalks.rifcs.graph{Crosswalc.java[Crosswalc" matchStrategy="1" name="Crosswalk" qualified="false" references="true" similarDeclarations="false" stamp="1436666127270" textual="false" version="1.0"/>
+</session>

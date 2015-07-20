@@ -1,0 +1,17 @@
+package org.rdswitchboard.importers.ands.s3.ddb;
+
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+
+public class Reader {
+	private final AmazonS3 s3client;
+	
+	public Reader(AWSCredentials awsCredentials) {
+		s3client = new AmazonS3Client(awsCredentials);
+	}
+	
+	public void process() {
+		
+	}
+}

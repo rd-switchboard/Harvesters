@@ -1,0 +1,43 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+public class HashMapSet extends HashMap<String, Object>{
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9215761426937841987L;
+
+	public void add(String key, Object value) {
+		if (null != value) {
+			Object par = get(key);
+			if (null == par) 
+				put(key, value);
+			else {
+				if (par instanceof Set<?>) {
+					@SuppressWarnings("unchecked")
+					Set<Object> set = (Set<Object>) par;
+					if (set.isEmpty())
+						set.add(value);
+					else {
+						Object v = set.iterator().next();
+						if (!v.getClass().equals(value.getClass())) 
+							throw new ClassCastException("The class " + value.getClass() + " is not the same as " + v.getClass());
+						set.add(value);
+					}
+				} else {
+					if (!par.getClass().equals(value.getClass()))
+						throw new ClassCastException("The class " + value.getClass() + " is not the same as " + par.getClass());
+					Set<Object> set = new HashSet<Object>();
+					set.add(par);
+					set.add(value);
+					put(key, set);
+				}
+			}
+		}
+	}
+}

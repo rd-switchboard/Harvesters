@@ -1,0 +1,15 @@
+package org.rdswitchboard.libraries.graph;
+
+import java.util.HashSet;
+
+public class SetObject extends HashSet<Object>{
+	public Object getAny() {
+		return iterator().next();
+	}
+	
+	public Class getStoredClass() {
+		if (isEmpty())
+			return null;
+			
+	}
+}

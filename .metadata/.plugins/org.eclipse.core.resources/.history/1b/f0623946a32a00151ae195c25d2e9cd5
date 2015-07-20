@@ -1,0 +1,8 @@
+package org.rdswitchboard.importers.ands.s3.ddb;
+
+public class ImportThreadException extends Exception {
+
+	public ImportThreadException(String reason) {
+		super ("Import Thread Exception: " + reason);
+	}
+}
