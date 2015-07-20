@@ -1,6 +1,0 @@
-package org.rdswitchboard.libraries.graph;
-
-public class Graph {
-	private List<Node> nodes;
-	private List<Relationship> relationships;
-}

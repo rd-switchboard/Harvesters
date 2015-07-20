@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename package &apos;import_graph_ddb&apos; to &apos;org.rdswitchboard.importers.graph.ddb&apos;&#x0A;- Original project: &apos;import_graph_ddb&apos;&#x0A;- Original element: &apos;import_graph_ddb/src/main/java/import_graph_ddb&apos;&#x0A;- Renamed element: &apos;import_graph_ddb/src/main/java/org.rdswitchboard.importers.graph.ddb&apos;&#x0A;- Update references to refactored element&#x0A;- Update textual occurrences in comments and strings" description="Rename package &apos;import_graph_ddb&apos;" flags="589830" hierarchical="false" id="org.eclipse.jdt.ui.rename.package" input="/src\/main\/java&lt;import_graph_ddb" name="org.rdswitchboard.importers.graph.ddb" qualified="false" references="true" stamp="1436840255731" textual="false" version="1.0"/>
-</session>

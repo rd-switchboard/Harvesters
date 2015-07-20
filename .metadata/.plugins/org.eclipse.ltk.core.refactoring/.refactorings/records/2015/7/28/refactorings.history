@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename local variable &apos;from&apos; in &apos;org.rdswitchboard.libraries.records.Relationship.Relationship(...)&apos; to &apos;keyFrom&apos;&#x0A;- Original project: &apos;records&apos;&#x0A;- Original element: &apos;org.rdswitchboard.libraries.records.Relationship.Relationship(String, String, String).from&apos;&#x0A;- Renamed element: &apos;from&apos;&#x0A;- Update references to refactored element" description="Rename local variable &apos;from&apos;" id="org.eclipse.jdt.ui.rename.local.variable" input="/src\/main\/java&lt;org.rdswitchboard.libraries.records{Relationship.java[Relationship~Relationship~QString;~QString;~QString;@from!592!602!599!602!QString;!0!true" name="keyFrom" references="true" stamp="1436596698863" version="1.0"/>
-</session>

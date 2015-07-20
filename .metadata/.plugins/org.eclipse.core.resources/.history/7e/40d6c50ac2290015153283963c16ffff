@@ -1,5 +1,0 @@
-package org.rdswitchboard.libraries.graph;
-
-public class SetObject extends HashSet<Object>{
-	
-}
