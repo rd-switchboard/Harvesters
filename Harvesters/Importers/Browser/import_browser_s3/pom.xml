@@ -9,7 +9,7 @@
   <groupId>org.rdswitchboard.importers</groupId>
   <artifactId>import_browser_s3</artifactId>
   <version>1.0.0</version>
-  <name>Import Data inio RD-Swithboard Browser</name>
+  <name>Import RIF:CS Records inio RD-Swithboard Browser</name>
   <description>Will import XML files from S3 storage into RD-Switchboard Browser</description>
   
   <properties>
@@ -85,7 +85,7 @@
     <dependency>
 	  <groupId>commons-io</groupId>
 	  <artifactId>commons-io</artifactId>
-	  <version>${commos.is.version}</version>
+	  <version>${commos.io.version}</version>
     </dependency>
   </dependencies>
   

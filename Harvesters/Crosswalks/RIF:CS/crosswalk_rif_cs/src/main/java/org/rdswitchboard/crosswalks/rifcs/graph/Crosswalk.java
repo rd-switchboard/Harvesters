@@ -1,10 +1,6 @@
 package org.rdswitchboard.crosswalks.rifcs.graph;
 
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -16,7 +12,11 @@ import org.openarchives.oai._2.ListRecordsType;
 import org.openarchives.oai._2.OAIPMHtype;
 import org.openarchives.oai._2.RecordType;
 import org.openarchives.oai._2.StatusType;
-import org.rdswitchboard.libraries.record.Record;
+import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphNode;
+import org.rdswitchboard.libraries.graph.GraphRelationship;
+import org.rdswitchboard.libraries.graph.GraphSchema;
+import org.rdswitchboard.libraries.graph.GraphUtils;
 
 import au.org.ands.standards.rif_cs.registryobjects.Activity;
 import au.org.ands.standards.rif_cs.registryobjects.Collection;
@@ -28,12 +28,30 @@ import au.org.ands.standards.rif_cs.registryobjects.RelatedObjectType;
 import au.org.ands.standards.rif_cs.registryobjects.RelationType;
 import au.org.ands.standards.rif_cs.registryobjects.Service;
 
-public class Crosswalk {
+public class Crosswalk {	
+	private static final String COLLECTION_TYPE_DATASET = "dataset";
+	private static final String COLLECTION_TYPE_NON_GEOGRAOPHIC_DATASET = "nonGeographicDataset";
+	private static final String COLLECTION_TYPE_RESEARCH_DATASET = "researchDataSet";
+	
+	private static final String ACTIVITY_TYPE_PROJECT = "project";
+	private static final String ACTIVITY_TYPE_PROGRAM = "program";
+	private static final String ACTIVITY_TYPE_AWARD = "award";
+	
+	private static final String PARTY_TYPE_PERSON = "person";
+	private static final String PARTY_TYPE_PUBLISHER = "publisher";
+	private static final String PARTY_TYPE_GROUP = "group";
+	private static final String PARTY_TYPE_ADMINISTRATIVE_POSITION = "administrativePosition";
+	
+	private static final String IDENTIFICATOR_NLA = "AU-ANL:PEAU";
+	private static final String IDENTIFICATOR_LOCAL = "local";
+	
+	private static final String NAME_PRIMARY = "primary";
+	
 	private static final String NAME_PART_FAMILY = "family";
 	private static final String NAME_PART_GIVEN = "given";
 	private static final String NAME_PART_SUFFIX = "suffix";
 	private static final String NAME_PART_TITLE = "title";
-	
+
 	private Unmarshaller unmarshaller;
 	private int existingRecords;
 	private int deletedRecords;
@@ -65,11 +83,12 @@ public class Crosswalk {
 		this.verbose = verbose;
 	}
 
-	public Map<String, Record> process(InputStream xml) throws Exception {
+	public Graph process(String source, InputStream xml) throws Exception {
 		existingRecords = deletedRecords = brokenRecords = 0;
 		
 		JAXBElement<?> element = (JAXBElement<?>) unmarshaller.unmarshal( xml );
-		Map<String, Record> graph = new HashMap<String, Record>();
+		Graph graph = new Graph();
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_KEY, true));
 		
 		OAIPMHtype root = (OAIPMHtype) element.getValue();
 		ListRecordsType records = root.getListRecords();
@@ -79,11 +98,7 @@ public class Crosswalk {
 					
 				StatusType status = header.getStatus();
 				boolean deleted = status == StatusType.DELETED;
-				
-					
-				//String idetifier = header.getIdentifier();
-//				System.out.println("Record: " + idetifier.toString());
-								
+			
 				if (null != record.getMetadata()) {
 					Object metadata = record.getMetadata().getAny();
 					if (metadata instanceof RegistryObjects) {
@@ -92,39 +107,31 @@ public class Crosswalk {
 							for (RegistryObjects.RegistryObject registryObject : registryObjects.getRegistryObject()) {
 								//String group = registryObject.getGroup();
 								String key = registryObject.getKey();
-								Record node = graph.get(key);
-								if (null == node) {
-									node = new Record().withKey(key);
-									graph.put(key, node);
-								} else
-									throw new Exception("Duplicate key has been found");
+								if (verbose) 
+									System.out.println("Key: " + key);
+								GraphNode node = new GraphNode()
+									.withKey(key)
+									.withSource(source);
 								
 								if (deleted) {
-									node.setProperty("deleted", true);
+									graph.addNode(node.withProperty(GraphUtils.PROPERTY_DELETED, true));
+									
 									++deletedRecords;
+								} else if (registryObject.getCollection() != null)
+									importCollection(graph, node, registryObject.getCollection());
+								else if (registryObject.getActivity() != null) 
+									importActivity(graph, node, registryObject.getActivity());
+								else if (registryObject.getService() != null)
+									importService(graph, node, registryObject.getService());
+								else if (registryObject.getParty() != null)
+									importParty(graph, node, registryObject.getParty());	
+								else {
+									graph.addNode(node.withProperty(GraphUtils.PROPERTY_BROKEN, true));
+									
+									++brokenRecords;
 								}
 								
-								boolean sound = false;
-								
-								if (registryObject.getCollection() != null)
-									sound = importCollection(node, registryObject.getCollection());
-								else if (registryObject.getActivity() != null) 
-									sound = importActivity(node, registryObject.getActivity());
-								else if (registryObject.getService() != null)
-									sound = importService(node, registryObject.getService());
-								else if (registryObject.getParty() != null)
-									sound = importParty(node, registryObject.getParty());																				
-								
-								if (!sound) {
-									node.setProperty("broken", true);
-									++brokenRecords;
-								}	
-								
 								++existingRecords;	
-								if (verbose) {
-									System.out.println("Key: " + key);
-									System.out.println("Node: " + node);
-								}								
 							}
 								
 							// at this point all registry objects should be imported, abort the function
@@ -134,8 +141,6 @@ public class Crosswalk {
 						throw new Exception("Metadata is not in rif format");
 				} else
 					throw new Exception("Unable to find metadata");
-				
-				++brokenRecords;
 			}
 		} else
 			System.out.println("Unable to find records");
@@ -143,10 +148,12 @@ public class Crosswalk {
 		return graph;
 	}
 	
-	private boolean importCollection(Record node, Collection collection) {
+	private boolean importCollection(Graph graph, GraphNode node, Collection collection) {
 		String type = collection.getType();
-		if (type.equals("dataset") || type.equals("nonGeographicDataset") || type.equals("researchDataSet"))
-			node.setType("dataset");
+		if (type.equals(COLLECTION_TYPE_DATASET) 
+				|| type.equals(COLLECTION_TYPE_NON_GEOGRAOPHIC_DATASET) 
+				|| type.equals(COLLECTION_TYPE_RESEARCH_DATASET))
+			node.setType(GraphUtils.TYPE_DATASET);
 		else
 			return false;// ignore
 				
@@ -156,16 +163,20 @@ public class Crosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(node, (RelatedObjectType) object);
+				processRelatedObject(graph, node, (RelatedObjectType) object);
 		}
+		
+		graph.addNode(node);
 		
 		return true;
 	}
 	
-	private boolean importActivity(Record node, Activity activity) {
+	private boolean importActivity(Graph graph, GraphNode node, Activity activity) {
 		String type = activity.getType();
-		if (type.equals("project") || type.equals("program") || type.equals("award"))
-			node.setType("grant");
+		if (type.equals(ACTIVITY_TYPE_PROJECT) 
+				|| type.equals(ACTIVITY_TYPE_PROGRAM) 
+				|| type.equals(ACTIVITY_TYPE_AWARD))
+			node.setType(GraphUtils.TYPE_GRANT);
 		else
 			return false;// ignore
 				
@@ -175,22 +186,24 @@ public class Crosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(node, (RelatedObjectType) object);
+				processRelatedObject(graph, node, (RelatedObjectType) object);
 		}
+		
+		graph.addNode(node);
 		
 		return true;
 	}
 	
-	private boolean importService(Record node, Service service) {
+	private boolean importService(Graph graph, GraphNode node, Service service) {
 		return false; // ignore all
 	}
 	
-	private boolean importParty(Record node, Party party) {
+	private boolean importParty(Graph graph, GraphNode node, Party party) {
 		String type = party.getType();
-		if (type.equals("person") || type.equals("publisher"))
-			node.setType("researcher");
-		else if (type.equals("group") || type.equals("administrativePosition"))
-			node.setType("institution");
+		if (type.equals(PARTY_TYPE_PERSON) || type.equals(PARTY_TYPE_PUBLISHER))
+			node.setType(GraphUtils.TYPE_RESEARCHER);
+		else if (type.equals(PARTY_TYPE_GROUP) || type.equals(PARTY_TYPE_ADMINISTRATIVE_POSITION))
+			node.setType(GraphUtils.TYPE_INSTITUTION);
 		else
 			return false;// ignore
 				
@@ -200,36 +213,40 @@ public class Crosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(node, (RelatedObjectType) object);
+				processRelatedObject(graph, node, (RelatedObjectType) object);
 		}
+		
+		graph.addNode(node);
 		
 		return true;
 	}
 	
-	private void processIdentifier(Record node, IdentifierType identifier) {
+	private void processIdentifier(GraphNode node, IdentifierType identifier) {
 		String type = identifier.getType();
 		if (null != type) {
-			if (type.equals("AU-ANL:PEAU"))
-				type = "nla";
-			else if (type.equals("local"))
-				type = "id";
-			else if (!type.equals("doi") && !type.equals("orcid") && !type.equals("purl"))
+			if (type.equals(IDENTIFICATOR_NLA))
+				type = GraphUtils.PROPERTY_NLA;
+			else if (type.equals(IDENTIFICATOR_LOCAL))
+				type = GraphUtils.PROPERTY_LOCAL_ID;
+			else if (!type.equals(GraphUtils.PROPERTY_DOI) 
+					&& !type.equals(GraphUtils.PROPERTY_ORCID) 
+					&& !type.equals(GraphUtils.PROPERTY_PURL))
 				type = null;			
 		}
 		
 		if (null != type) {
 			String key = identifier.getValue();
 			if (null != key && !key.isEmpty())
-				node.addIndex(key, type);
+				node.addProperty(type, key);
 		}
 	}
 	
-	private void processName(Record node, NameType name) {
+	private void processName(GraphNode node, NameType name) {
 		String type = name.getType();
-		if (null != type && type.equals("primary")) {
+		if (null != type && type.equals(NAME_PRIMARY)) {
 			String fullName = getFullName(name);
 			if (!fullName.isEmpty())
-				node.addProperty("title", fullName);
+				node.addProperty(GraphUtils.PROPERTY_TITLE, fullName);
 		}
 	}
 
@@ -293,12 +310,21 @@ public class Crosswalk {
 		return sb.toString();
 	}
 	
-	private void processRelatedObject(Record node, RelatedObjectType relatedObject) {
+	private void processRelatedObject(Graph graph, GraphNode from, RelatedObjectType relatedObject) {
 		for (RelationType relType : relatedObject.getRelation()) {
 			String key = relatedObject.getKey();
 			String type = relType.getType();
-			if (null != key && !key.isEmpty() && null != type && !type.isEmpty())
-				node.addRelationship(relatedObject.getKey(), relType.getType());
+			if (null != key && !key.isEmpty() && null != type && !type.isEmpty()) { 
+				Object source = from.getSource();
+				GraphRelationship relationship = new GraphRelationship()
+					.withRelationship(type)
+					.withStartSource(source)
+					.withStartKey(from.getKey())
+					.withEndSource(source)
+					.withEndKey(key);
+				
+				graph.addRelationship(relationship);
+			}
 		}
 	}
 }

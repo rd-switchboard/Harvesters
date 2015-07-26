@@ -15,6 +15,7 @@ import org.apache.commons.io.IOUtils;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.GetObjectRequest;
@@ -66,10 +67,7 @@ public class App {
 	        
 	        String accessKey = properties.getProperty("aws.access.key");
 	        String secretKey = properties.getProperty("aws.secret.key");
-
-	        if (StringUtils.isNullOrEmpty(accessKey) || StringUtils.isNullOrEmpty(secretKey))
-                throw new IllegalArgumentException("AWS Access Key and Secret Key can not be empty");
-	        
+   
 	        String bucket = properties.getProperty("s3.bucket");
 	        
 	        if (StringUtils.isNullOrEmpty(bucket))
@@ -87,9 +85,18 @@ public class App {
 	        Client client = Client.create();
 	        Cookie cookie = new Cookie("PHPSESSID", properties.getProperty("session"));
 	        
-	        AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
-	        AmazonS3 s3client = new AmazonS3Client(awsCredentials);
-	     
+	        AmazonS3 s3client;
+	        
+	        if (!StringUtils.isNullOrEmpty(accessKey) && !StringUtils.isNullOrEmpty(secretKey)) {
+	        	System.out.println("Connecting to AWS via Access and Secret Keys. This is not safe practice, consider to use IAM Role instead.");
+		        
+	        	AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+		        s3client = new AmazonS3Client(awsCredentials);
+	        } else {
+	        	System.out.println("Connecting to AWS via Instance Profile Credentials");
+	        	
+	        	s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+	        }	     
 	        
 	        //String file = "rda/rif/class:collection/54800.xml";
 	        

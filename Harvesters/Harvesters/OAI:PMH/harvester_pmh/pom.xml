@@ -9,7 +9,7 @@
   <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_pmh</artifactId>
   <version>1.2.2</version>
-  <name>OAI-PMH Interface implementation </name>
+  <name>OAI-PMH Harvester to Local Storage</name>
   <description>Base library to harvest information from OAI-PMH site</description>
     
   <build>
