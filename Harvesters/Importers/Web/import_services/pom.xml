@@ -1,13 +1,18 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.rdswitchboard</groupId>
+  	<artifactId>harvesters</artifactId>
+  	<version>1.0</version>
+  	<relativePath>../../../pom.xml</relativePath>
+  </parent>
   <groupId>org.rdswitchboard.importers</groupId>
   <artifactId>import_services</artifactId>
   <version>1.0.0</version>
-  <name>Service nodes Importer</name>
+  <name>Import Web Services</name>
      
   <properties>
-    <jdk.version>1.7</jdk.version>
-    <class.path>jars/</class.path>
+    <main.class>org.rdswitchboard.importers.services.App</main.class>
   </properties>
   
   <build>
@@ -31,7 +36,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.rdswitchboard.importers.services.App</mainClass>
+		      <mainClass>${main.class}</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
@@ -58,24 +63,27 @@
  	</plugins>
   </build>
   
-   <repositories>
-    <repository>
-      <id>neo4j-contrib-releases</id>
-      <url>https://raw.github.com/neo4j-contrib/m2/master/releases</url>
-    </repository>
-  </repositories>
-  
   <dependencies>
-    <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j-rest-graphdb</artifactId>
-      <version>2.0.2-SNAPSHOT</version>
+	<dependency>
+	  <groupId>net.sf.opencsv</groupId>
+	  <artifactId>opencsv</artifactId>
+	  <version>${opencsv.version}</version>
     </dependency>
     <dependency>
-      <groupId>opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>2.3</version>
+	  <groupId>commons-io</groupId>
+	  <artifactId>commons-io</artifactId>
+	  <version>${commos.io.version}</version>
     </dependency>
+    <dependency>
+  	  <groupId>org.rdswitchboard.databases</groupId>
+  	  <artifactId>import_graph_neo4j</artifactId>
+  	  <version>1.0.0</version>
+  	</dependency>
+  	<dependency>
+  	  <groupId>org.rdswitchboard.libraries</groupId>
+  	  <artifactId>graph_utils</artifactId>
+  	  <version>3.0.0</version>
+  	</dependency>
   </dependencies>
   
 </project>

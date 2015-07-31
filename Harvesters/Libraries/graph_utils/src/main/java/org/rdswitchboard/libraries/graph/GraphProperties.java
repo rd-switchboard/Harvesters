@@ -78,10 +78,28 @@ public class GraphProperties {
 		int size = set.size();
 		if (0 == size)
 			return null;
-		if (1 == size)
-			return set.iterator().next();
 		
-		return set.toArray(new Object[size]);
+		Object element = set.iterator().next();
+		if (1 == size)
+			return element;
+		if (element instanceof Boolean)
+			return set.toArray(new Boolean[size]);
+		if (element instanceof Byte)
+			return set.toArray(new Byte[size]);
+		if (element instanceof Short)
+			return set.toArray(new Short[size]);
+		if (element instanceof Integer)
+			return set.toArray(new Integer[size]);
+		if (element instanceof Long)
+			return set.toArray(new Long[size]);
+		if (element instanceof Float)
+			return set.toArray(new Float[size]);
+		if (element instanceof Double)
+			return set.toArray(new Double[size]);
+		if (element instanceof String)
+			return set.toArray(new String[size]);
+		
+		throw new ClassCastException("Unable to convert Property Array, they property type: " + element.getClass() + " is not supported");
 	}
 
 	protected static void setProperty(Set<Object> set, Object value) {

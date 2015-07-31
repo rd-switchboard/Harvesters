@@ -10,10 +10,9 @@ import java.util.List;
 import java.util.Properties;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.Importer;
+import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphNode;
-import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
 
@@ -56,15 +55,15 @@ public class App {
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			Importer importer = new Importer(neo4jFolder);
+			ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
 			importer.setVerbose(true);
-			importer.ImportSchemas(schemas);
+			importer.importSchemas(schemas);
 			
 			Graph graph = importPatternsCsv(patterns);
 			if (null == graph)
 				return;
 			
-			importer.ImportNodes(graph.getNodes());
+			importer.importNodes(graph.getNodes());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		

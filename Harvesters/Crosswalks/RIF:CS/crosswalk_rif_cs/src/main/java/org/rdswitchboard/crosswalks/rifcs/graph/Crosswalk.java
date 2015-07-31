@@ -1,6 +1,7 @@
 package org.rdswitchboard.crosswalks.rifcs.graph;
 
 import java.io.InputStream;
+import java.io.PrintStream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -53,9 +54,11 @@ public class Crosswalk {
 	private static final String NAME_PART_TITLE = "title";
 
 	private Unmarshaller unmarshaller;
-	private int existingRecords;
-	private int deletedRecords;
-	private int brokenRecords;
+	private long existingRecords = 0;
+	private long deletedRecords = 0;
+	private long brokenRecords = 0;
+	private long filesCounter = 0;
+	private long markTime = 0;
 	
 	private boolean verbose = false;
 	
@@ -63,18 +66,30 @@ public class Crosswalk {
 		unmarshaller = JAXBContext.newInstance( "org.openarchives.oai._2:au.org.ands.standards.rif_cs.registryobjects:au.org.ands.standards.rif_cs.extendedregistryobjects" ).createUnmarshaller();
 	}
 	
-	public int getExistingRecords() {
+	public long getExistingRecords() {
 		return existingRecords;
 	}
 
-	public int getDeletedRecords() {
+	public long getDeletedRecords() {
 		return deletedRecords;
 	}
 
-	public int getBrokenRecords() {
+	public long getBrokenRecords() {
 		return brokenRecords;
 	}
+	
+	public long getFilesCounter() {
+		return filesCounter;
+	}
 
+	public long getMarkTime() {
+		return markTime;
+	}
+	
+	public long getSpentTime() {
+		return markTime == 0 ? 0 : System.currentTimeMillis() - markTime;
+	}
+	
 	public boolean isVerbose() {
 		return verbose;
 	}
@@ -82,9 +97,18 @@ public class Crosswalk {
 	public void setVerbose(boolean verbose) {
 		this.verbose = verbose;
 	}
+	
+	public void resetCounters() {
+		existingRecords = deletedRecords = brokenRecords = filesCounter = markTime = 0;
+	}
+	
+	public void mark() {
+		markTime = System.currentTimeMillis();
+	}
 
 	public Graph process(String source, InputStream xml) throws Exception {
-		existingRecords = deletedRecords = brokenRecords = 0;
+		if (0 == markTime)
+			markTime = System.currentTimeMillis();
 		
 		JAXBElement<?> element = (JAXBElement<?>) unmarshaller.unmarshal( xml );
 		Graph graph = new Graph();
@@ -148,6 +172,12 @@ public class Crosswalk {
 		return graph;
 	}
 	
+	public void printStatistics(PrintStream out) {
+		long spentTime = getSpentTime();
+		out.println( String.format("Processed %d files.\nSpent %d millisecods.\nFound %d records.\nFound %d deleted records.\nFound %d broken records.\nSpent ~ %f milliseconds per record.", 
+				filesCounter, spentTime, existingRecords, deletedRecords, brokenRecords, (float) spentTime / (float) existingRecords));
+	}
+	
 	private boolean importCollection(Graph graph, GraphNode node, Collection collection) {
 		String type = collection.getType();
 		if (type.equals(COLLECTION_TYPE_DATASET) 
@@ -172,13 +202,13 @@ public class Crosswalk {
 	}
 	
 	private boolean importActivity(Graph graph, GraphNode node, Activity activity) {
-		String type = activity.getType();
+/*		String type = activity.getType();
 		if (type.equals(ACTIVITY_TYPE_PROJECT) 
 				|| type.equals(ACTIVITY_TYPE_PROGRAM) 
-				|| type.equals(ACTIVITY_TYPE_AWARD))
+				|| type.equals(ACTIVITY_TYPE_AWARD))*/
 			node.setType(GraphUtils.TYPE_GRANT);
-		else
-			return false;// ignore
+//		else
+//			return false;// ignore
 				
 		for (Object object : activity.getIdentifierOrNameOrLocation()) {
 			if (object instanceof IdentifierType) 

@@ -23,6 +23,9 @@
   <modules>
   	<module>Libraries/graph_utils</module>
   	<module>Libraries/neo4j_utils</module>
+  	<module>Libraries/google_cache</module>
+  	<module>Libraries/google_cse</module>
+	<module>Libraries/ORCID/orcid_utils</module>
   	<module>Crosswalks/RIF:CS/crosswalk_rif_cs</module>
   	<module>Databases/Neo4j/import_graph_neo4j</module>
   	<module>Harvesters/OAI:PMH/harvester_pmh</module>
@@ -32,7 +35,10 @@
   	<module>Importers/ARC/import_arc</module>
   	<module>Importers/NHMRC/import_nhmrc</module>
 	<module>Importers/Web/import_institutions</module>
-    <module>Importers/Web/import_patterns</module>
+	<module>Importers/Web/import_patterns</module>
+	<module>Importers/Web/import_services</module>
+	<module>Importers/ORCID/import_orcid</module>
+	<module>Linkers/Google/link_web_researchers</module>
   </modules>
 
   <build>

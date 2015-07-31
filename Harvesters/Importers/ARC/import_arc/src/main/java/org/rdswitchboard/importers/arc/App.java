@@ -11,8 +11,9 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.Importer;
+import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphImporter;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
@@ -78,23 +79,23 @@ public class App {
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			Importer importer = new Importer(neo4jFolder);
+			GraphImporter importer = new ImporterNeo4j(neo4jFolder);
 			importer.setVerbose(true);
-			importer.ImportSchemas(schema);
+			importer.importSchemas(schema);
 			
 			Graph graph = importGrantsCsv(completedGrants);
 			if (null == graph)
 				return;
 			
-			importer.ImportNodes(graph.getNodes());
-			importer.ImportRelationships(graph.getRelationships());
+			importer.importNodes(graph.getNodes());
+			importer.importRelationships(graph.getRelationships());
 			
 			graph = importGrantsCsv(newGrants);
 			if (null == graph)
 				return;
 			
-			importer.ImportNodes(graph.getNodes());
-			importer.ImportRelationships(graph.getRelationships());			
+			importer.importNodes(graph.getNodes());
+			importer.importRelationships(graph.getRelationships());			
 			
 		} catch (Exception e) {
 			e.printStackTrace();

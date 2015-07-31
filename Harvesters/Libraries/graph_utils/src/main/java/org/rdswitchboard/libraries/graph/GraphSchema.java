@@ -19,7 +19,9 @@ public class GraphSchema extends GraphProperties {
 	}
 	
 	public GraphSchema(String label, String index, boolean unique) {
-		
+		setLabel(label);
+		setIndex(index);
+		setUnique(unique);
 	}
 	
 	public String getLabel() {

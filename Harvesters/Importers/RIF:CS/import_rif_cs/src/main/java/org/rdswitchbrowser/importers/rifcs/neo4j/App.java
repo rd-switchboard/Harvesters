@@ -2,12 +2,10 @@ package org.rdswitchbrowser.importers.rifcs.neo4j;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.rdswitchboard.crosswalks.rifcs.graph.Crosswalk;
-import org.rdswitchboard.importers.graph.neo4j.Importer;
+import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
@@ -95,16 +93,14 @@ public class App {
         Crosswalk crosswalk = new Crosswalk();
      //   crosswalk.setVerbose(true);
         
-    	Importer importer = new Importer(neo4jFolder);
-    //	importer.setVerbose(true);
-    	List<GraphSchema> schemas = new ArrayList<GraphSchema>();
-        schemas.add( new GraphSchema()
-        		.withLabel(GraphUtils.SOURCE_ANDS)
-        		.withIndex(GraphUtils.PROPERTY_KEY)
-        		.withUnique(true));
+    	ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+    	//importer.setVerbose(true);
     	
-    	importer.ImportSchemas(schemas);
-    
+    	importer.importSchema( new GraphSchema()
+			.withLabel(GraphUtils.SOURCE_ANDS)
+			.withIndex(GraphUtils.PROPERTY_KEY)
+			.withUnique(true) );
+	    
     	ListObjectsRequest listObjectsRequest;
 		ObjectListing objectListing;
 		S3Object object;
@@ -126,32 +122,15 @@ public class App {
 								
 				System.out.println("Parsing file: " + file);
 				Graph graph = crosswalk.process(GraphUtils.SOURCE_ANDS, xml);
-				importer.ImportNodes(graph.getNodes());
+				importer.importGraph(graph);
 			}
 			listObjectsRequest.setMarker(objectListing.getNextMarker());
 		} while (objectListing.isTruncated());
 		
-		listObjectsRequest = new ListObjectsRequest()
-			.withBucketName(bucket)
-			.withPrefix(prefix);
-		do {
-			objectListing = s3client.listObjects(listObjectsRequest);
-			for (S3ObjectSummary objectSummary : 
-				objectListing.getObjectSummaries()) {
-				
-				String file = objectSummary.getKey();
-	
-		        System.out.println("Processing file: " + file);
-				
-				object = s3client.getObject(new GetObjectRequest(bucket, file));
-				InputStream xml = object.getObjectContent();
-								
-				System.out.println("Parsing file: " + file);
-				Graph graph = crosswalk.process(GraphUtils.SOURCE_ANDS, xml);
-				importer.ImportRelationships(graph.getRelationships());
-			}
-			listObjectsRequest.setMarker(objectListing.getNextMarker());
-		} while (objectListing.isTruncated());
+		System.out.println("Done");
+		
+		crosswalk.printStatistics(System.out);
+		importer.printStatistics(System.out);
 	}
 	
 	/*private static void processMultiThread(String accessKey, String secretKey, 

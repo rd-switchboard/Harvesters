@@ -35,6 +35,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
@@ -241,16 +242,21 @@ public class Harvester {
 			throw new IllegalArgumentException("The OAI:PMH Repository Prefix can not be empty");
 			
 		metadataPrefix = properties.getProperty("metadata");
-				
-		//this.folderBase = folderBase;
-		String accessKey = properties.getProperty("aws.accessKey");
-		String secretKey = properties.getProperty("aws.secretKey");
 		
-		if (StringUtils.isNullOrEmpty(accessKey) || StringUtils.isNullOrEmpty(secretKey))
-			throw new IllegalArgumentException("The AWS access and secret keys can not be empty");
+		String credentials = properties.getProperty("aws.credentials");
+		if (null != credentials && credentials.equals("instance")) {
+			s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+		} else {
+			//this.folderBase = folderBase;
+			String accessKey = properties.getProperty("aws.accessKey");
+			String secretKey = properties.getProperty("aws.secretKey");
+			
+			if (StringUtils.isNullOrEmpty(accessKey) || StringUtils.isNullOrEmpty(secretKey))
+				throw new IllegalArgumentException("The AWS access and secret keys can not be empty");
+			
+			s3client = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey)); 
+		}
 		
-		s3client = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey)); 
-	
 		bucketName = properties.getProperty("s3.bucket");
 		if (StringUtils.isNullOrEmpty(bucketName))
 			throw new IllegalArgumentException("The AWS S3 Bucket name can not be empty");

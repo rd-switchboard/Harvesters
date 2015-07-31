@@ -30,6 +30,10 @@ public class GraphUtils {
 	public static final String PROPERTY_STATE = "state";
 	public static final String PROPERTY_HOST = "host";
 	public static final String PROPERTY_PATTERN = "pattern";
+	public static final String PROPERTY_ORIGINAL_SOURCE = "original_source";
+	public static final String PROPERTY_CONTRIBUTORS = "contributors";
+	public static final String PROPERTY_SCOPUS_ID = "scopus_id";
+	public static final String PROPERTY_ORCID_ID = "orcid_id";
 	
 	// control properties
 	public static final String PROPERTY_DELETED = "deleted";
@@ -40,12 +44,19 @@ public class GraphUtils {
 	public static final String SOURCE_ARC = "arc";
 	public static final String SOURCE_NHMRC = "nhmrc";
 	public static final String SOURCE_WEB = "web";
+	public static final String SOURCE_ORCID = "orcid";
 	
 	// meta-data types
 	public static final String TYPE_DATASET = "dataset";
 	public static final String TYPE_GRANT = "grant";
 	public static final String TYPE_RESEARCHER = "researcher";
 	public static final String TYPE_INSTITUTION = "institution";
-	public static final String TYPE_PATTERN = "pattern";
+	public static final String TYPE_SERVICE = "service";
+	public static final String TYPE_PUBLICATION = "publication";
 	
+	// relationships
+	
+	public static final String RELATIONSHIP_RELATED_TO = "relatedTo";
+	public static final String RELATIONSHIP_KNOWN_AS = "knownAs";
+	public static final String RELATIONSHIP_AUTHOR = "author";	
 }
