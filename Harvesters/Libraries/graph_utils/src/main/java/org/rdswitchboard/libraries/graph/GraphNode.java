@@ -42,6 +42,24 @@ public class GraphNode extends GraphProperties {
 		setProperty(GraphUtils.PROPERTY_TYPE, type);
 	}
 	
+	public boolean isDeleted() {
+		Object deleted = getProperty(GraphUtils.PROPERTY_DELETED);
+		return null != deleted && (Boolean) deleted;
+	}
+
+	public boolean isBroken() {
+		Object broken = getProperty(GraphUtils.PROPERTY_BROKEN);
+		return null != broken && (Boolean) broken;
+	}
+	
+	public void setDeleted(boolean deleted) {
+		setProperty(GraphUtils.PROPERTY_DELETED, deleted);
+	}
+
+	public void setBroken(boolean broken) {
+		setProperty(GraphUtils.PROPERTY_BROKEN, broken);
+	}
+	
 	public GraphNode withProperties(Map<String, Object> properties) {
 		setProperties(properties);
 		return this;
@@ -64,6 +82,16 @@ public class GraphNode extends GraphProperties {
 
 	public GraphNode withType(String type) {
 		setType(type);
+		return this;
+	}
+	
+	public GraphNode withDeleted(boolean deleted) {
+		setDeleted(deleted);
+		return this;
+	}
+
+	public GraphNode withBroken(boolean broken) {
+		setBroken(broken);
 		return this;
 	}
 

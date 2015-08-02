@@ -161,6 +161,7 @@ public class ImporterNeo4j implements GraphImporter {
 		String source = (String) graphNode.getSource();
 		String type = (String) graphNode.getType();
 		String key = (String) graphNode.getKey();
+	
 		
 		if (verbose) {
 			System.out.println("Importing Node (source=" + source + ", type=" + type + ", key=" + key + ")");

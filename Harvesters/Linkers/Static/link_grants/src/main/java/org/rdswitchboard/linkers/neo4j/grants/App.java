@@ -1,4 +1,4 @@
-package org.rdswitchboard.linkers.grants;
+package org.rdswitchboard.linkers.neo4j.grants;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -23,6 +23,8 @@ private static final String PROPERTIES_FILE = "properties/link_grants.properties
 	        try (InputStream in = new FileInputStream(propertiesFile)) {
 	            properties.load(in);
 	        }
+	        
+	        System.out.println("Linking Grants");
 	        	        
 	        String neo4jFolder = properties.getProperty("neo4j");
 	        if (StringUtils.isEmpty(neo4jFolder))
@@ -31,6 +33,7 @@ private static final String PROPERTIES_FILE = "properties/link_grants.properties
 	        
 	        GrantsLinker linker = new GrantsLinker(neo4jFolder);
 	        linker.link();
+	        linker.printStatistics(System.out);
 	        
 		} catch (Exception e) {
 			e.printStackTrace();

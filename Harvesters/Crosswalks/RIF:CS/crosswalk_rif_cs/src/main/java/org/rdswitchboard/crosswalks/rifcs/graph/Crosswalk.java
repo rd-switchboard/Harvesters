@@ -2,6 +2,7 @@ package org.rdswitchboard.crosswalks.rifcs.graph;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -21,6 +22,8 @@ import org.rdswitchboard.libraries.graph.GraphUtils;
 
 import au.org.ands.standards.rif_cs.registryobjects.Activity;
 import au.org.ands.standards.rif_cs.registryobjects.Collection;
+import au.org.ands.standards.rif_cs.registryobjects.DatesType;
+import au.org.ands.standards.rif_cs.registryobjects.DatesType.Date;
 import au.org.ands.standards.rif_cs.registryobjects.IdentifierType;
 import au.org.ands.standards.rif_cs.registryobjects.NameType;
 import au.org.ands.standards.rif_cs.registryobjects.Party;
@@ -34,9 +37,9 @@ public class Crosswalk {
 	private static final String COLLECTION_TYPE_NON_GEOGRAOPHIC_DATASET = "nonGeographicDataset";
 	private static final String COLLECTION_TYPE_RESEARCH_DATASET = "researchDataSet";
 	
-	private static final String ACTIVITY_TYPE_PROJECT = "project";
+	/*private static final String ACTIVITY_TYPE_PROJECT = "project";
 	private static final String ACTIVITY_TYPE_PROGRAM = "program";
-	private static final String ACTIVITY_TYPE_AWARD = "award";
+	private static final String ACTIVITY_TYPE_AWARD = "award";*/
 	
 	private static final String PARTY_TYPE_PERSON = "person";
 	private static final String PARTY_TYPE_PUBLISHER = "publisher";
@@ -45,6 +48,8 @@ public class Crosswalk {
 	
 	private static final String IDENTIFICATOR_NLA = "AU-ANL:PEAU";
 	private static final String IDENTIFICATOR_LOCAL = "local";
+	private static final String IDENTIFICATOR_ARC = "arc";
+	private static final String IDENTIFICATOR_NHMRC = "nhmrc";
 	
 	private static final String NAME_PRIMARY = "primary";
 	
@@ -52,6 +57,9 @@ public class Crosswalk {
 	private static final String NAME_PART_GIVEN = "given";
 	private static final String NAME_PART_SUFFIX = "suffix";
 	private static final String NAME_PART_TITLE = "title";
+	
+	private static final String[] GRANT_DATES = new String[] { "startDate" };
+	private static final String[] COLLECTION_DATES = new String[] { null };
 
 	private Unmarshaller unmarshaller;
 	private long existingRecords = 0;
@@ -122,23 +130,25 @@ public class Crosswalk {
 					
 				StatusType status = header.getStatus();
 				boolean deleted = status == StatusType.DELETED;
-			
+							
 				if (null != record.getMetadata()) {
 					Object metadata = record.getMetadata().getAny();
 					if (metadata instanceof RegistryObjects) {
 						RegistryObjects registryObjects = (RegistryObjects) metadata;
 						if (registryObjects.getRegistryObject() != null && registryObjects.getRegistryObject().size() > 0) {
 							for (RegistryObjects.RegistryObject registryObject : registryObjects.getRegistryObject()) {
-								//String group = registryObject.getGroup();
+								String group = registryObject.getGroup();
 								String key = registryObject.getKey();
 								if (verbose) 
 									System.out.println("Key: " + key);
+								
 								GraphNode node = new GraphNode()
 									.withKey(key)
-									.withSource(source);
+									.withSource(source)
+									.withProperty(GraphUtils.PROPERTY_ANDS_GROUP, group);
 								
 								if (deleted) {
-									graph.addNode(node.withProperty(GraphUtils.PROPERTY_DELETED, true));
+									graph.addNode(node.withDeleted(true));
 									
 									++deletedRecords;
 								} else if (registryObject.getCollection() != null)
@@ -150,7 +160,7 @@ public class Crosswalk {
 								else if (registryObject.getParty() != null)
 									importParty(graph, node, registryObject.getParty());	
 								else {
-									graph.addNode(node.withProperty(GraphUtils.PROPERTY_BROKEN, true));
+									graph.addNode(node.withBroken(true));
 									
 									++brokenRecords;
 								}
@@ -194,6 +204,8 @@ public class Crosswalk {
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
 				processRelatedObject(graph, node, (RelatedObjectType) object);
+			else if (object instanceof DatesType) 
+				processDates(node, GraphUtils.PROPERTY_PUBLISHED_DATE, COLLECTION_DATES, (DatesType) object);
 		}
 		
 		graph.addNode(node);
@@ -217,6 +229,8 @@ public class Crosswalk {
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
 				processRelatedObject(graph, node, (RelatedObjectType) object);
+			else if (object instanceof DatesType) 
+				processDates(node, GraphUtils.PROPERTY_AWARDED_DATE, GRANT_DATES, (DatesType) object);
 		}
 		
 		graph.addNode(node);
@@ -258,6 +272,10 @@ public class Crosswalk {
 				type = GraphUtils.PROPERTY_NLA;
 			else if (type.equals(IDENTIFICATOR_LOCAL))
 				type = GraphUtils.PROPERTY_LOCAL_ID;
+			else if (type.equals(IDENTIFICATOR_ARC))
+				type = GraphUtils.PROPERTY_ARC_ID;
+			else if (type.equals(IDENTIFICATOR_NHMRC))
+				type = GraphUtils.PROPERTY_NHMRC_ID;
 			else if (!type.equals(GraphUtils.PROPERTY_DOI) 
 					&& !type.equals(GraphUtils.PROPERTY_ORCID) 
 					&& !type.equals(GraphUtils.PROPERTY_PURL))
@@ -274,70 +292,71 @@ public class Crosswalk {
 	private void processName(GraphNode node, NameType name) {
 		String type = name.getType();
 		if (null != type && type.equals(NAME_PRIMARY)) {
-			String fullName = getFullName(name);
+			String family = null;
+			String given = null;
+			String title = null;
+			String suffix =  null;
+			
+			for (NameType.NamePart part : name.getNamePart()) {
+				final String nameType = part.getType();
+				if (null != nameType && !nameType.isEmpty()) {
+					if (nameType.equals(NAME_PART_FAMILY)) {
+						family = part.getValue();
+						node.addProperty(GraphUtils.PROPERTY_LAST_NAME, family);
+					} else if (nameType.equals(NAME_PART_GIVEN)) {
+						given = part.getValue();
+						node.addProperty(GraphUtils.PROPERTY_FIRST_NAME, given);
+					} else if (nameType.equals(NAME_PART_TITLE)) {
+						title = part.getValue();
+						node.addProperty(GraphUtils.PROPERTY_NAME_PREFIX, title);
+					} else if (nameType.equals(NAME_PART_SUFFIX)) {
+						suffix = part.getValue();
+						node.addProperty(GraphUtils.PROPERTY_NAME_PREFIX, suffix);
+					}
+				}				
+			}
+			
+			StringBuilder sb = new StringBuilder();
+			if (null != title && !title.isEmpty()) 
+				sb.append(title);
+			if (null != suffix && !suffix.isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" ");
+				
+				sb.append(suffix);
+			}
+			if (null != given && !given.isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" ");
+				
+				sb.append(given);
+			}
+			if (null != family && !family.isEmpty()) {
+				if (sb.length() > 0)
+					sb.append(" ");
+				
+				sb.append(family);
+			}
+			for (NameType.NamePart part : name.getNamePart()) {
+				final String nameType = part.getType();
+				if (null != nameType 
+						&& !nameType.isEmpty() 
+						&& (nameType.equals(NAME_PART_FAMILY) 
+								|| nameType.equals(NAME_PART_GIVEN) 
+								|| nameType.equals(NAME_PART_TITLE) 
+								|| nameType.equals(NAME_PART_SUFFIX)))
+					continue;
+				
+				if (sb.length() > 0)
+					sb.append(" ");
+				
+				sb.append(part.getValue());				
+			}
+			
+			String fullName = sb.toString();
 			if (!fullName.isEmpty())
 				node.addProperty(GraphUtils.PROPERTY_TITLE, fullName);
 		}
-	}
-
-	private String getFullName(NameType name) {
-		String family = null;
-		String given = null;
-		String title = null;
-		String suffix =  null;
-		
-		for (NameType.NamePart part : name.getNamePart()) {
-			final String type = part.getType();
-			if (null != type && !type.isEmpty()) {
-				if (type.equals(NAME_PART_FAMILY))
-					family = part.getValue();
-				else if (type.equals(NAME_PART_GIVEN))
-					given = part.getValue();
-				else if (type.equals(NAME_PART_TITLE))
-					title = part.getValue();
-				else if (type.equals(NAME_PART_SUFFIX))
-					suffix = part.getValue();
-			}				
-		}
-		
-		StringBuilder sb = new StringBuilder();
-		if (null != title && !title.isEmpty()) 
-			sb.append(title);
-		if (null != suffix && !suffix.isEmpty()) {
-			if (sb.length() > 0)
-				sb.append(" ");
-			
-			sb.append(suffix);
-		}
-		if (null != given && !given.isEmpty()) {
-			if (sb.length() > 0)
-				sb.append(" ");
-			
-			sb.append(given);
-		}
-		if (null != family && !family.isEmpty()) {
-			if (sb.length() > 0)
-				sb.append(" ");
-			
-			sb.append(family);
-		}
-		for (NameType.NamePart part : name.getNamePart()) {
-			final String type = part.getType();
-			if (null != type 
-					&& !type.isEmpty() 
-					&& (type.equals(NAME_PART_FAMILY) 
-							|| type.equals(NAME_PART_GIVEN) 
-							|| type.equals(NAME_PART_TITLE) 
-							|| type.equals(NAME_PART_SUFFIX)))
-				continue;
-			
-			if (sb.length() > 0)
-				sb.append(" ");
-			
-			sb.append(part.getValue());				
-		}
-		
-		return sb.toString();
 	}
 	
 	private void processRelatedObject(Graph graph, GraphNode from, RelatedObjectType relatedObject) {
@@ -357,4 +376,28 @@ public class Crosswalk {
 			}
 		}
 	}
+	
+	private void processDates(GraphNode node, String propertyName, String[] types, DatesType dates) {
+		List<Date> list = dates.getDate();
+		if (null != list) {
+			String date = null;
+			
+			for (String type : types) 
+				if ((date = extractDate(type, list)) != null)
+					break;
+			
+			if (null != date)
+				node.addProperty(propertyName, date);
+		}
+	}
+	
+	private String extractDate(String type, List<Date> dates) {
+		for (Date date : dates) {
+			if (null == type || type.equals(date.getType()))
+				return date.getValue();
+		}
+		
+		return null;		
+	}
+	
 }

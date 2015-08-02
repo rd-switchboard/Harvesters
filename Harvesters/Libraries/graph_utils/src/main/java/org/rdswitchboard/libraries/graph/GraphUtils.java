@@ -8,10 +8,11 @@ public class GraphUtils {
 	
 	// required properties
 	public static final String PROPERTY_KEY = "key";
-	public static final String PROPERTY_SOURCE = "source";
-	public static final String PROPERTY_TYPE = "type";
+	public static final String PROPERTY_SOURCE = "node_source";
+	public static final String PROPERTY_TYPE = "node_type";
 	public static final String PROPERTY_TITLE = "title";
-
+	public static final String PROPERTY_RDS_URL = "rds_url";
+	
 	// properties required for meta-data harmonization  
 	public static final String PROPERTY_URL = "url"; 
    
@@ -34,6 +35,11 @@ public class GraphUtils {
 	public static final String PROPERTY_CONTRIBUTORS = "contributors";
 	public static final String PROPERTY_SCOPUS_ID = "scopus_id";
 	public static final String PROPERTY_ORCID_ID = "orcid_id";
+	public static final String PROPERTY_ANDS_GROUP = "ands_group";
+	public static final String PROPERTY_AWARDED_DATE = "awarded_date";
+	public static final String PROPERTY_PUBLISHED_DATE = "published_date";
+	public static final String PROPERTY_ARC_ID = "arc_id";
+	public static final String PROPERTY_NHMRC_ID = "nhmrc_id";
 	
 	// control properties
 	public static final String PROPERTY_DELETED = "deleted";
