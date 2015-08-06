@@ -13,6 +13,7 @@ import org.parboiled.common.StringUtils;
 import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphNode;
+import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
 
@@ -49,21 +50,18 @@ public class App {
 	        if (StringUtils.isEmpty(patterns))
 	            throw new IllegalArgumentException("Invalid path to Patterns CSV file");
 	        
-	        List<GraphSchema> schemas = new ArrayList<GraphSchema>();
-	        schemas.add( new GraphSchema()
-	        		.withLabel(GraphUtils.SOURCE_WEB)
-	        		.withIndex(GraphUtils.PROPERTY_KEY)
-	        		.withUnique(true));
-	        
-			ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+	        ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
 			importer.setVerbose(true);
-			importer.importSchemas(schemas);
+			importer.importSchema( new GraphSchema()
+    			.withLabel(GraphUtils.SOURCE_WEB)
+    			.withIndex(GraphUtils.PROPERTY_KEY)
+    			.withUnique(true) );
 			
 			Graph graph = importPatternsCsv(patterns);
 			if (null == graph)
 				return;
 			
-			importer.importNodes(graph.getNodes());
+			importer.importGraph(graph);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
@@ -114,12 +112,21 @@ public class App {
 					else if (host.startsWith("web."))
 						host = host.substring(4);
 					
+					String key = "pattern:"+host+":"+pat;
+					
 					graph.addNode(new GraphNode()
-						.withKey(host)
+						.withKey(key)
 						.withSource(GraphUtils.SOURCE_WEB)
-						.withType(GraphUtils.TYPE_INSTITUTION)
+						.withType(GraphUtils.TYPE_PATTERN)
 						.withProperty(GraphUtils.PROPERTY_PATTERN, pat)
 						.withProperty(GraphUtils.PROPERTY_HOST, host));
+					
+					graph.addRelationship(new GraphRelationship()
+						.withRelationship(GraphUtils.RELATIONSHIP_PATTERN)
+						.withStartKey(host)
+						.withStartSource(GraphUtils.SOURCE_WEB)
+						.withEndKey(key)
+						.withEndSource(GraphUtils.SOURCE_WEB));
 				}
 			}
 				

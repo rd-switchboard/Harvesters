@@ -17,6 +17,10 @@ public class GraphNode extends GraphProperties {
 	public GraphNode(Map<String, Object> properties) {
 		super(properties);
 	}
+
+	public boolean hasKey() {
+		return hasProperty(GraphUtils.PROPERTY_KEY);
+	}
 	
 	public Object getKey() {
 		return getProperty(GraphUtils.PROPERTY_KEY);
@@ -24,6 +28,14 @@ public class GraphNode extends GraphProperties {
 	
 	public void setKey(Object key) {
 		setProperty(GraphUtils.PROPERTY_KEY, key);
+	}
+	
+	public void setKeyOnce(Object key) {
+		setPropertyOnce(GraphUtils.PROPERTY_KEY, key);
+	}
+
+	public boolean hasSource() {
+		return hasProperty(GraphUtils.PROPERTY_SOURCE);
 	}
 	
 	public Object getSource() {
@@ -34,6 +46,14 @@ public class GraphNode extends GraphProperties {
 		setProperty(GraphUtils.PROPERTY_SOURCE, source);
 	}
 
+	public void addSource(Object source) {
+		addProperty(GraphUtils.PROPERTY_SOURCE, source);
+	}
+
+	public boolean hasType() {
+		return hasProperty(GraphUtils.PROPERTY_TYPE);
+	}
+	
 	public Object getType() {
 		return getProperty(GraphUtils.PROPERTY_TYPE);
 	}
@@ -41,7 +61,11 @@ public class GraphNode extends GraphProperties {
 	public void setType(Object type) {
 		setProperty(GraphUtils.PROPERTY_TYPE, type);
 	}
-	
+
+	public void addType(Object type) {
+		addProperty(GraphUtils.PROPERTY_TYPE, type);
+	}
+
 	public boolean isDeleted() {
 		Object deleted = getProperty(GraphUtils.PROPERTY_DELETED);
 		return null != deleted && (Boolean) deleted;

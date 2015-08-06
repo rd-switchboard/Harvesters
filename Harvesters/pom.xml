@@ -13,6 +13,7 @@
     <jdk.version>1.7</jdk.version>
     <junit.version>4.11</junit.version>
     <commos.io.version>2.4</commos.io.version>
+    <commons.lang.version>2.6</commons.lang.version>
     <aws-java-sdk.version>1.9.39</aws-java-sdk.version>
     <jackson.version>2.5.0</jackson.version>
     <jersey.version>1.9</jersey.version>
@@ -42,7 +43,13 @@
 	<module>Linkers/Google/link_web_researchers</module>
 	<module>Linkers/Static/link_grants</module>
 	<module>Utils/RDS/export_rds_urls</module>
+	<module>Utils/RDS/clean_rds_records</module>
+	<module>Utils/RDS/sync_solr</module>
 	<module>Utils/Neo4j/import_rds_urls</module>
+	<module>Utils/Neo4j/copy_nodes</module>
+	<module>Utils/Neo4j/copy_harmonized</module>
+	<module>Exporters/Graph/export_graph_json</module>
+	<module>Exporters/Graph/export_ands_json</module>
   </modules>
 
   <build>

@@ -1,20 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.rdswitchboard</groupId>
+  	<artifactId>harvesters</artifactId>
+  	<version>1.0</version>
+  	<relativePath>../../../pom.xml</relativePath>
+  </parent>
   <groupId>org.rdswitchboard.utils</groupId>
   <artifactId>clean_rds_records</artifactId>
   <version>1.0.0</version>
+  <name>Clean RDS Records</name>
+  <description>Will Remove non-existing Records from RDS Database</description>
   
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <class.path>jars/</class.path>
-    <jdk.version>1.7</jdk.version>
-    <junit.version>4.11</junit.version>
-    <mysql.version>5.1.35</mysql.version>
-    <jersey.version>1.9</jersey.version>
-    <opencsv.vesrion>2.3</opencsv.vesrion>
+    <main.class>org.rdswitchboard.utils.rds.records.clean.App</main.class>
   </properties>
   
-   <build>
+  <build>
 	<plugins>
 	  <plugin>
 		<groupId>org.apache.maven.plugins</groupId>
@@ -34,7 +36,7 @@
 	      <archive>
 		    <manifest>
 		      <addClasspath>true</addClasspath>
-		      <mainClass>org.rd.switchboard.nexus.utils.clean.App</mainClass>
+		      <mainClass>${main.class}</mainClass>
 		      <classpathPrefix>${class.path}</classpathPrefix>
 		    </manifest>
 	      </archive>
@@ -74,9 +76,9 @@
 	  <version>${mysql.version}</version>
     </dependency>
     <dependency>
-      <groupId>opencsv</groupId>
-      <artifactId>opencsv</artifactId>
-      <version>${opencsv.vesrion}</version>
+      <groupId>net.sf.opencsv</groupId>
+	  <artifactId>opencsv</artifactId>
+	  <version>${opencsv.version}</version>
     </dependency>
 	<dependency>
       <groupId>com.sun.jersey</groupId>

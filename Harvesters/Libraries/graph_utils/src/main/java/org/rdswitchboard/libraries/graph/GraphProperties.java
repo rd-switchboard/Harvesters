@@ -18,7 +18,12 @@ public class GraphProperties {
 		// Add Properties will work faster
 		addProperties(properties);
 	}
-		
+
+	public boolean hasProperty(String key) {
+		return properties.containsKey(key);
+	}
+
+	
 	public Object getProperty(String key) {
 		return getProperty(properties.get(key));
 	}
@@ -26,15 +31,24 @@ public class GraphProperties {
 	public void setProperty(String key, Object value) {
 		if (null != value) {
 			Set<Object> set = properties.get(key);
-			if (null == set) {
-				set = new HashSet<Object>();
-				properties.put(key,  set);
-			} else
+			if (null == set) 
+				properties.put(key, set = new HashSet<Object>());
+			else
 				set.clear();
 			
 			setProperty(set, value);
 		} else
 			properties.remove(key);			
+	}
+	
+	public void setPropertyOnce(String key, Object value) {
+		if (null != value) {
+			Set<Object> set = properties.get(key);
+			if (null == set) {
+				properties.put(key,  set = new HashSet<Object>());
+				setProperty(set, value);
+			} 
+		} 			
 	}
 	
 	public void addProperty(String key, Object value) {
@@ -105,20 +119,28 @@ public class GraphProperties {
 	protected static void setProperty(Set<Object> set, Object value) {
 		if (value instanceof String[]) 
 			set.addAll(Arrays.asList((String[]) value));
-		else if (value instanceof Integer[])
-			set.addAll(Arrays.asList((Integer[]) value));
-		else if (value instanceof Float[])
-			set.addAll(Arrays.asList((Float[]) value));
 		else if (value instanceof Boolean[])
 			set.addAll(Arrays.asList((Boolean[]) value));
-		else if (value instanceof Object[])
-			set.addAll(Arrays.asList((Object[]) value));
+		else if (value instanceof Byte[])
+			set.addAll(Arrays.asList((Byte[]) value));
+		else if (value instanceof Short[])
+			set.addAll(Arrays.asList((Short[]) value));
+		else if (value instanceof Integer[])
+			set.addAll(Arrays.asList((Integer[]) value));
+		else if (value instanceof Long[])
+			set.addAll(Arrays.asList((Long[]) value));
+		else if (value instanceof Float[])
+			set.addAll(Arrays.asList((Float[]) value));
+		else if (value instanceof Double[])
+			set.addAll(Arrays.asList((Double[]) value));
+		/*else if (value instanceof Object[])
+			set.addAll(Arrays.asList((Object[]) value));*/
 		else if (value instanceof Collection<?>)
 			set.addAll((Collection<?>) value);
 		else if (value instanceof Map<?,?>)
 			throw new IllegalArgumentException("Maps as Parameters are not supported");
 		else if (value.getClass().isArray())
-			throw new IllegalArgumentException("Array myst be String, Integer, Float, Boolean or Object type");
+			throw new IllegalArgumentException("Array myst be of Primitive type");
 		else
 			set.add(value);
 	}

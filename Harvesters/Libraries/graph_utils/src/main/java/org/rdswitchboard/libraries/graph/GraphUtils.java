@@ -51,7 +51,9 @@ public class GraphUtils {
 	public static final String SOURCE_NHMRC = "nhmrc";
 	public static final String SOURCE_WEB = "web";
 	public static final String SOURCE_ORCID = "orcid";
-	
+	public static final String SOURCE_DRYAD = "dryad";
+	public static final String SOURCE_CROSSREF = "crossref";
+	public static final String SOURCE_FIGSHARE = "figshare";
 	// meta-data types
 	public static final String TYPE_DATASET = "dataset";
 	public static final String TYPE_GRANT = "grant";
@@ -59,10 +61,12 @@ public class GraphUtils {
 	public static final String TYPE_INSTITUTION = "institution";
 	public static final String TYPE_SERVICE = "service";
 	public static final String TYPE_PUBLICATION = "publication";
+	public static final String TYPE_PATTERN = "pattern";
 	
 	// relationships
 	
 	public static final String RELATIONSHIP_RELATED_TO = "relatedTo";
 	public static final String RELATIONSHIP_KNOWN_AS = "knownAs";
-	public static final String RELATIONSHIP_AUTHOR = "author";	
+	public static final String RELATIONSHIP_AUTHOR = "author";
+	public static final String RELATIONSHIP_PATTERN = "pattern";
 }

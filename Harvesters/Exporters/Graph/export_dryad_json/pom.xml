@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.rdswitchboard.nexus</groupId>
+  <artifactId>export_dryad_json</artifactId>
+  <version>1.0.0</version>
+  <name>Export Dryad JSON</name>
+  <description>Dryad Datasets JSON Graph exporter</description>
+  
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdk.version>1.7</jdk.version>
+    <junit.version>4.11</junit.version>
+    <class.path>jars/</class.path>
+  </properties>
+  
+   <build>
+	<plugins>
+	  <plugin>
+		<groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-compiler-plugin</artifactId>
+		<version>3.1</version>
+		<configuration>
+			<source>${jdk.version}</source>
+			<target>${jdk.version}</target>
+		</configuration>
+	  </plugin>
+	  
+	  <plugin>
+  	    <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+	      <archive>
+		    <manifest>
+		      <addClasspath>true</addClasspath>
+		      <mainClass>org.rdswitchboard.nexus.exporters.dryad.json.App</mainClass>
+		      <classpathPrefix>${class.path}</classpathPrefix>
+		    </manifest>
+	      </archive>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+	    <groupId>org.apache.maven.plugins</groupId>
+		<artifactId>maven-dependency-plugin</artifactId>
+		<version>2.9</version>
+        <executions>
+		  <execution>
+	        <id>copy-dependencies</id>
+			<phase>package</phase>
+			<goals>
+			  <goal>copy-dependencies</goal>
+			</goals>
+			<configuration>
+			  <outputDirectory>${project.build.directory}/${class.path}</outputDirectory>
+			</configuration>
+		  </execution>
+		</executions>
+      </plugin>
+ 	</plugins>
+  </build>
+  
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.rdswitchboard.nexus</groupId>
+      <artifactId>export_graph_json</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+  
+</project>

@@ -1,4 +1,4 @@
-package org.rdswitchboard.nexus.utils.clean;
+package org.rdswitchboard.utils.rds.records.clean;
 
 import java.io.FileInputStream;
 import java.io.FileReader;

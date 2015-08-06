@@ -97,6 +97,10 @@ public class Linker {
 		
 		loadNodes( nodes, GraphUtils.SOURCE_ANDS, GraphUtils.TYPE_GRANT, 
 				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );
+		/*loadNodes( nodes, GraphUtils.SOURCE_ARC, GraphUtils.TYPE_GRANT, 
+				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );
+		loadNodes( nodes, GraphUtils.SOURCE_NHMRC, GraphUtils.TYPE_GRANT, 
+				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );*/
 		
 		if (verbose)
 			System.out.println("Done. Loaded " + nodes.size() + " Nodes\nProcessing Nodes");
@@ -135,7 +139,7 @@ public class Linker {
         this.webPatterns = new ArrayList<Pattern>();
 
         String cypher = "MATCH (n:" + GraphUtils.SOURCE_WEB 
-	    		  + ":" + GraphUtils.TYPE_INSTITUTION 
+	    		  + ":" + GraphUtils.TYPE_PATTERN 
 		          + ") WHERE HAS(n." + GraphUtils.PROPERTY_PATTERN 
 		          + ") RETURN n." + GraphUtils.PROPERTY_PATTERN 
 		          + " AS " + FIELD_PATTERN;

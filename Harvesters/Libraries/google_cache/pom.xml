@@ -10,6 +10,7 @@
   <artifactId>google_cache</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
+  <name>Google Cache Library</name>
   
   <build>
 	<plugins>
