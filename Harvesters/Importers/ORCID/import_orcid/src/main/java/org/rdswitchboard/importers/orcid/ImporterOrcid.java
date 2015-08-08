@@ -3,10 +3,7 @@ package org.rdswitchboard.importers.orcid;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
 import org.parboiled.common.StringUtils;
@@ -30,6 +27,8 @@ import org.rdswitchboard.utils.orcid.OrcidWorks;
 import org.rdswitchboard.utils.orcid.PersonalDetails;
 import org.rdswitchboard.utils.orcid.RequestType;
 import org.rdswitchboard.utils.orcid.WorkContributors;
+import org.rdswitchboard.utils.orcid.WorkIdentifier;
+import org.rdswitchboard.utils.orcid.WorkIdentifiers;
 
 /**
  * History
@@ -89,6 +88,10 @@ public class ImporterOrcid {
 	private static final String PROPERTY_CONTRIBUTORS = "contributors";
 */		
 	private static final String NAME_SCOPUS_AUTHOR_ID = "Scopus Author ID";
+	
+	private static final String IDENTIFICATOR_DOI = "DOI";
+	private static final String IDENTIFICATOR_ISBN = "ISBN";
+	private static final String IDENTIFICATOR_ISSN = "ISSN";
 		
 /*	private RestAPI graphDb;
 	private RestCypherQueryEngine engine;
@@ -227,19 +230,19 @@ public class ImporterOrcid {
 			throw new Exception("Unable to parse JSON file");
 	}
 	
-	private Graph processResearcher(OrcidProfile profile) {
+	private Graph processResearcher(OrcidProfile profile) throws Exception {
 		Graph graph = new Graph();
 		
 		OrcidIdentifier identifier = profile.getIdentifier();
 		if (null != identifier && StringUtils.isNotEmpty(identifier.getUri())) { // must have an identifier
-			String key = identifier.getUri();
+			String key = GraphUtils.extractFormalizedUrl(identifier.getUri());
 			
 			GraphNode node = new GraphNode()
 				.withKey(key)
 				.withSource(GraphUtils.SOURCE_ORCID)
 				.withType(GraphUtils.TYPE_RESEARCHER)
 				.withProperty(GraphUtils.PROPERTY_URL, key)
-				.withProperty(GraphUtils.PROPERTY_LOCAL_ID, identifier.getPath());
+				.withProperty(GraphUtils.PROPERTY_ORCID_ID, identifier.getPath());
 			
 //			addProperty(map, PROPERTY_ORCID_TYPE, profile.getType());
 			
@@ -276,8 +279,14 @@ public class ImporterOrcid {
 					if (null != identifiers) 
 						for (ExternalIdentifier externalIdentifier : identifiers) {
 							String commonName = externalIdentifier.getCommonName();
-							if (null != commonName && commonName.equals(NAME_SCOPUS_AUTHOR_ID)) 	
-								node.addProperty(GraphUtils.PROPERTY_SCOPUS_ID, externalIdentifier.getUrl());
+							if (null != commonName && commonName.equals(NAME_SCOPUS_AUTHOR_ID)) { 	
+								String scopusId = GraphUtils.extractScopusAuthorId(externalIdentifier.getUrl());
+								if (StringUtils.isNotEmpty(scopusId))
+									node.addProperty(GraphUtils.PROPERTY_SCOPUS_ID, externalIdentifier.getUrl());
+								else
+									throw new Exception("Unable to extract scopus author id from URL: " + externalIdentifier.getUrl());
+							}
+							
 						}														
 				}
 	
@@ -373,7 +382,7 @@ public class ImporterOrcid {
 		}
 	}*/
 	
-	private void processOrcidWork(Graph graph, String researcherKey, OrcidWork work) {
+	private void processOrcidWork(Graph graph, String researcherKey, OrcidWork work) throws Exception {
 		String putCode = work.getPutCode();
 		if (null != putCode &&  !putCode.isEmpty()) {
 			String key = researcherKey + "/" + putCode;
@@ -383,7 +392,8 @@ public class ImporterOrcid {
 				.withSource(GraphUtils.SOURCE_ORCID)
 				.withType(GraphUtils.TYPE_PUBLICATION)
 				.withProperty(GraphUtils.PROPERTY_LOCAL_ID, putCode)
-				.withProperty(GraphUtils.PROPERTY_TITLE, work.getJournalTitle()); 
+				.withProperty(GraphUtils.PROPERTY_TITLE, work.getJournalTitle())
+				.withProperty(GraphUtils.PROPERTY_PUBLISHED_DATE, work.getPublicationDateString());
 				
 			graph.addNode(node);
 				
@@ -393,6 +403,27 @@ public class ImporterOrcid {
 				.withStartKey(researcherKey)
 				.withEndSource(GraphUtils.SOURCE_ORCID)
 				.withEndKey(key));
+			
+			WorkIdentifiers workIdentifiers = work.getWorlIdentifiers();
+			if (null != workIdentifiers && null != workIdentifiers.getIdentifiers()) 
+				for (WorkIdentifier workId : workIdentifiers.getIdentifiers()) {
+					String type = workId.getType();
+					if (null != type) { 
+						if (type.equals(IDENTIFICATOR_DOI)) {
+							String doi = GraphUtils.extractDoi(workId.getId());
+							if (null != doi) {
+								node.addProperty(GraphUtils.PROPERTY_DOI, doi);
+								node.addProperty(GraphUtils.PROPERTY_URL, GraphUtils.generateDoiUri(doi));
+							} else
+								System.err.println("Unable to extract doi from: " + workId.getId());
+						} else if (type.equals(IDENTIFICATOR_ISBN)) {
+							node.addProperty(GraphUtils.PROPERTY_ISBN, workId.getId());
+						} else if (type.equals(IDENTIFICATOR_ISSN)) {
+							node.addProperty(GraphUtils.PROPERTY_ISSN, workId.getId());
+						}
+					}
+				}
+
 			
 //			addProperty(map, PROPERTY_PUBLICATION_DATE, work.getPublicationDateString());
 //			addProperty(map, PROPERTY_DESCRIPTION, work.getShortDescription());
@@ -407,17 +438,7 @@ public class ImporterOrcid {
 				addProperty(map, property, citation.getCitation());
 			}*/
 			
-			/*WorkIdentifiers workIdentifiers = work.getWorlIdentifiers();
-			if (null != workIdentifiers && null != workIdentifiers.getIdentifiers()) 
-				for (WorkIdentifier workId : workIdentifiers.getIdentifiers()) {
-					String property = PROPERTY_IDENTIFIER;
-					String type = workId.getType();
-					if (null != type && !type.isEmpty()) 
-						property += "_" + type;
-					
-					addProperty(map, property, workId.getId());													
-				}
-			
+			/*			
 			/*WorkTitle title = work.getTitle();
 			if (null != title) {
 				addProperty(map, PROPERTY_TITLE, title.getTitle());	
@@ -527,7 +548,7 @@ public class ImporterOrcid {
 		}*/
 	//}
 
-	
+	/*
 	@SuppressWarnings("unchecked")
 	private void addProperty(Map<String, Object> map, final String key, final String value) {
 		if (null != key && null != value && !key.isEmpty()) {
@@ -547,7 +568,7 @@ public class ImporterOrcid {
 					((Set<String>)par).add(value);
 			}
 		}
-	}
+	}*/
 	
 	/*
 	private void createUniqueRelationship(RestNode nodeStart, RestNode nodeEnd, 

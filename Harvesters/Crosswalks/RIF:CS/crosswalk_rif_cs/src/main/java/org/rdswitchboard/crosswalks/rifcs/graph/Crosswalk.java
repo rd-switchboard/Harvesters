@@ -9,6 +9,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.lang.StringUtils;
 import org.openarchives.oai._2.HeaderType;
 import org.openarchives.oai._2.ListRecordsType;
 import org.openarchives.oai._2.OAIPMHtype;
@@ -50,6 +51,9 @@ public class Crosswalk {
 	private static final String IDENTIFICATOR_LOCAL = "local";
 	private static final String IDENTIFICATOR_ARC = "arc";
 	private static final String IDENTIFICATOR_NHMRC = "nhmrc";
+	private static final String IDENTIFICATOR_ORCID = "orcid";
+	private static final String IDENTIFICATOR_DOI = "doi";
+	private static final String IDENTIFICATOR_PURL = "purl";
 	
 	private static final String NAME_PRIMARY = "primary";
 	
@@ -267,26 +271,34 @@ public class Crosswalk {
 	
 	private void processIdentifier(GraphNode node, IdentifierType identifier) {
 		String type = identifier.getType();
+		String key = identifier.getValue();
 		if (null != type) {
-			if (type.equals(IDENTIFICATOR_NLA))
+			if (type.equals(IDENTIFICATOR_NLA)) {
 				type = GraphUtils.PROPERTY_NLA;
-			else if (type.equals(IDENTIFICATOR_LOCAL))
+				key = GraphUtils.extractFormalizedUrlSafe(key);
+			} else if (type.equals(IDENTIFICATOR_LOCAL))
 				type = GraphUtils.PROPERTY_LOCAL_ID;
 			else if (type.equals(IDENTIFICATOR_ARC))
 				type = GraphUtils.PROPERTY_ARC_ID;
 			else if (type.equals(IDENTIFICATOR_NHMRC))
 				type = GraphUtils.PROPERTY_NHMRC_ID;
-			else if (!type.equals(GraphUtils.PROPERTY_DOI) 
-					&& !type.equals(GraphUtils.PROPERTY_ORCID) 
-					&& !type.equals(GraphUtils.PROPERTY_PURL))
+			else if (type.equals(IDENTIFICATOR_ORCID)) {
+				type = GraphUtils.PROPERTY_ORCID_ID;
+				key = GraphUtils.extractOrcidId(key);
+			}
+			else if (type.equals(IDENTIFICATOR_DOI)) {
+				type = GraphUtils.PROPERTY_DOI;
+				key = GraphUtils.extractDoi(key);
+			}
+			else if (type.equals(IDENTIFICATOR_PURL)) {
+				type = GraphUtils.PROPERTY_PURL;
+				key = GraphUtils.extractFormalizedUrlSafe(key);
+			} else 
 				type = null;			
 		}
 		
-		if (null != type) {
-			String key = identifier.getValue();
-			if (null != key && !key.isEmpty())
-				node.addProperty(type, key);
-		}
+		if (null != type && StringUtils.isNotEmpty(key)) 
+			node.addProperty(type, key);
 	}
 	
 	private void processName(GraphNode node, NameType name) {
