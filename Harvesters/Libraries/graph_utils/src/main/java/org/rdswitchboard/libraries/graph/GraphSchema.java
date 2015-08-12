@@ -1,5 +1,7 @@
 package org.rdswitchboard.libraries.graph;
 
+import java.util.Objects;
+
 
 /**
  * A class to store schema of the Graph
@@ -13,7 +15,11 @@ package org.rdswitchboard.libraries.graph;
  * @version 1.0.0
  */
 
-public class GraphSchema extends GraphProperties {
+public class GraphSchema {
+	private String label;
+	private String index;
+	private boolean unique;
+	
 	public GraphSchema() {
 		
 	}
@@ -25,11 +31,11 @@ public class GraphSchema extends GraphProperties {
 	}
 	
 	public String getLabel() {
-		return (String) getProperty(GraphUtils.SCHEMA_LABEL);
+		return label;
 	}
 	
 	public void setLabel(String label) {
-		setProperty(GraphUtils.SCHEMA_LABEL, label);
+		this.label = label;
 	}
 		 
 	public GraphSchema withLabel(String label) {
@@ -38,11 +44,11 @@ public class GraphSchema extends GraphProperties {
 	}
 	
 	public String getIndex() {
-		return (String) getProperty(GraphUtils.SCHEMA_INDEX);
+		return index;
 	}
 	
 	public void setIndex(String index) {
-		setProperty(GraphUtils.SCHEMA_INDEX, index);
+		this.index = index;
 	}
 
 	public GraphSchema withIndex(String index) {
@@ -51,12 +57,11 @@ public class GraphSchema extends GraphProperties {
 	}
 	 
 	public boolean isUnique() {
-		Boolean unique = (Boolean) getProperty(GraphUtils.SCHEMA_UNIQUE);
-	    return null == unique ? false : unique; 
+		return unique;
 	}
 	
 	public void setUnique(boolean unique) {
-		setProperty(GraphUtils.SCHEMA_UNIQUE, unique);
+		this.unique = unique;
 	}
 
 	public GraphSchema withUnique(boolean unique) {
@@ -64,11 +69,11 @@ public class GraphSchema extends GraphProperties {
 		return this;
 	}
 	
-	/*@Override
+	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-		if (obj == null)
+		if (null == obj)
 			return false;
 		if (obj instanceof GraphSchema) 
 			return this.unique == ((GraphSchema) obj).unique
@@ -81,10 +86,11 @@ public class GraphSchema extends GraphProperties {
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.unique, this.label, this.index);
-	}*/
+	}
 
 	@Override
 	public String toString() {
-		return "GraphSchema [properties=" + properties + "]";
+		return "GraphSchema [label=" + label + ", index=" + index + ", unique="
+				+ unique + "]";
 	}
 }

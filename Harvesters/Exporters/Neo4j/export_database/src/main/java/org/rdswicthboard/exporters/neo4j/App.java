@@ -4,12 +4,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.apache.commons.lang.StringUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class App {
-	private static final String PROPERTIES_FILE = "properties/sync_solr.properties";
+/*	private static final String PROPERTIES_FILE = "properties/sync_solr.properties";
 	private static final String NEO4J1_FOLDER = "neo4j1"; 
 	private static final String NEO4J2_FOLDER = "neo4j2";
 	
@@ -41,6 +38,6 @@ public class App {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}	
-	}
+	}*/
 
 }

@@ -130,7 +130,7 @@ public class App {
 				if (!grants.contains(projectId)) {
 					grants.add(projectId);
 					
-					String purl = "http://purl.org/au-research/grants/arc/" + projectId;
+					String purl = GraphUtils.generateArcGrantPurl(projectId);
 					String institutionName = grant[4];
 					String institutionKey = "arc:institution:"+ institutionName;
 					String title = grant[7];										

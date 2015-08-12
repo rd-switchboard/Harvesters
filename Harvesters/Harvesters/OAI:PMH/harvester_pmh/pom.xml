@@ -3,28 +3,17 @@
   <parent>
     <groupId>org.rdswitchboard</groupId>
     <artifactId>harvesters</artifactId>
-    <version>1.0</version>
+    <version>1.1.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_pmh</artifactId>
-  <version>1.2.2</version>
   <name>OAI-PMH Harvester to Local Storage</name>
   <description>Base library to harvest information from OAI-PMH site</description>
     
   <build>
 	<plugins>
-
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>3.1</version>
-		<configuration>
-			<source>${jdk.version}</source>
-			<target>${jdk.version}</target>
-		</configuration>
-	  </plugin>
-	  
+  
 	  <plugin>
   	    <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>

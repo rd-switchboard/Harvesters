@@ -3,12 +3,11 @@
   <parent>
     <groupId>org.rdswitchboard</groupId>
     <artifactId>harvesters</artifactId>
-    <version>1.0</version>
+    <version>1.1.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchboard.linkers</groupId>
   <artifactId>link_web_researchers</artifactId>
-  <version>1.0.0</version>
   <name>Link Web:Researcher by Google Search</name>
   <description>Link Web:Researcher to the Grant and Publication nodes by Google CSE Result</description>
   
@@ -74,22 +73,22 @@
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
       <artifactId>graph_utils</artifactId>
-      <version>3.0.0</version>
+      <version>1.1.0</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
       <artifactId>neo4j_utils</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
 	  <artifactId>google_cse</artifactId>
-	  <version>1.0.0</version>
+	  <version>1.1.0</version>
   	</dependency>
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
       <artifactId>google_cache</artifactId>
-      <version>1.0.0</version>
+      <version>1.1.0</version>
   	</dependency>
   </dependencies>
 </project>

@@ -3,25 +3,15 @@
   <parent>
     <groupId>org.rdswitchboard</groupId>
     <artifactId>harvesters</artifactId>
-    <version>1.0</version>
+    <version>1.1.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_pmh_s3</artifactId>
-  <version>1.0.0</version>
   <name>OAI-PMH Harvester to AWS S3 bucket</name>
   
   <build>
 	<plugins>
-	  <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-compiler-plugin</artifactId>
-		<version>3.1</version>
-		<configuration>
-			<source>${jdk.version}</source>
-			<target>${jdk.version}</target>
-		</configuration>
-	  </plugin>
 	  
 	  <plugin>
   	    <groupId>org.apache.maven.plugins</groupId>
@@ -62,7 +52,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>${commos.io.version}</version>
+      <version>${commons.io.version}</version>
     </dependency>
       <dependency>
       <groupId>com.amazonaws</groupId>

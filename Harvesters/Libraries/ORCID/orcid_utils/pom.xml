@@ -3,12 +3,11 @@
   <parent>
     <groupId>org.rdswitchboard</groupId>
     <artifactId>harvesters</artifactId>
-    <version>1.0</version>
+    <version>1.1.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchboard.libraries</groupId>
   <artifactId>orcid_utils</artifactId>
-  <version>1.0.0</version>
   <name>ORCID library</name>
     
   <build>

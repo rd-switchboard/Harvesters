@@ -112,40 +112,29 @@ public class App {
 				String country = institution[0];
 				String state = institution[1];
 				String title = institution[2];
-				String url = institution[3];
 				
-				System.out.println("Institution: " + url);
+				URL url = GraphUtils.toURL(institution[3]);
+				String formalizedUrl = GraphUtils.extractFormalizedUrl(url);
+				String host = GraphUtils.extractHost(url);
 				
-				URL hostUrl = null;
-				
-				try {
-					hostUrl = new URL(url);
-				} catch(MalformedURLException ex) {
-					hostUrl = new URL("http://" + url);
-				}
-				
-				String host = hostUrl.getHost();
-				if (host.startsWith("www."))
-					host = host.substring(4);
-				else if (host.startsWith("www3."))
-					host = host.substring(5);
-				else if (host.startsWith("web."))
-					host = host.substring(4);
+				if (null != host) {
+					System.out.println("Institution: " + formalizedUrl + ", host: " + host);
+		
+					GraphNode node = new GraphNode()
+						.withKey(host)
+						.withSource(GraphUtils.SOURCE_WEB)
+						.withType(GraphUtils.TYPE_INSTITUTION)
+						.withProperty(GraphUtils.PROPERTY_TITLE, title)
+						.withProperty(GraphUtils.PROPERTY_URL, formalizedUrl)
+						.withProperty(GraphUtils.PROPERTY_HOST, host);
+							
+					if (StringUtils.isNotEmpty(country))
+						node.setProperty(GraphUtils.PROPERTY_COUNTRY, country);
+					if (StringUtils.isNotEmpty(state))
+						node.setProperty(GraphUtils.PROPERTY_STATE, state);
 					
-				GraphNode node = new GraphNode()
-					.withKey(host)
-					.withSource(GraphUtils.SOURCE_WEB)
-					.withType(GraphUtils.TYPE_INSTITUTION)
-					.withProperty(GraphUtils.PROPERTY_TITLE, title)
-					.withProperty(GraphUtils.PROPERTY_URL, url)
-					.withProperty(GraphUtils.PROPERTY_HOST, host);
-						
-				if (StringUtils.isNotEmpty(country))
-					node.setProperty(GraphUtils.PROPERTY_COUNTRY, country);
-				if (StringUtils.isNotEmpty(state))
-					node.setProperty(GraphUtils.PROPERTY_STATE, state);
-				
-				graph.addNode(node);
+					graph.addNode(node);
+				}
 			}
 				
 			reader.close();			

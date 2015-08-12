@@ -269,6 +269,8 @@ public class Linker {
 	}
 	
 	private Node getOrCreateWebResearcher(String url, String searchString) throws Exception {
+		url = GraphUtils.extractFormalizedUrl(url);
+		
 		Node node = findWebResearcher(url);
 		if (null != node) {
 			if (!node.hasLabel(labelResearcher))

@@ -282,12 +282,11 @@ public class ImporterOrcid {
 							if (null != commonName && commonName.equals(NAME_SCOPUS_AUTHOR_ID)) { 	
 								String scopusId = GraphUtils.extractScopusAuthorId(externalIdentifier.getUrl());
 								if (StringUtils.isNotEmpty(scopusId))
-									node.addProperty(GraphUtils.PROPERTY_SCOPUS_ID, externalIdentifier.getUrl());
+									node.addProperty(GraphUtils.PROPERTY_SCOPUS_ID, scopusId);
 								else
-									throw new Exception("Unable to extract scopus author id from URL: " + externalIdentifier.getUrl());
+									System.err.println("Unable to extract scopus author id from URL: " + externalIdentifier.getUrl());
 							}
-							
-						}														
+						}
 				}
 	
 				graph.addNode(node);
@@ -385,7 +384,7 @@ public class ImporterOrcid {
 	private void processOrcidWork(Graph graph, String researcherKey, OrcidWork work) throws Exception {
 		String putCode = work.getPutCode();
 		if (null != putCode &&  !putCode.isEmpty()) {
-			String key = researcherKey + "/" + putCode;
+			String key = researcherKey + ":" + putCode;
 			
 			GraphNode node = new GraphNode()
 				.withKey(key)
@@ -404,6 +403,15 @@ public class ImporterOrcid {
 				.withEndSource(GraphUtils.SOURCE_ORCID)
 				.withEndKey(key));
 			
+			String url = work.getUrl();
+			if (null != url) {
+				node.addProperty(GraphUtils.PROPERTY_URL, GraphUtils.extractFormalizedUrl(url));
+				
+				String eid = GraphUtils.extractScopusEID(url);
+				if (null != eid) 
+					node.addProperty(GraphUtils.PROPERTY_SCOPUS_EID, eid);				
+			}
+			
 			WorkIdentifiers workIdentifiers = work.getWorlIdentifiers();
 			if (null != workIdentifiers && null != workIdentifiers.getIdentifiers()) 
 				for (WorkIdentifier workId : workIdentifiers.getIdentifiers()) {
@@ -413,7 +421,7 @@ public class ImporterOrcid {
 							String doi = GraphUtils.extractDoi(workId.getId());
 							if (null != doi) {
 								node.addProperty(GraphUtils.PROPERTY_DOI, doi);
-								node.addProperty(GraphUtils.PROPERTY_URL, GraphUtils.generateDoiUri(doi));
+							//	node.addProperty(GraphUtils.PROPERTY_URL, GraphUtils.generateDoiUri(doi));
 							} else
 								System.err.println("Unable to extract doi from: " + workId.getId());
 						} else if (type.equals(IDENTIFICATOR_ISBN)) {
@@ -455,7 +463,7 @@ public class ImporterOrcid {
 
 					OrcidIdentifier contributorId = contributor.getOrcidId();
 					if (null != contributorId) {
-						String url = contributorId.getUri();
+						url = GraphUtils.extractFormalizedUrl(contributorId.getUri());
 						if (StringUtils.isNotEmpty(url)) {
 							graph.addRelationship(new GraphRelationship()
 								.withRelationship(GraphUtils.RELATIONSHIP_RELATED_TO)

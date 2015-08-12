@@ -122,11 +122,11 @@ public class App {
 				String grantId = grant[0];
 				System.out.println("Grant id: " + grantId);
 				
-				String purl = "http://purl.org/au-research/grants/nhmrc/" + grantId;
+				String purl = GraphUtils.generateNhmrcGrantPurl(grantId);
 				String institutionName = grant[6].trim();
 				String institutionKey = "nhmrc:institution:" + institutionName;
 				String title = grant[9]; // grant[10] - simplified							
-				String investigatorString = grant[6];
+				//String investigatorString = grant[6];
 									
 				if (!institutions.contains(institutionKey)) {
 					institutions.add(institutionKey);

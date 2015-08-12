@@ -94,24 +94,8 @@ public class App {
 				
 				System.out.println("url: " + pat);
 				
-				if (null != url && !url.isEmpty()) {
-					
-					URL hostUrl = null;
-					
-					try {
-						hostUrl = new URL(url);
-					} catch(MalformedURLException ex) {
-						hostUrl = new URL("http://" + url);
-					}
-					
-					String host = hostUrl.getHost();
-					if (host.startsWith("www."))
-						host = host.substring(4);
-					else if (host.startsWith("www3."))
-						host = host.substring(5);
-					else if (host.startsWith("web."))
-						host = host.substring(4);
-					
+				String host = GraphUtils.extractHost(url);				
+				if (null != host) {
 					String key = "pattern:"+host+":"+pat;
 					
 					graph.addNode(new GraphNode()
