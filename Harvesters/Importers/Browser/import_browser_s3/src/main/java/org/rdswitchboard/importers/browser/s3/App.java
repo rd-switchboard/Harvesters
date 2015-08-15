@@ -2,14 +2,20 @@ package org.rdswitchboard.importers.browser.s3;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.Collection;
 import java.util.Properties;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.MediaType;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
 
@@ -24,21 +30,20 @@ import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.util.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 
 public class App {
-	private static final String PROPERTIES_FILE = "properties/import_ands.properties";
-	private static final String SOURCE_ANDS = "ands";
-	private static final String ENCODING = "UTF-8";
+	private static final String ENCODING = "UTF-8";	
 	
 	public static void main(String[] args) {
 		try {
-            String propertiesFile = PROPERTIES_FILE;
-            if (args.length > 0 && !StringUtils.isNullOrEmpty(args[0])) 
-                    propertiesFile = args[0];
-
+			if (args.length == 0 || StringUtils.isNullOrEmpty(args[0]))
+				throw new Exception("Please provide properties file");
+			
+            String propertiesFile = args[0];
             Properties properties = new Properties();
 	        try (InputStream in = new FileInputStream(propertiesFile)) {
 	            properties.load(in);
@@ -81,6 +86,19 @@ public class App {
 	            throw new IllegalArgumentException("AWS S3 Prefix can not be empty");
         
 	        System.out.println("S3 Prefix: " + prefix);
+	    
+	        String crosswalk = properties.getProperty("crosswalk");
+	        Templates template = null;
+	        
+	        if (!StringUtils.isNullOrEmpty(prefix)) {
+	        	System.out.println("Crosswalk: " + crosswalk);
+	        	
+	        	template = TransformerFactory.newInstance().newTemplates(
+	        			new StreamSource(
+	        					new FileInputStream(crosswalk)));
+	        } 
+	        
+	        ObjectMapper mapper = new ObjectMapper();
 	        
 	        Client client = Client.create();
 	        Cookie cookie = new Cookie("PHPSESSID", properties.getProperty("session"));
@@ -114,9 +132,21 @@ public class App {
 					System.out.println("Processing file: " + file);
 					
 					S3Object object = s3client.getObject(new GetObjectRequest(bucket, file));
-					InputStream is = object.getObjectContent();
+					String xml = null;
 					
-					String xml = IOUtils.toString(is, ENCODING); 
+					if (null != template) {
+						Source reader = new StreamSource(object.getObjectContent());
+						StringWriter writer = new StringWriter();
+						
+						Transformer transformer = template.newTransformer(); 
+						transformer.transform(reader, new StreamResult(writer));
+						
+						xml = writer.toString();
+					} else {
+						InputStream is = object.getObjectContent();
+						
+						xml = IOUtils.toString(is, ENCODING);
+					}
 					
 			        URL url = new URL(baseUrl + "/import/import_s3/");
 
@@ -141,13 +171,18 @@ public class App {
 					}
 
 					String output = response.getEntity(String.class);
-				 
-					System.out.println(output);
+					
+					Result result = mapper.readValue(output, Result.class);
+					
+					if (!result.getStatus().equals("OK")) {
+						System.err.println(result.getMessage());
+						
+						break;
+					} else 
+						System.out.println(result.getMessage());					
 				}
 				listObjectsRequest.setMarker(objectListing.getNextMarker());
 			} while (objectListing.isTruncated());
-	      
-	        
 	        
 		} catch (Exception e) {
             e.printStackTrace();

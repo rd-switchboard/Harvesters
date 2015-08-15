@@ -7,7 +7,10 @@ import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
 
 import com.mysql.jdbc.StringUtils;
@@ -21,10 +24,11 @@ public class App {
 	private static final String MYSQL_HOST = "localhost";
 	private static final String MYSQL_DATABASE = "dbs_registry";
 	private static final String OUTPUT_NAME = "rds_urls.csv";
-	private static final String URL_SCHEMA = "rd-switchboard.net/%s/%s";
+	//private static final String URL_SCHEMA = "rd-switchboard.net/%s/%s";
 	private static final String DELEMITER = ",";
 	
 	private static final String FIELD_KEY = "key";
+	private static final String FIELD_DATA_SOURCE_ID = "data_source_id";
 	private static final String FIELD_SLUG = "slug";
 	private static final String FIELD_RECORD_ID = "registry_object_id";
 		
@@ -74,20 +78,28 @@ public class App {
             System.out.println("Connecting to the database");
             // Obtain the mysql connection
             try (Connection conn = DriverManager.getConnection("jdbc:mysql://"+dbHost+"/"+dbDatabase+"?user="+dbUsername+"&password="+dbPassword)) {
-               try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_UPDATABLE)) {
-            	   try (ResultSet ds = stmt.executeQuery("SELECT `key`, slug, registry_object_id FROM registry_objects")) {
+            	Map<Long, String> dataSources = queryDataSources(conn);
+            	
+            	try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+            		try (ResultSet ds = stmt.executeQuery("SELECT `data_source_id`, `key`, slug, registry_object_id FROM registry_objects")) {
            	        	try (PrintWriter writer = new PrintWriter(outFileName, StandardCharsets.UTF_8.name())) {
-           	        		writer.println("key,record_id,slug");
+           	        		writer.println("ds_id,ds,key,record_id,slug");
         		        	
            	        		while (ds.next()) {
-	                           writer.print(ds.getString(FIELD_KEY));
-	                           writer.print(outDelemiter);
-	                           writer.print(ds.getString(FIELD_SLUG));                          
-	                           writer.print(outDelemiter);
-	                           writer.println(ds.getLong(FIELD_RECORD_ID));
-	            		   }
-	            	   }                	   
-	               }
+           	        			Long dsId = ds.getLong(FIELD_DATA_SOURCE_ID);
+           	        			
+           	        			writer.print(dsId);
+           	        			writer.print(outDelemiter);
+           	        			writer.print(dataSources.get(dsId));
+           	        			writer.print(outDelemiter);
+           	        			writer.print(ds.getString(FIELD_KEY));
+		                        writer.print(outDelemiter);
+		                        writer.print(ds.getString(FIELD_SLUG));                          
+		                        writer.print(outDelemiter);
+		                        writer.println(ds.getLong(FIELD_RECORD_ID));
+           	        		}
+           	        	}                	   
+            		}
 	            }
 	        }
             
@@ -97,4 +109,18 @@ public class App {
 
 	}
 
+	private static Map<Long, String> queryDataSources(Connection conn) throws SQLException {
+		Map<Long, String> ds = new HashMap<Long, String>();
+	
+		try (Statement stmt = conn.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY)) {
+			try (ResultSet rs = stmt.executeQuery("SELECT `data_source_id`, `key` FROM data_sources")) {
+				while (rs.next()) {
+					ds.put(rs.getLong(FIELD_DATA_SOURCE_ID), rs.getString(FIELD_KEY));
+     		   }
+			}
+		}
+		
+		return ds;
+	}
+	
 }

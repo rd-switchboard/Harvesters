@@ -1,0 +1,1787 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registryObjects xmlns="http://ands.org.au/standards/rif-cs/registryObjects" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ands.org.au/standards/rif-cs/registryObjects http://services.ands.org.au/documentation/rifcs/schema/registryObjects.xsd">
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.18/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.18/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.16</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.16</electronic>
+        </address>
+      </location>
+      <description type="full">Mathematica file that summarizes and plots results of the program mlgenomeu.c to infer maximum likelihood estimates of the mutation rate and effect size, using two fitness assays (sporulation rate, growth rate).
+
+Author: Hill, Jessica A.
+Author: Otto, Sarah P.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2007-12-14T21:38:07Z</date>
+        <date type="dc.issued">2007-12-14T21:38:07Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Maximum Likelihood Estimator</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.18</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://datadryad.org/bitstream/handle/10255/dryad.16/license.txt?sequence=2"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.18/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.18/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.17</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.17</electronic>
+        </address>
+      </location>
+      <description type="full">Mathematica file that contains all of the growth rate data obtained from the Bioscreen as well as all of the sporulation data.  This file performs all of the major statistical analyses on these datasets reported in Hill and Otto (2007).
+
+Author: Hill, Jessica A.
+Author: Otto, Sarah P.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2007-12-14T21:38:08Z</date>
+        <date type="dc.issued">2007-12-14T21:38:08Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Statistical Analyzer</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.18</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://datadryad.org/bitstream/handle/10255/dryad.17/license.txt?sequence=2"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.18/3</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.18/3</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.19</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.19</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Hill, Jessica A.
+Author: Otto, Sarah P.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2007-12-14T22:32:19Z</date>
+        <date type="dc.issued">2007-12-14T22:32:19Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Sporulation Rate Data</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.18</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://datadryad.org/bitstream/handle/10255/dryad.19/license.txt?sequence=2"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.20/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.20/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.23</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.23</electronic>
+        </address>
+      </location>
+      <description type="full">Results of a relative warps analysis done in tpsRelw using the data in http://hdl.handle.net/10255/dryad.57.  The data in the Excel spreadsheet were used to prepare the morphospace figures that appear in Sidlauskas 2007. The order of taxa in the spreadsheet should match the order of taxa in the TPS file.
+
+Author: Sidlauskas, Brian</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2007-12-20T21:55:22Z</date>
+        <date type="dc.issued">2007-12-20</date>
+      </dates>
+      <name>
+        <namePart type="primary">Relative Warps</namePart>
+      </name>
+      <subject type="local">disparity</subject>
+      <subject type="local">evolutionary rates</subject>
+      <subject type="local">Brownian evolution</subject>
+      <subject type="local">mode</subject>
+      <subject type="local">freshwater fishes</subject>
+      <subject type="local">tempo</subject>
+      <subject type="local">adaptive radiation</subject>
+      <coverage>
+        <spatial>South America</spatial>
+        <spatial>South America</spatial>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.20</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.25/12</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.25/12</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.26</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.26</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Harris, Jerry
+Author: Taylor, Michael P.
+Author: Naish, Darren</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-01-02T20:18:48Z</date>
+        <date type="dc.issued">2008-01-02T20:18:48Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Nexus File</namePart>
+      </name>
+      <subject type="local">Wealden</subject>
+      <subject type="local">Hastings Beds Group</subject>
+      <coverage>
+        <spatial>East Sussex, England</spatial>
+        <temporal>
+          <text>Lower Cretaceous</text>
+        </temporal>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.25</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.25/30</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.25/30</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.28</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.28</electronic>
+        </address>
+      </location>
+      <description type="full">Schematic lithostratigraphy of the Wealden indicating the origin of the holotype of Xenoposeidon proneneukos gen. et sp. nov. within the Ashdown Beds Formation of the Hastings Beds Group.
+
+Author: Taylor, Michael P.
+Author: Naish, Darren</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-01-08T16:22:16Z</date>
+        <date type="dc.issued">2008-01-08T16:22:16Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Schematic Lithostratigraphy of the Wealden</namePart>
+      </name>
+      <subject type="local">Wealden</subject>
+      <subject type="local">Hastings Beds Group</subject>
+      <coverage>
+        <spatial>East Sussex, England</spatial>
+        <temporal>
+          <text>Lower Cretaceous</text>
+        </temporal>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.25</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.20/3</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.20/3</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.57</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.57</electronic>
+        </address>
+      </location>
+      <description type="full">Raw 2D coordinate positions representing the geometry of anatomical landmarks taken from the skulls of 151 fish species. This is a raw text file. Each entry includes the line LM=21 (indicating that there are 21 landmarks per species), a list of the 21 landmarks (X and Y coordinates), and an ID line that includes the name of the species to which the 21 landmarks _above_ the ID belong.
+
+The file is intended to be analyzed with the tpsRelw program by F. James Rohlf, which is available at http://life.bio.sunysb.edu/morph/
+
+Author: Sidlauskas, Brian</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-01-17T23:47:00Z</date>
+        <date type="dc.issued">2008-01-17T23:47:00Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Landmark Consensuses</namePart>
+      </name>
+      <subject type="local">tempo</subject>
+      <subject type="local">freshwater fishes</subject>
+      <subject type="local">mode</subject>
+      <subject type="local">Brownian evolution</subject>
+      <subject type="local">evolutionary rates</subject>
+      <subject type="local">disparity</subject>
+      <subject type="local">adaptive radiation</subject>
+      <coverage>
+        <spatial>South America</spatial>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.20</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.20/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.20/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.58</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.58</electronic>
+        </address>
+      </location>
+      <description type="full">Species, lot numbers and numbers of specimens used to create the morphospace. Institutional abbreviations are as listed at http://www.asih.org/files/codons.pdf
+
+Author: Sidlauskas, Brian</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-01-18T15:56:44Z</date>
+        <date type="dc.issued">2008-01-18T15:56:44Z</date>
+      </dates>
+      <name>
+        <namePart type="primary">Morphospace Specimens</namePart>
+      </name>
+      <subject type="local">Brownian evolution</subject>
+      <subject type="local">freshwater fishes</subject>
+      <subject type="local">mode</subject>
+      <subject type="local">evolutionary rates</subject>
+      <subject type="local">disparity</subject>
+      <subject type="local">tempo</subject>
+      <subject type="local">adaptive radiation</subject>
+      <coverage>
+        <spatial>South America</spatial>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.20</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.59/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.59/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.60</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.60</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Hoeksema, Jason D.
+Author: Thompson, J. N.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-01-28T19:21:09Z</date>
+        <date type="dc.issued">2008-01-28</date>
+      </dates>
+      <name>
+        <namePart type="primary">Pinus-Rhizopogon Cross-Inoculation Experiment</namePart>
+      </name>
+      <subject type="local">coevolution</subject>
+      <subject type="local">local adaptation</subject>
+      <subject type="local">mutualism</subject>
+      <subject type="local">mycorrhizal fungi</subject>
+      <subject type="local">parasitism</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.59</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.64/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.64/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.65</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.65</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Soltis, Douglas E.
+Author: Soltis, Pamela S.
+Author: Mort, Mark E.
+Author: Savolainen, Vincent
+Author: Chase, Mark W.
+Author: Hoot, Sara B.
+Author: Morton, Cynthia M.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-22T15:30:55Z</date>
+        <date type="dc.issued">1998-03-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Soltis et al. Table 1</namePart>
+      </name>
+      <subject type="local">large data sets</subject>
+      <subject type="local">parsimony</subject>
+      <subject type="local">phylogeny</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.64</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.66/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.66/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.67</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.67</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Baum, David A.
+Author: Small, Randall L.
+Author: Wendel, Jonathan F.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-22T16:16:19Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Baum et. al Data Matrix</namePart>
+      </name>
+      <subject type="local">phylogeny</subject>
+      <subject type="local">biogeography</subject>
+      <subject type="local">molecular clock</subject>
+      <subject type="local">data set conflict</subject>
+      <subject type="local">floral evolution</subject>
+      <subject type="local">introgression</subject>
+      <coverage>
+        <spatial>Gondwana</spatial>
+      </coverage>
+      <relatedObject>
+        <key>doi:10.5061/dryad.66</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/5</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/5</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.71</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.71</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:10:44Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: Clustal</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/8</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/8</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.72</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.72</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:12:36Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: Conservative-1</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/9</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/9</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.73</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.73</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:14:36Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: Conservative-2</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/11</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/11</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.74</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.74</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:17:54Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.111.01</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/10</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/10</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.75</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.75</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:19:37Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.111.02</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/16</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/16</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.76</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.76</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:26:21Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.111.03</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/23</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/23</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.77</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.77</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:49:05Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.01</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/25</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/25</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.78</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.78</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:50:54Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.02</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/12</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/12</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.79</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.79</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:53:07Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.03</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/21</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/21</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.80</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.80</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T15:56:13Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.04</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/19</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/19</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.81</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.81</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T16:05:43Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.05</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.82/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.82/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.83</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.83</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Price, Samantha A.
+Author: Gittleman, John L.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-27T17:48:02Z</date>
+        <date type="dc.issued">2007-05-17</date>
+      </dates>
+      <name>
+        <namePart type="primary">Price and Gittleman Data Set</namePart>
+      </name>
+      <subject type="local">phylogenetic comparative methods</subject>
+      <subject type="local">bushmeat</subject>
+      <subject type="local">extinction</subject>
+      <subject type="local">hunting</subject>
+      <subject type="local">economic development</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.82</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/20</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/20</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.84</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.84</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-29T16:04:31Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.06</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/3</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/3</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.85</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.85</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-02-29T16:06:53Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.07</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.86</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.86</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-03T14:38:28Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.08</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/7</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/7</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.87</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.87</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-03T14:40:29Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.09</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/4</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/4</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.88</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.88</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-03T14:46:08Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.124.10</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/18</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/18</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.89</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.89</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-03T14:52:40Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.01</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/6</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/6</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.90</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.90</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-03T15:01:17Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.02</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/14</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/14</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.91</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.91</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-05T18:55:33Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.03</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/15</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/15</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.92</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.92</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-05T19:00:34Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.04</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/22</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/22</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.93</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.93</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-05T19:02:11Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.05</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/13</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/13</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.94</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.94</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-05T19:33:27Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.06</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/27</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/27</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.95</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.95</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-05T19:35:54Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.07</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/17</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/17</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.96</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.96</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-07T20:15:25Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.08</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/26</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/26</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.97</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.97</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-07T20:19:44Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.09</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/24</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/24</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.98</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.98</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-07T20:24:04Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: MALIGN.136.10</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.70/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.70/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.99</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.99</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Cerchio, Salvatore
+Author: Tucker, Priscilla</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-07T20:51:23Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Cerchio and Tucker Data Matrix: Milinkovitch</namePart>
+      </name>
+      <relatedObject>
+        <key>doi:10.5061/dryad.70</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.100/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.100/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.101</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.101</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Davis, Jerrold I.
+Author: Simmons, Mark P.
+Author: Stevenson, Dennis W.
+Author: Wendel, Jonathan F.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-19T18:57:00Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Davis et al Data Matrix</namePart>
+      </name>
+      <subject type="local">atp A</subject>
+      <subject type="local">data decisiveness</subject>
+      <subject type="local">restriction sites</subject>
+      <subject type="local">character incongruence</subject>
+      <subject type="local">plant mitochondrial DNA</subject>
+      <subject type="local">rbc L</subject>
+      <subject type="local">cladistics</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.100</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.102/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.102/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.103</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.103</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Stone, J. R.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-19T19:13:36Z</date>
+        <date type="dc.issued">1998-06-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Stone Data Matrix</namePart>
+      </name>
+      <subject type="local">geometric morphometrics</subject>
+      <subject type="local">landmarks</subject>
+      <subject type="local">thin-plate spline</subject>
+      <subject type="local">principal components</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.102</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.104/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.104/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.105</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.105</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Burk, Angela
+Author: Westerman, Michael
+Author: Springer, Mark S.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-19T19:50:32Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Burk et al Data Matrix</namePart>
+      </name>
+      <subject type="local">ribosomal RNA</subject>
+      <subject type="local">bipedal hopping</subject>
+      <subject type="local">kangaroo</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.104</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.106/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.106/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.107</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.107</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Chombard, Catherine
+Author: Boury-Esnault, Nicole
+Author: Tillier, Simon</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-21T14:09:11Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Chombard et al Data Matrix</namePart>
+      </name>
+      <subject type="local">phylogeny</subject>
+      <subject type="local">ribosomal DNA</subject>
+      <subject type="local">molecular systematics</subject>
+      <subject type="local">skeleton</subject>
+      <subject type="local">homology</subject>
+      <subject type="local">spicule</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.106</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.108/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.108/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.109</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.109</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Normark, Benjamin
+Author: Lanteri, Analia A.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-21T14:31:21Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Normark and Lanteri Appendix 1</namePart>
+      </name>
+      <subject type="local">reticulation</subject>
+      <subject type="local">parthenogenesis</subject>
+      <subject type="local">ancient asexuals</subject>
+      <subject type="local">hybridization</subject>
+      <subject type="local">incongruence</subject>
+      <subject type="local">root weevils</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.108</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.108/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.108/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.110</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.110</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Normark, Benjamin
+Author: Lanteri, Analia A.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-21T14:32:39Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Normark and Lanteri Appendix 2</namePart>
+      </name>
+      <subject type="local">reticulation</subject>
+      <subject type="local">parthenogenesis</subject>
+      <subject type="local">ancient asexuals</subject>
+      <subject type="local">hybridization</subject>
+      <subject type="local">incongruence</subject>
+      <subject type="local">root weevils</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.108</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.111/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.111/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.112</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.112</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Wiens, John J.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:17:55Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Wiens 40 Taxon Matrix</namePart>
+      </name>
+      <subject type="local">likelihood</subject>
+      <subject type="local">congruence</subject>
+      <subject type="local">morphology</subject>
+      <subject type="local">distance</subject>
+      <subject type="local">parsimony</subject>
+      <subject type="local">accuracy</subject>
+      <subject type="local">polymorphic characters</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.111</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.111/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.111/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.113</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.113</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Wiens, John J.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:19:06Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Wiens Tree I Matrix</namePart>
+      </name>
+      <subject type="local">polymorphic characters</subject>
+      <subject type="local">congruence</subject>
+      <subject type="local">distance</subject>
+      <subject type="local">parsimony</subject>
+      <subject type="local">accuracy</subject>
+      <subject type="local">likelihood</subject>
+      <subject type="local">morphology</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.111</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.111/3</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.111/3</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.114</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.114</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Wiens, John J.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:20:25Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Wiens Tree II Matrix</namePart>
+      </name>
+      <subject type="local">morphology</subject>
+      <subject type="local">congruence</subject>
+      <subject type="local">likelihood</subject>
+      <subject type="local">accuracy</subject>
+      <subject type="local">parsimony</subject>
+      <subject type="local">distance</subject>
+      <subject type="local">polymorphic characters</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.111</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.111/4</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.111/4</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.115</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.115</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Wiens, John J.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:21:47Z</date>
+        <date type="dc.issued">1998-09-01</date>
+      </dates>
+      <name>
+        <namePart type="primary">Wiens Tree III Matrix</namePart>
+      </name>
+      <subject type="local">morphology</subject>
+      <subject type="local">congruence</subject>
+      <subject type="local">likelihood</subject>
+      <subject type="local">accuracy</subject>
+      <subject type="local">parsimony</subject>
+      <subject type="local">distance</subject>
+      <subject type="local">polymorphic characters</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.111</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.116/1</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.116/1</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.117</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.117</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Graham, Sean W.
+Author: Kohn, Joshua R.
+Author: Morton, Brian R.
+Author: Eckenwalder, James E.
+Author: Barrett, Spencer C.H.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:50:41Z</date>
+        <date type="dc.issued">1998-12-30</date>
+      </dates>
+      <name>
+        <namePart type="primary">Graham et al Appendix 1</namePart>
+      </name>
+      <subject type="local">chloroplast DNA</subject>
+      <subject type="local">congruence tests</subject>
+      <subject type="local">incongruence</subject>
+      <subject type="local">morphology</subject>
+      <subject type="local">ndhF</subject>
+      <subject type="local">rbcL</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.116</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+  <registryObject group="Dryad">
+    <key>doi:10.5061/dryad.116/2</key>
+    <originatingSource>Dryad</originatingSource>
+    <collection type="collection">
+      <identifier type="doi">doi:10.5061/dryad.116/2</identifier>
+      <identifier type="handle">http://hdl.handle.net/10255/dryad.118</identifier>
+      <location>
+        <address>
+          <electronic type="url">http://hdl.handle.net/10255/dryad.118</electronic>
+        </address>
+      </location>
+      <description type="full">
+
+Author: Graham, Sean W.
+Author: Kohn, Joshua R.
+Author: Morton, Brian R.
+Author: Eckenwalder, James E.
+Author: Barrett, Spencer C.H.</description>
+      <dates>
+        <date type="dc.dateSubmitted">2015-01-15T17:23:29</date>
+        <date type="dc.available">2008-03-24T14:54:27Z</date>
+        <date type="dc.issued">1998-12-30</date>
+      </dates>
+      <name>
+        <namePart type="primary">Graham et al Appendix 2</namePart>
+      </name>
+      <subject type="local">incongruence</subject>
+      <subject type="local">chloroplast DNA</subject>
+      <subject type="local">congruence tests</subject>
+      <subject type="local">morphology</subject>
+      <subject type="local">ndhF</subject>
+      <subject type="local">rbcL</subject>
+      <relatedObject>
+        <key>doi:10.5061/dryad.116</key>
+        <relation type="isPartOf"/>
+      </relatedObject>
+      <rights>
+        <licence rightsUri="http://creativecommons.org/publicdomain/zero/1.0/"/>
+      </rights>
+    </collection>
+  </registryObject>
+</registryObjects>
