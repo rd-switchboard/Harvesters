@@ -1,10 +1,7 @@
-package org.rdswitchboard.utils.neo4j.local;
+package org.rdswitchboard.libraries.neo4j;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.Direction;
 import org.neo4j.graphdb.DynamicLabel;
 import org.neo4j.graphdb.GraphDatabaseService;
@@ -18,8 +15,15 @@ import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.schema.ConstraintDefinition;
 import org.neo4j.graphdb.schema.IndexDefinition;
 import org.neo4j.graphdb.schema.Schema;
-import org.neo4j.kernel.impl.util.StringLogger;
 import org.neo4j.tooling.GlobalGraphOperations;
+
+/**
+ * Neo4jUtils class
+ * 
+ * @author Dima Kudriavcev
+ * 
+ * The class is depricated, please use Neo4jDatabase instead
+ */
 
 public class Neo4jUtils {
 	public static final String NEO4J_CONF = "/conf/neo4j.properties";
@@ -48,14 +52,6 @@ public class Neo4jUtils {
 		return graphDb;
 	}
 	
-	public static GlobalGraphOperations getGlobalOperations( final GraphDatabaseService graphDb ) {
-		return GlobalGraphOperations.at(graphDb);
-	}
-	
-	public static ExecutionEngine getExecutionEngine( final GraphDatabaseService graphDb ) {
-		return new ExecutionEngine(graphDb, StringLogger.SYSTEM);
-	}
-	
 	public static void registerShutdownHook( final GraphDatabaseService graphDb )
 	{
 	    // Registers a shutdown hook for the Neo4j instance so that it
@@ -68,38 +64,12 @@ public class Neo4jUtils {
 	        {
 	            graphDb.shutdown();
 	        }
-	    } );
-	}
-			
-	public static Map<String, Object> getProperties(Node node) {
-		Iterable<String> keys = node.getPropertyKeys();
-		Map<String, Object> pars = null;
-		
-		for (String key : keys) {
-			if (null == pars)
-				pars = new HashMap<String, Object>();
-			
-			pars.put(key, node.getProperty(key));
-		}
-		
-		return pars;
+	    });
 	}
 	
-	public static Map<String, Object> getProperties(Relationship relationship) {
-		Iterable<String> keys = relationship.getPropertyKeys();
-		Map<String, Object> pars = null;
-		
-		for (String key : keys) {
-			if (null == pars)
-				pars = new HashMap<String, Object>();
-			
-			pars.put(key, relationship.getProperty(key));
-		}
-		
-		return pars;
-	}
-	
-	public static ConstraintDefinition createConstrant(GraphDatabaseService graphDb, Label label, String key) {
+	@Deprecated
+	public static ConstraintDefinition createConstrant(final GraphDatabaseService graphDb, 
+			final Label label, final String key) {
 		Schema schema = graphDb.schema();
 		
 		for (ConstraintDefinition constraint : schema.getConstraints(label))
@@ -113,11 +83,20 @@ public class Neo4jUtils {
 				.create();
 	}
 	
-	public static ConstraintDefinition createConstrant(GraphDatabaseService graphDb, String label, String key) {
+	@Deprecated
+	public static ConstraintDefinition createConstrant(final GraphDatabaseService graphDb, 
+			final String label, final String key) {
 		return createConstrant(graphDb, DynamicLabel.label(label), key);
 	}
-
-	public static IndexDefinition createIndex(GraphDatabaseService graphDb, Label label, String key) {
+	
+	@Deprecated
+	public static GlobalGraphOperations getGlobalOperations(final GraphDatabaseService graphDb) {
+		return GlobalGraphOperations.at(graphDb);
+	}
+	
+	@Deprecated
+	public static IndexDefinition createIndex(final GraphDatabaseService graphDb, 
+			final Label label, final String key) {
 		Schema schema = graphDb.schema();
 		
 		for (IndexDefinition index : schema.getIndexes(label))
@@ -131,18 +110,18 @@ public class Neo4jUtils {
 				.create();
 	}
 	
-	public static IndexDefinition createIndex(GraphDatabaseService graphDb, String label, String key) {
+	@Deprecated
+	public static IndexDefinition createIndex(final GraphDatabaseService graphDb, 
+			final String label, final String key) {
 		return createIndex(graphDb, DynamicLabel.label(label), key);
 	}
-
-	public static Index<Node> getNodeIndex(GraphDatabaseService graphDb, String label) {
-		return graphDb.index().forNodes( label );			
+	
+	@Deprecated
+	public static Index<Node> getNodeIndex(final GraphDatabaseService graphDb, final String label) {
+		return graphDb.index().forNodes( label );
 	}
 	
-	public static Node findNode(Index<Node> index, String key, String value) {
-		 return index.get(key, value).getSingle();
-	}
-	
+	@Deprecated
 	public static Relationship findRelationship(Iterable<Relationship> rels, long nodeId, Direction direction) {
 		for (Relationship rel : rels) {
 			switch (direction) {
@@ -164,51 +143,61 @@ public class Neo4jUtils {
 		return null;
 	}
 	
+	@Deprecated
 	public static Relationship findRelationship(Node nodeStart, long nodeId, 
 			RelationshipType type, Direction direction) {
 		return findRelationship(nodeStart.getRelationships(type, direction), nodeId, direction);
 	}
 	
+	@Deprecated
 	public static Relationship findRelationship(Node nodeStart, Node endNode, 
 			RelationshipType type, Direction direction) {
 		return findRelationship(nodeStart, endNode.getId(), type, direction);
 	}
 	
+	@Deprecated
 	public static void addLabel(Node node, Label label) {
 		node.addLabel(label);
 	}
 
+	@Deprecated
 	public static void addLabels(Node node, Label[] labels) {
 		for (Label label : labels)
 			node.addLabel(label);
 	}
 	
+	@Deprecated
 	public static void setProperties(Node node, Map<String, Object> properties) {
-		for (Entry<String, Object> entry : properties.entrySet())
+		for (Map.Entry<String, Object> entry : properties.entrySet())
 			node.setProperty(entry.getKey(), entry.getValue());
 	}
 	
+	@Deprecated
 	public static void setProperties(Relationship relationship, Map<String, Object> properties) {
-		for (Entry<String, Object> entry : properties.entrySet())
+		for (Map.Entry<String, Object> entry : properties.entrySet())
 			relationship.setProperty(entry.getKey(), entry.getValue());
 	}
 	
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb) {
 		return graphDb.createNode();
 	}
 	
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb, Label label) {
 		Node node = graphDb.createNode();
 		addLabel(node, label);
 		return node;
 	}
 
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb, Label[] labels) {
 		Node node = graphDb.createNode();
 		addLabels(node, labels);
 		return node;
 	}
 	
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb, Map<String, Object> properties) {
 		Node node = graphDb.createNode();
 		if (null != properties)
@@ -216,6 +205,7 @@ public class Neo4jUtils {
 		return node;
 	}
 	
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb, Label label, Map<String, Object> properties) {
 		Node node = graphDb.createNode();
 		addLabel(node, label);
@@ -224,6 +214,7 @@ public class Neo4jUtils {
 		return node;
 	}
 
+	@Deprecated
 	public static Node createNode(GraphDatabaseService graphDb, Label[] labels, Map<String, Object> properties) {
 		Node node = graphDb.createNode();
 		addLabels(node, labels);
@@ -232,6 +223,7 @@ public class Neo4jUtils {
 		return node;
 	}
 	
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value) {
 		Node node = index.get(key, value).getSingle();
 		if (null == node) {
@@ -243,6 +235,7 @@ public class Neo4jUtils {
 		return node;
 	}
 
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value, 
 			Label label) {
 		Node node = index.get(key, value).getSingle();
@@ -255,6 +248,7 @@ public class Neo4jUtils {
 		return node;
 	}
 	
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value, 
 			Label[] labels) {
 		Node node = index.get(key, value).getSingle();
@@ -267,6 +261,7 @@ public class Neo4jUtils {
 		return node;
 	}
 
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value, 
 			Map<String, Object> properties) {
 		Node node = index.get(key, value).getSingle();
@@ -279,6 +274,7 @@ public class Neo4jUtils {
 		return node;
 	}
 
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value, 
 			Label label, Map<String, Object> properties) {
 		Node node = index.get(key, value).getSingle();
@@ -291,6 +287,7 @@ public class Neo4jUtils {
 		return node;
 	}
 	
+	@Deprecated
 	public static Node createUniqueNode(GraphDatabaseService graphDb, Index<Node> index, String key, String value, 
 			Label[] labels, Map<String, Object> properties) {
 		Node node = index.get(key, value).getSingle();
@@ -303,10 +300,12 @@ public class Neo4jUtils {
 		return node;
 	}
 
+	@Deprecated
 	public static Relationship createRelationship(Node nodeStart, Node nodeEnd, RelationshipType type) {
 		return nodeStart.createRelationshipTo(nodeEnd, type);
 	}
 	
+	@Deprecated
 	public static Relationship createRelationship(Node nodeStart, Node nodeEnd, RelationshipType type, 
 			Map<String, Object> properties) {
 		Relationship relationship = createRelationship(nodeStart, nodeEnd, type);
@@ -316,6 +315,7 @@ public class Neo4jUtils {
 		return relationship;
 	}	
 	
+	@Deprecated
 	public static Relationship createUniqueRelationship(Node nodeStart, Node nodeEnd, RelationshipType type, 
 			Direction direction, Map<String, Object> properties) {
 
@@ -326,6 +326,7 @@ public class Neo4jUtils {
 		return relationship;
 	}
 		
+	@Deprecated
 	public static Relationship mergeRelationship(Node nodeStart, Node nodeEnd, RelationshipType type, 
 			Direction direction, Map<String, Object> properties) {
 

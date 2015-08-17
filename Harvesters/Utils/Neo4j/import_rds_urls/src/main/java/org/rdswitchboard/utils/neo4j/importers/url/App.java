@@ -5,15 +5,13 @@ import java.io.FileReader;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.IndexHits;
 import org.neo4j.graphdb.index.ReadableIndex;
 import org.parboiled.common.StringUtils;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -50,23 +48,15 @@ public class App {
 
 	        boolean requireAutoIndex = Boolean.parseBoolean(properties.getProperty("require_autoindex", REQUIRE_AUTOINDEX));
 	        
-	        GraphDatabaseService graphDb = Neo4jUtils.getGraphDb(neo4jFolder);
+	        Neo4jDatabase graphDb = new Neo4jDatabase(neo4jFolder);
 	        ReadableIndex<Node> index;
 	        
-	        try ( Transaction tx = graphDb.beginTx() ) 
+	        try ( Transaction tx = graphDb._beginTx() ) 
 			{
 	        	if (StringUtils.isEmpty(label)) {
-		        	AutoIndexer<Node> nodeAutoIndexer = graphDb.index().getNodeAutoIndexer();
-		 	        if (requireAutoIndex) {
-		 		        System.out.println("Configuring database");
-		 		        
-		 		        nodeAutoIndexer.startAutoIndexingProperty( GraphUtils.PROPERTY_KEY );
-		 		        nodeAutoIndexer.setEnabled( true );
-		 	        }
-		 	        
-		 	        index = nodeAutoIndexer.getAutoIndex();
-		        } else 
-		        	index = graphDb.index().forNodes( label );
+	        		index = graphDb._getNodeAutoIndex(requireAutoIndex ? GraphUtils.PROPERTY_KEY : null);
+	        	} else 
+		        	index = graphDb._getNodeIndex(label);
 	        	
 	        	tx.success();
 			}
@@ -77,7 +67,7 @@ public class App {
 	        long unknownKeys  = 0;
 	        
 	    	CSVReader reader = new CSVReader(new FileReader(inputName));
-	        try ( Transaction tx = graphDb.beginTx() ) 
+	        try ( Transaction tx = graphDb._beginTx() ) 
 			{
 				String[] line;
 				boolean header = false;
@@ -123,7 +113,7 @@ public class App {
 				tx.success();
 			}
 			
-			graphDb.shutdown();
+//			graphDb.shutdown();
 			reader.close();
 
 			System.out.println("Done. Assingned " + goodKeys + " URL's. " + unknownKeys + " keys has not been found in the database, " + badKeys + " keys was just bad"); 

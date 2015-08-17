@@ -10,12 +10,13 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -74,7 +75,7 @@ public class App {
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+	        Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
 			importer.setVerbose(true);
 			importer.importSchemas(schema);
 			
@@ -132,7 +133,7 @@ public class App {
 					institutions.add(institutionKey);
 
 					graph.addNode(new GraphNode()
-						.withKey(institutionKey)
+						.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, institutionKey))
 						.withSource(GraphUtils.SOURCE_NHMRC)
 						.withType(GraphUtils.TYPE_INSTITUTION)
 						.withProperty(GraphUtils.PROPERTY_TITLE, institutionName));
@@ -140,7 +141,7 @@ public class App {
 				}					
 					
 				graph.addNode(new GraphNode()
-					.withKey(purl)
+					.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, purl))
 					.withSource(GraphUtils.SOURCE_NHMRC)
 					.withType(GraphUtils.TYPE_GRANT)
 					.withProperty(GraphUtils.PROPERTY_URL, purl)
@@ -150,10 +151,8 @@ public class App {
 				
 				graph.addRelationship(new GraphRelationship()
 					.withRelationship("AdminInstitute")
-					.withStartSource(GraphUtils.SOURCE_NHMRC)
-					.withStartKey(purl)
-					.withEndSource(GraphUtils.SOURCE_NHMRC)
-					.withEndKey(institutionKey));
+					.withStart(new GraphKey(GraphUtils.SOURCE_NHMRC, purl))
+					.withEnd(new GraphKey(GraphUtils.SOURCE_NHMRC, institutionKey)));
 			}
 				
 			reader.close();			
@@ -205,7 +204,7 @@ public class App {
 					String fullName = grantee[8].trim();
 									
 					GraphNode node = new GraphNode()
-						.withKey(key)
+						.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, key))
 						.withSource(GraphUtils.SOURCE_NHMRC)
 						.withType(GraphUtils.TYPE_RESEARCHER)
 						.withProperty(GraphUtils.PROPERTY_LOCAL_ID, individualId)
@@ -226,10 +225,8 @@ public class App {
 				
 				graph.addRelationship(new GraphRelationship()
 					.withRelationship("Investigator")
-					.withStartSource(GraphUtils.SOURCE_NHMRC)
-					.withStartKey(key)
-					.withEndSource(GraphUtils.SOURCE_NHMRC)
-					.withEndKey(purl));
+					.withStart(new GraphKey(GraphUtils.SOURCE_NHMRC, key))
+					.withEnd(new GraphKey(GraphUtils.SOURCE_NHMRC, purl)));
 			}
 				
 			reader.close();			

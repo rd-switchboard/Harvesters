@@ -7,12 +7,12 @@ import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 import org.rdswitchboard.utils.orcid.Contributor;
 import org.rdswitchboard.utils.orcid.ExternalIdentifier;
 import org.rdswitchboard.utils.orcid.ExternalIdentifiers;
@@ -114,7 +114,7 @@ public class ImporterOrcid {
 	private RelationshipType relContributor = DynamicRelationshipType.withName(RELATIONSHIP_CONTRIBUTOR);
 */	
 	private Orcid orcid = new Orcid();
-	private ImporterNeo4j importer;
+	private Neo4jDatabase importer;
 	
 	private boolean verbose;
 	
@@ -143,7 +143,7 @@ public class ImporterOrcid {
 	 * @throws Exception 
 	 */
 	public ImporterOrcid(final String neo4jUrl) throws Exception {
-		importer = new ImporterNeo4j(neo4jUrl);
+		importer = new Neo4jDatabase(neo4jUrl);
 		
 		/*graphDb = new RestAPIFacade(neo4jUrl);
 		engine = new RestCypherQueryEngine(graphDb);  
@@ -238,7 +238,7 @@ public class ImporterOrcid {
 			String key = GraphUtils.extractFormalizedUrl(identifier.getUri());
 			
 			GraphNode node = new GraphNode()
-				.withKey(key)
+				.withKey(GraphUtils.SOURCE_ORCID, key)
 				.withSource(GraphUtils.SOURCE_ORCID)
 				.withType(GraphUtils.TYPE_RESEARCHER)
 				.withProperty(GraphUtils.PROPERTY_URL, key)
@@ -387,7 +387,7 @@ public class ImporterOrcid {
 			String key = researcherKey + ":" + putCode;
 			
 			GraphNode node = new GraphNode()
-				.withKey(key)
+				.withKey(GraphUtils.SOURCE_ORCID, key)
 				.withSource(GraphUtils.SOURCE_ORCID)
 				.withType(GraphUtils.TYPE_PUBLICATION)
 				.withProperty(GraphUtils.PROPERTY_LOCAL_ID, putCode)
@@ -398,10 +398,8 @@ public class ImporterOrcid {
 				
 			graph.addRelationship(new GraphRelationship()
 				.withRelationship(GraphUtils.RELATIONSHIP_AUTHOR)
-				.withStartSource(GraphUtils.SOURCE_ORCID)
-				.withStartKey(researcherKey)
-				.withEndSource(GraphUtils.SOURCE_ORCID)
-				.withEndKey(key));
+				.withStart(GraphUtils.SOURCE_ORCID, researcherKey)
+				.withEnd(GraphUtils.SOURCE_ORCID, key));
 			
 			String url = work.getUrl();
 			if (null != url) {
@@ -467,10 +465,8 @@ public class ImporterOrcid {
 						if (StringUtils.isNotEmpty(url)) {
 							graph.addRelationship(new GraphRelationship()
 								.withRelationship(GraphUtils.RELATIONSHIP_RELATED_TO)
-								.withStartSource(GraphUtils.SOURCE_ORCID)
-								.withStartKey(url)
-								.withEndSource(GraphUtils.SOURCE_ORCID)
-								.withEndKey(key));
+								.withStart(GraphUtils.SOURCE_ORCID, url)
+								.withEnd(GraphUtils.SOURCE_ORCID, key));
 						}
 					}
 				}

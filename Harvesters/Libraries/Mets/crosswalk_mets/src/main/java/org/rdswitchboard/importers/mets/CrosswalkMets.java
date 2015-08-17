@@ -22,11 +22,12 @@ import org.openarchives.oai._2.OAIPMHtype;
 import org.openarchives.oai._2.RecordType;
 import org.openarchives.oai._2.StatusType;
 import org.rdswitchboard.libraries.graph.Graph;
-import org.rdswitchboard.libraries.graph.GraphCrosswalk;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.graph.interfaces.GraphCrosswalk;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -40,8 +41,8 @@ import org.w3c.dom.NodeList;
 public class CrosswalkMets implements GraphCrosswalk {
 	private static final String MD_TYPE_MODS = "MODS";
 	
-	private static final String GENRE_DATASET = "dataset";
-	private static final String GENRE_ARTICLE = "article";
+	//private static final String GENRE_DATASET = "dataset";
+	//private static final String GENRE_ARTICLE = "article";
 		
 	private static final String NODE_GENRE = "genre";
 	private static final String NODE_IDENTIFIER = "identifier";
@@ -62,6 +63,10 @@ public class CrosswalkMets implements GraphCrosswalk {
 	
 	private static final String ROLE_AUTHOR = "author";
 	
+	private static final String RELATION_HOST = "host";
+	private static final String RELATION_CONSTITUENT = "constituent";
+	private static final String RELATION_IS_REFERENCED_BY = "isReferencedBy";
+	
 	private Unmarshaller unmarshaller;
 	
 	private long processedFiles = 0;
@@ -73,6 +78,8 @@ public class CrosswalkMets implements GraphCrosswalk {
 	private long markTime = 0;
 	
 	private boolean verbose = false;
+	
+	private String source;
 		
 	/**
 	 * Class constructor
@@ -170,6 +177,16 @@ public class CrosswalkMets implements GraphCrosswalk {
 		markTime = System.currentTimeMillis();
 	}
 	
+	@Override
+	public String getSource() {
+		return source;
+	}
+
+	@Override
+	public void setSource(String source) {
+		this.source = source;
+	}
+
 	/**
 	 * Process XML Document
 	 * @param source String - Data Source Name
@@ -177,7 +194,8 @@ public class CrosswalkMets implements GraphCrosswalk {
 	 * @return Graph object
 	 * @throws JAXBException 
 	 */
-	public Graph process(String source, InputStream xml) throws Exception  {
+	@Override
+	public Graph process(InputStream xml) throws Exception  {
 		if (0 == markTime)
 			markTime = System.currentTimeMillis();
 		
@@ -188,6 +206,14 @@ public class CrosswalkMets implements GraphCrosswalk {
 
 		// create graph object
 		Graph graph = new Graph();
+		graph.addSchema(new GraphSchema()
+				.withLabel(GraphUtils.SOURCE_DRYAD)
+				.withIndex(GraphUtils.PROPERTY_KEY)
+				.withUnique(true));
+		graph.addSchema(new GraphSchema()
+				.withLabel(GraphUtils.SOURCE_DRYAD)
+				.withIndex(GraphUtils.PROPERTY_DOI)
+				.withUnique(false));
 		// setup graph schema
 		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_KEY, true));
 		// extract root object
@@ -214,14 +240,12 @@ public class CrosswalkMets implements GraphCrosswalk {
 				
 						// create new node
 						GraphNode node = new GraphNode()
-							.withKey(idetifier)
-							.withSource(source);
+							.withKey(new GraphKey(source, idetifier))
+							.withSource(source)
+							.withType(GraphUtils.TYPE_DATASET);
 					//		.withProperty(GraphUtils.PROPERTY_OAI, oai);
 						
-						// add it to the graph
-						graph.addNode(node);
-						++createdRecords;
-						
+						// add it to the graph						
 						// check if record has been marked as deleted
 						if (status == StatusType.DELETED) 
 							setDeleted(node);
@@ -237,6 +261,9 @@ public class CrosswalkMets implements GraphCrosswalk {
 								setBroken(node);
 						} else
 							setBroken(node);
+						
+						graph.addNode(node);
+						++createdRecords;
 					}
 				} 
 			} else 
@@ -330,8 +357,8 @@ public class CrosswalkMets implements GraphCrosswalk {
 		if (null != xmlData) {
 			List<Object> xmlObjects = xmlData.getAny();
 
-			Element genre = findXmlElement(xmlObjects, NODE_GENRE);
-			if (null != genre) {
+	//		Element genre = findXmlElement(xmlObjects, NODE_GENRE);
+/*			if (null != genre) {
 				String nodeType = null;
 				String genreString = genre.getTextContent().toLowerCase();
 				if (genreString.equals(GENRE_DATASET))
@@ -340,17 +367,17 @@ public class CrosswalkMets implements GraphCrosswalk {
 					nodeType = GraphUtils.TYPE_PUBLICATION;
 
 				if (null != nodeType) {
-					node.setType(nodeType);
+					node.setType(nodeType);*/
 					
 					processIdentifiers(node, findXmlElements(xmlObjects, NODE_IDENTIFIER));
 					processTitle(node, findXmlElement(xmlObjects, NODE_TITLE_INFO));
 					processNames(node, findXmlElements(xmlObjects, NODE_NAME));
-					processRelatedItems(graph, (String) node.getSource(), (String) node.getKey(), 
+					processRelatedItems(graph, node,  
 							findXmlElements(xmlObjects, NODE_RELATED_ITEM));
 		
 					return true;
-				}
-			} 
+/*				}
+			}*/ 
 		} 
 		
 		// if we have reach this place, the record must be broken
@@ -371,8 +398,10 @@ public class CrosswalkMets implements GraphCrosswalk {
 				if (null != identifierString && ! identifierString.isEmpty()) {
 					if (identifierString.contains(PART_DOI)) {
 						String doi = GraphUtils.extractDoi(identifierString);
-						if (StringUtils.isNotEmpty(doi))
-							node.addProperty(GraphUtils.PROPERTY_DOI, doi);										
+						if (StringUtils.isNotEmpty(doi)) {
+							node.addIndex(source, GraphUtils.PROPERTY_DOI, doi);
+							//node.addProperty(GraphUtils.PROPERTY_DOI, doi);
+						}
 					} else if (identifierString.contains(PART_PURL)) {
 						String purl = GraphUtils.extractFormalizedUrl(identifierString);
 						if (StringUtils.isNotEmpty(purl))
@@ -415,7 +444,7 @@ public class CrosswalkMets implements GraphCrosswalk {
 						roleString = roleTerm.getTextContent();																
 				}
 	
-				if (roleString.equals(ROLE_AUTHOR)) {
+				if (null != roleString && roleString.equals(ROLE_AUTHOR)) {
 					String nameString = null;
 				
 					List<Element> nameParts = findXmlElements(name.getChildNodes(), NODE_NAME_PART);
@@ -441,26 +470,33 @@ public class CrosswalkMets implements GraphCrosswalk {
 	 * @param key
 	 * @param relatedItems
 	 */
-	private void processRelatedItems(Graph graph, String source, String key, List<Element> relatedItems) {
+	private void processRelatedItems(Graph graph, GraphNode node, List<Element> relatedItems) {
+		GraphKey start = node.getKey();
+		if (null == start)
+			throw new IllegalArgumentException("The Node does not have a Key");
 		if (null != relatedItems)
 			for (Element relatedItem : relatedItems) {
 				String relation = relatedItem.getTextContent();
-				if (null != relation && !relation.isEmpty()) {
-					String relationType = relatedItem.getAttribute(ATTRIBUTE_TYPE);
-					if (null == relationType || relationType.isEmpty())
-						relationType = GraphUtils.RELATIONSHIP_RELATED_TO;
-				
-					GraphRelationship relationship = new GraphRelationship()
-						.withRelationship(relationType)
-						.withStartSource(source)
-						.withStartKey(key)
-						.withEndSource(source)
-						.withEndKey(relation);
-				
-					graph.addRelationship(relationship);
-					
-					++createdRelationships;
-				}
+				if (relation.contains(PART_DOI)) {
+					String doi = GraphUtils.extractDoi(relation);
+					if (null != doi) {
+						String relationType = relatedItem.getAttribute(ATTRIBUTE_TYPE);
+						if (StringUtils.isNotEmpty(relationType)) {
+							if (relationType.equals(RELATION_HOST) 
+									|| relationType.equals(RELATION_CONSTITUENT)) {
+								graph.addRelationship(new GraphRelationship()
+									.withRelationship(relationType)
+									.withStart(start)
+									.withEnd(new GraphKey(start.getIndex(), GraphUtils.PROPERTY_DOI, doi)));
+								
+								++createdRelationships;
+							} else if (relationType.equals(RELATION_IS_REFERENCED_BY)) {
+								node.addProperty(GraphUtils.PROPERTY_REFERENCED_BY, doi);
+							}									
+						}
+					} else 
+						node.addProperty("invalid_doi", doi);
+				}		
 			}
 	}
 	

@@ -21,7 +21,7 @@ import org.rdswitchboard.exporters.graph.json.JsonGraph;
 import org.rdswitchboard.exporters.graph.json.JsonNode;
 import org.rdswitchboard.exporters.graph.json.JsonRelationship;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;

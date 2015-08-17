@@ -1,5 +1,7 @@
 package org.rdswitchboard.libraries.graph;
 
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Map;
 
 /**
@@ -9,30 +11,91 @@ import java.util.Map;
  */
 
 public class GraphNode extends GraphProperties {
-
+	private GraphKey key;
+	private final Set<GraphKey> indexes = new HashSet<GraphKey>();
+	
 	public GraphNode() {
-		
 	}
 	
 	public GraphNode(Map<String, Object> properties) {
 		super(properties);
 	}
-
+	
 	public boolean hasKey() {
-		return hasProperty(GraphUtils.PROPERTY_KEY);
+		return null != key;
+	}
+	
+	public GraphKey getKey() {
+		return key;
+	}
+
+	public void setKey(GraphKey key) {
+		this.key = key;
+	}
+	
+	public void setKey(String index, Object value) {
+		this.key = new GraphKey(index, value);
+	}
+
+	public void setKey(String index, String key, Object value) {
+		this.key = new GraphKey(index, key, value);
+	}
+
+	public Set<GraphKey> getIndexes() {
+		return indexes;
+	}
+	
+	/**
+	 * Function will return any existing key
+	 * @return GraphKey
+	 */
+/*	public GraphKey getAnyKey() {
+		return indexes.isEmpty() ? null : indexes.iterator().next();
+	}	*/
+	
+	public void addIndex(GraphKey index) {
+		indexes.add(index);
+	}
+	
+	public void addIndex(String index, Object value) {
+		indexes.add(new GraphKey(index, value));
+	}
+
+	public void addIndex(String index, String key, Object value) {
+		indexes.add(new GraphKey(index, key, value));
+	}
+
+	/*public boolean hasKey() {
+		return connection.hasKey();
 	}
 	
 	public Object getKey() {
-		return getProperty(GraphUtils.PROPERTY_KEY);
+		return connection.getValue();
 	}
 	
 	public void setKey(Object key) {
+		connection.setValue(key);
 		setProperty(GraphUtils.PROPERTY_KEY, key);
 	}
 	
 	public void setKeyOnce(Object key) {
-		setPropertyOnce(GraphUtils.PROPERTY_KEY, key);
+		if (!connection.hasKey()) {
+			connection.setValue(key);
+			setProperty(GraphUtils.PROPERTY_KEY, key);
+		}
 	}
+	
+	public boolean hasIndex() {
+		return hasProperty(GraphUtils.PROPERTY_INDEX);
+	}
+	
+	public String getIndex() {
+		return (String) getProperty(GraphUtils.PROPERTY_INDEX);
+	}
+	
+	public void setIndex(String index) {
+		setProperty(GraphUtils.PROPERTY_INDEX, index);
+	}*/
 
 	public boolean hasSource() {
 		return hasProperty(GraphUtils.PROPERTY_SOURCE);
@@ -65,6 +128,17 @@ public class GraphNode extends GraphProperties {
 	public void addType(Object type) {
 		addProperty(GraphUtils.PROPERTY_TYPE, type);
 	}
+	
+	public String[] getLabels() {
+		Set<String> labels = new HashSet<String>();
+		
+		for (Object source : properties.get(GraphUtils.PROPERTY_SOURCE))
+			labels.add((String) source);
+		for (Object type : properties.get(GraphUtils.PROPERTY_TYPE))
+			labels.add((String) type);
+		
+		return labels.toArray(new String[labels.size()]);
+	}
 
 	public boolean isDeleted() {
 		Object deleted = getProperty(GraphUtils.PROPERTY_DELETED);
@@ -83,6 +157,36 @@ public class GraphNode extends GraphProperties {
 	public void setBroken(boolean broken) {
 		setProperty(GraphUtils.PROPERTY_BROKEN, broken);
 	}
+
+	public GraphNode withKey(GraphKey key) {
+		setKey(key);
+		return this;
+	}
+	
+	public GraphNode withKey(String index, Object value) {
+		setKey(index, value);
+		return this;
+	}
+
+	public GraphNode withKey(String index, String key, Object value) {
+		setKey(index, key, value);
+		return this;
+	}
+	
+	public GraphNode withIndex(GraphKey index) {
+		addIndex(index);
+		return this;
+	}
+	
+	public GraphNode withIndex(String index, Object value) {
+		addIndex(index, value);
+		return this;
+	}
+
+	public GraphNode withIndex(String index, String key, Object value) {
+		addIndex(index, key, value);
+		return this;
+	}
 	
 	public GraphNode withProperties(Map<String, Object> properties) {
 		setProperties(properties);
@@ -94,10 +198,15 @@ public class GraphNode extends GraphProperties {
 		return this;
 	}
 	
-	public GraphNode withKey(String key) {
+	/*public GraphNode withKey(String key) {
 		setKey(key);
 		return this;
 	}
+	
+	public GraphNode withIndex(String index) {
+		setIndex(index);
+		return this;
+	}*/
 	
 	public GraphNode withSource(String source) {
 		setSource(source);
@@ -121,6 +230,6 @@ public class GraphNode extends GraphProperties {
 
 	@Override
 	public String toString() {
-		return "GraphNode [properties=" + properties + "]";
-	}	
+		return "GraphNode [key=" + key + ", indexes=" + indexes + ", properties=" + properties + "]";
+	}
 }

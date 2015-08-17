@@ -4,9 +4,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 import org.rdswitchboard.libraries.rifcs.graph.CrosswalkRifCs;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
@@ -90,9 +90,10 @@ public class App {
         AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
         
         CrosswalkRifCs crosswalk = new CrosswalkRifCs();
+        crosswalk.setSource(GraphUtils.SOURCE_ANDS);
      //   crosswalk.setVerbose(true);
         
-    	ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+    	Neo4jDatabase neo4j = new Neo4jDatabase(neo4jFolder);
     	//importer.setVerbose(true);
     		    
     	ListObjectsRequest listObjectsRequest;
@@ -115,8 +116,8 @@ public class App {
 				InputStream xml = object.getObjectContent();
 								
 				System.out.println("Parsing file: " + file);
-				Graph graph = crosswalk.process(GraphUtils.SOURCE_ANDS, xml);
-				importer.importGraph(graph);
+				Graph graph = crosswalk.process(xml);
+				neo4j.importGraph(graph);
 			}
 			listObjectsRequest.setMarker(objectListing.getNextMarker());
 		} while (objectListing.isTruncated());
@@ -124,7 +125,7 @@ public class App {
 		System.out.println("Done");
 		
 		crosswalk.printStatistics(System.out);
-		importer.printStatistics(System.out);
+		neo4j.printStatistics(System.out);
 	}
 	
 	/*private static void processMultiThread(String accessKey, String secretKey, 

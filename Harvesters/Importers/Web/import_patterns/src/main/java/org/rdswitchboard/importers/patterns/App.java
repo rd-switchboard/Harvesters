@@ -3,19 +3,15 @@ package org.rdswitchboard.importers.patterns;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Properties;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -50,7 +46,7 @@ public class App {
 	        if (StringUtils.isEmpty(patterns))
 	            throw new IllegalArgumentException("Invalid path to Patterns CSV file");
 	        
-	        ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+	        Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
 			importer.setVerbose(true);
 			importer.importSchema( new GraphSchema()
     			.withLabel(GraphUtils.SOURCE_WEB)
@@ -99,7 +95,7 @@ public class App {
 					String key = "pattern:"+host+":"+pat;
 					
 					graph.addNode(new GraphNode()
-						.withKey(key)
+						.withKey(GraphUtils.SOURCE_WEB, key)
 						.withSource(GraphUtils.SOURCE_WEB)
 						.withType(GraphUtils.TYPE_PATTERN)
 						.withProperty(GraphUtils.PROPERTY_PATTERN, pat)
@@ -107,10 +103,8 @@ public class App {
 					
 					graph.addRelationship(new GraphRelationship()
 						.withRelationship(GraphUtils.RELATIONSHIP_PATTERN)
-						.withStartKey(host)
-						.withStartSource(GraphUtils.SOURCE_WEB)
-						.withEndKey(key)
-						.withEndSource(GraphUtils.SOURCE_WEB));
+						.withStart(GraphUtils.SOURCE_WEB, host)
+						.withEnd(GraphUtils.SOURCE_WEB, key));
 				}
 			}
 				

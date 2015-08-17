@@ -23,9 +23,10 @@ import org.neo4j.graphdb.ResourceIterator;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.tooling.GlobalGraphOperations;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 
 public class App {
 	private static final String PROPERTIES_FILE = "properties/copy_harmonized.properties";
@@ -225,7 +226,7 @@ public class App {
 			
 			// check what node has a key
 			if (graphNode.hasKey()) {
-				String key = (String) graphNode.getKey();
+				String key = (String) graphNode.getKey().getValue();
 			//	System.out.println(key);
 				String type = (String) graphNode.getType();
 				Object sources = graphNode.getSource();
@@ -306,18 +307,20 @@ public class App {
 	private static void exportGraphNode(GraphNode graphNode, Collection<Node> nodes, 
 			String source, String keyName) throws Exception {
 		for (Node node : nodes) {
-			if (source.equals(node.getProperty(GraphUtils.PROPERTY_SOURCE))) {				
+			if (source.equals(node.getProperty(GraphUtils.PROPERTY_SOURCE))) {	
+				String nodeType = (String) node.getProperty(GraphUtils.PROPERTY_TYPE);
+				if (!graphNode.hasType()) 
+					graphNode.setType(nodeType);
+				
 				if (!graphNode.hasKey() && node.hasProperty(keyName)) {
 					String key = extractUri((String) node.getProperty(keyName));
-					graphNode.setKey(key);
+					graphNode.setKey(new GraphKey((String) graphNode.getType(), key));
 				}
 				
 				String nodeSource = (String) node.getProperty(GraphUtils.PROPERTY_SOURCE);
 				graphNode.addSource(nodeSource);
 				
-				String nodeType = (String) node.getProperty(GraphUtils.PROPERTY_TYPE);
-				if (!graphNode.hasType()) 
-					graphNode.setType(nodeType);
+				
 	/*			else
 					if (!nodeType.equals(graphNode.getType()))
 						throw new Exception("Unable to megre nodes with different types: " + nodeType + ", " + graphNode.getType());*/

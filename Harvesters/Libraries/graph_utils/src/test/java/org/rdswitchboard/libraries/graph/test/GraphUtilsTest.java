@@ -76,6 +76,10 @@ public class GraphUtilsTest {
 		assertEquals("Should be able to extract DOI from mailformed URL", 
 				"10.4049/jimmunol.1101206", 
 				GraphUtils.extractDoi("http://dx.doi.org/doi:10.4049/jimmunol.1101206"));
+
+		assertEquals("Should be able to extract DOI starting with doi:", 
+				"10.1080/106351598260581", 
+				GraphUtils.extractDoi("doi:10.1080/106351598260581"));
 		
 		assertEquals("Should be able to extract mailformed DOI", 
 				"10.1371/journal.pone.0019001", 

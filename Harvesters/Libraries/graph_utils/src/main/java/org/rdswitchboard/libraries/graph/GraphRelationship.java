@@ -23,8 +23,8 @@ import java.util.Map;
 
 public class GraphRelationship extends GraphProperties {
     private String relationship;
-    private final GraphProperties start = new GraphProperties();
-    private final GraphProperties end = new GraphProperties();
+    private GraphKey start;
+    private GraphKey end;
     
     public GraphRelationship() {
     	
@@ -44,45 +44,6 @@ public class GraphRelationship extends GraphProperties {
     	this.end = end;
     }*/
 
-	public GraphProperties getStart() {
-		return start;
-	}
-	
-	public Object getStartSource() {
-		return start.getProperty(GraphUtils.PROPERTY_SOURCE);
-	}
-
-	public void setStartSource(Object source) {
-		start.setProperty(GraphUtils.PROPERTY_SOURCE, source);
-	}
-
-	public Object getStartKey() {
-		return start.getProperty(GraphUtils.PROPERTY_KEY);
-	}
-
-	public void setStartKey(Object key) {
-		start.setProperty(GraphUtils.PROPERTY_KEY, key);
-	}
-	
-	public GraphProperties getEnd() {
-		return end;
-	}
-
-	public Object getEndSource() {
-		return end.getProperty(GraphUtils.PROPERTY_SOURCE);
-	}
-
-	public void setEndSource(Object source) {
-		end.setProperty(GraphUtils.PROPERTY_SOURCE, source);
-	}
-
-	public Object getEndKey() {
-		return end.getProperty(GraphUtils.PROPERTY_KEY);
-	}
-
-	public void setEndKey(Object key) {
-		end.setProperty(GraphUtils.PROPERTY_KEY, key);
-	}
 
 	public String getRelationship() {
 		return relationship;
@@ -90,6 +51,38 @@ public class GraphRelationship extends GraphProperties {
 
 	public void setRelationship(String relationship) {
 		this.relationship = relationship;
+	}
+
+	public GraphKey getStart() {
+		return start;
+	}
+
+	public void setStart(GraphKey start) {
+		this.start = start;
+	}
+
+	public void setStart(String index, Object value) {
+		this.start = new GraphKey(index, value);
+	}
+
+	public void setStart(String index, String key, Object value) {
+		this.start = new GraphKey(index, key, value);
+	}
+	
+	public GraphKey getEnd() {
+		return end;
+	}
+
+	public void setEnd(GraphKey end) {
+		this.end = end;
+	}
+	
+	public void setEnd(String index, Object value) {
+		this.end = new GraphKey(index, value);
+	}
+
+	public void setEnd(String index, String key, Object value) {
+		this.end = new GraphKey(index, key, value);
 	}
 
 	public GraphRelationship withRelationship(String relationship) {
@@ -107,26 +100,36 @@ public class GraphRelationship extends GraphProperties {
 		return this;
 	}
 	
-	public GraphRelationship withStartSource(Object source) {
-		setStartSource(source);
+	public GraphRelationship withStart(GraphKey start) {
+		setStart(start);
 		return this;
 	}
 
-	public GraphRelationship withStartKey(Object key) {
-		setStartKey(key);
+	public GraphRelationship withStart(String index, Object value) {
+		setStart(index, value);
 		return this;
 	}
 
-	public GraphRelationship withEndSource(Object source) {
-		setEndSource(source);
+	public GraphRelationship withStart(String index, String key, Object value) {
+		setStart(index, key, value);
 		return this;
 	}
 
-	public GraphRelationship withEndKey(Object key) {
-		setEndKey(key);
+	public GraphRelationship withEnd(GraphKey end) {
+		setEnd(end);
 		return this;
 	}
 
+	public GraphRelationship withEnd(String index, Object value) {
+		setEnd(index, value);
+		return this;
+	}
+
+	public GraphRelationship withEnd(String index, String key, Object value) {
+		setEnd(index, key, value);
+		return this;
+	}
+	
 	@Override
 	public String toString() {
 		return "GraphRelationship [relationship=" + relationship + ", start="

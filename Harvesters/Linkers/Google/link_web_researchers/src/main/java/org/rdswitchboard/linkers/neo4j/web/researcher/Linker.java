@@ -28,13 +28,13 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 import org.rdswitchboard.utils.google.cache2.Link;
 import org.rdswitchboard.utils.google.cache2.Result;
 import org.rdswitchboard.utils.google.cache2.GoogleUtils;
 import org.rdswitchboard.utils.google.cse.Item;
 import org.rdswitchboard.utils.google.cse.Query;
 import org.rdswitchboard.utils.google.cse.QueryResponse;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
 
 public class Linker {	
 	private static final String FIELD_PATTERN = "pattern";

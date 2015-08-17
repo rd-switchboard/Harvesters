@@ -1,6 +1,11 @@
-package org.rdswitchboard.libraries.graph;
+package org.rdswitchboard.libraries.graph.interfaces;
 
 import java.util.Collection;
+
+import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphNode;
+import org.rdswitchboard.libraries.graph.GraphRelationship;
+import org.rdswitchboard.libraries.graph.GraphSchema;
 
 public interface GraphImporter {
 	void importGraph(Graph graph);

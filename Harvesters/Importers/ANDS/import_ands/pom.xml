@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.rdswitchboard</groupId>
     <artifactId>harvesters</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchbaord.importers</groupId>
@@ -72,12 +72,12 @@
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
   	  <artifactId>crosswalk_rif_cs</artifactId>
-      <version>1.1.0</version>
+      <version>1.2.0</version>
   	</dependency>
   	<dependency>
-  	  <groupId>org.rdswitchboard.databases</groupId>
-  	  <artifactId>import_graph_neo4j</artifactId>
-  	  <version>1.1.0</version>
+  	  <groupId>org.rdswitchboard.libraries</groupId>
+  	  <artifactId>neo4j_utils</artifactId>
+  	  <version>1.2.0</version>
   	</dependency>
   </dependencies>
   

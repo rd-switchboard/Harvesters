@@ -16,11 +16,12 @@ import org.openarchives.oai._2.OAIPMHtype;
 import org.openarchives.oai._2.RecordType;
 import org.openarchives.oai._2.StatusType;
 import org.rdswitchboard.libraries.graph.Graph;
-import org.rdswitchboard.libraries.graph.GraphCrosswalk;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.graph.interfaces.GraphCrosswalk;
 
 import au.org.ands.standards.rif_cs.registryobjects.Activity;
 import au.org.ands.standards.rif_cs.registryobjects.Collection;
@@ -75,6 +76,8 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 	
 	private boolean verbose = false;
 	
+	private String source;
+	
 	public CrosswalkRifCs() throws JAXBException {
 		unmarshaller = JAXBContext.newInstance( "org.openarchives.oai._2:au.org.ands.standards.rif_cs.registryobjects:au.org.ands.standards.rif_cs.extendedregistryobjects" ).createUnmarshaller();
 	}
@@ -118,8 +121,20 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 	public void mark() {
 		markTime = System.currentTimeMillis();
 	}
+	
+	@Override
+	public void setSource(String source) {
+		this.source = source;
+		
+	}
 
-	public Graph process(String source, InputStream xml) throws Exception {
+	@Override
+	public String getSource() {
+		return source;
+	}
+
+	@Override
+	public Graph process(InputStream xml) throws Exception {
 		if (0 == markTime)
 			markTime = System.currentTimeMillis();
 		
@@ -150,7 +165,7 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 									System.out.println("Key: " + key);
 								
 								GraphNode node = new GraphNode()
-									.withKey(key)
+									.withKey(new GraphKey(source, key))
 									.withSource(source)
 									.withProperty(GraphUtils.PROPERTY_ANDS_GROUP, group);
 								
@@ -210,7 +225,7 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(graph, node, (RelatedObjectType) object);
+				processRelatedObject(graph, node.getKey(), (RelatedObjectType) object);
 			else if (object instanceof DatesType) 
 				processDates(node, GraphUtils.PROPERTY_PUBLISHED_DATE, COLLECTION_DATES, (DatesType) object);
 		}
@@ -235,7 +250,7 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(graph, node, (RelatedObjectType) object);
+				processRelatedObject(graph, node.getKey(), (RelatedObjectType) object);
 			else if (object instanceof DatesType) 
 				processDates(node, GraphUtils.PROPERTY_AWARDED_DATE, GRANT_DATES, (DatesType) object);
 		}
@@ -264,7 +279,7 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 			else if (object instanceof NameType)
 				processName(node, (NameType) object);
 			else if (object instanceof RelatedObjectType) 
-				processRelatedObject(graph, node, (RelatedObjectType) object);
+				processRelatedObject(graph, node.getKey(), (RelatedObjectType) object);
 		}
 		
 		graph.addNode(node);
@@ -374,18 +389,15 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 		}
 	}
 	
-	private void processRelatedObject(Graph graph, GraphNode from, RelatedObjectType relatedObject) {
+	private void processRelatedObject(Graph graph, GraphKey from, RelatedObjectType relatedObject) {
 		for (RelationType relType : relatedObject.getRelation()) {
 			String key = relatedObject.getKey();
 			String type = relType.getType();
 			if (null != key && !key.isEmpty() && null != type && !type.isEmpty()) { 
-				Object source = from.getSource();
 				GraphRelationship relationship = new GraphRelationship()
 					.withRelationship(type)
-					.withStartSource(source)
-					.withStartKey(from.getKey())
-					.withEndSource(source)
-					.withEndKey(key);
+					.withStart(from)
+					.withEnd(new GraphKey(from.getIndex(), key));
 				
 				graph.addRelationship(relationship);
 			}
@@ -413,6 +425,5 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 		}
 		
 		return null;		
-	}
-	
+	}	
 }

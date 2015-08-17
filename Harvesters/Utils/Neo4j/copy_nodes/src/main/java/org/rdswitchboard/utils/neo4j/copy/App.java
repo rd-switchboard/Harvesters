@@ -25,7 +25,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.tooling.GlobalGraphOperations;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 
 public class App {
 	private static final String PROPERTIES_FILE = "properties/copy_nodes.properties";

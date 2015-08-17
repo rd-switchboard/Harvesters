@@ -11,13 +11,14 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
-import org.rdswitchboard.libraries.graph.GraphImporter;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.graph.interfaces.GraphImporter;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -79,7 +80,7 @@ public class App {
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			GraphImporter importer = new ImporterNeo4j(neo4jFolder);
+			GraphImporter importer = new Neo4jDatabase(neo4jFolder);
 			importer.setVerbose(true);
 			importer.importSchemas(schema);
 			
@@ -140,15 +141,14 @@ public class App {
 						institutions.add(institutionKey);
 
 						graph.addNode(new GraphNode()
-							.withKey(institutionKey)
-							.withSource(GraphUtils.SOURCE_ARC)
+							.withKey(new GraphKey(GraphUtils.SOURCE_ARC, institutionKey))
 							.withType(GraphUtils.TYPE_INSTITUTION)
 							.withProperty(GraphUtils.PROPERTY_TITLE, institutionName));
 						
 					}					
-						
+					
 					graph.addNode(new GraphNode()
-						.withKey(purl)
+						.withKey(new GraphKey(GraphUtils.SOURCE_ARC, purl))
 						.withSource(GraphUtils.SOURCE_ARC)
 						.withType(GraphUtils.TYPE_GRANT)
 						.withProperty(GraphUtils.PROPERTY_URL, purl)
@@ -158,10 +158,8 @@ public class App {
 					
 					graph.addRelationship(new GraphRelationship()
 						.withRelationship("AdminInstitute")
-						.withStartSource(GraphUtils.SOURCE_ARC)
-						.withStartKey(purl)
-						.withEndSource(GraphUtils.SOURCE_ARC)
-						.withEndKey(institutionKey));
+						.withStart(new GraphKey(GraphUtils.SOURCE_ARC, purl))
+						.withEnd(new GraphKey(GraphUtils.SOURCE_ARC, institutionKey)));
 							
 					if (!investigatorString.contains("n.a.")) {
 									
@@ -214,17 +212,15 @@ public class App {
 								String granteeKey = "arc:researcher:" + projectId + ":" + granteeName;
 								
 								graph.addNode(new GraphNode()
-									.withKey(granteeKey)
+									.withKey(new GraphKey(GraphUtils.SOURCE_ARC, granteeKey))
 									.withSource(GraphUtils.SOURCE_ARC)
 									.withType(GraphUtils.TYPE_RESEARCHER)
 									.withProperty(GraphUtils.PROPERTY_TITLE, granteeName));
 																
 								graph.addRelationship(new GraphRelationship()
 									.withRelationship("Investigator")
-									.withStartSource(GraphUtils.SOURCE_ARC)
-									.withStartKey(granteeKey)
-									.withEndSource(GraphUtils.SOURCE_ARC)
-									.withEndKey(purl));
+									.withStart(new GraphKey(GraphUtils.SOURCE_ARC, granteeKey))
+									.withEnd(new GraphKey(GraphUtils.SOURCE_ARC, purl)));
 							}
 						}
 					}

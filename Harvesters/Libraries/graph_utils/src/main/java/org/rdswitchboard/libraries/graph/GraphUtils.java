@@ -14,6 +14,7 @@ public class GraphUtils {
 	public static final String SCHEMA_UNIQUE = "unique";
 	
 	// required properties
+	public static final String PROPERTY_INDEX = "index";
 	public static final String PROPERTY_KEY = "key";
 	public static final String PROPERTY_SOURCE = "node_source";
 	public static final String PROPERTY_TYPE = "node_type";
@@ -52,6 +53,7 @@ public class GraphUtils {
 	public static final String PROPERTY_ISSN = "issn";
 	//public static final String PROPERTY_OAI = "oai";
 	public static final String PROPERTY_AUTHORS = "authors";
+	public static final String PROPERTY_REFERENCED_BY = "referenced_by"; // temporary for Dryad
 	
 	// control properties
 	public static final String PROPERTY_DELETED = "deleted";
@@ -85,7 +87,8 @@ public class GraphUtils {
 	public static final String SCOPUS_PARTNER_ID = "MN8TOARS";
 	
 	private static final String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
-	private static final String DOI_REGEX = "\\d{2}\\.\\d{4,}/.+$";
+	//private static final String DOI_REGEX = "\\d{2,}(\\.\\d{4,})?/.+$";
+	private static final String DOI_REGEX = "\\d+(\\.\\d+)?/.+$";
 	private static final String ORCID_REGEX = "\\d{4}-\\d{4}-\\d{4}-\\d{3}(\\d|X)";
 	private static final String SCOPUS_AUTHOR_REGEX = "author[iI][dD]=\\d+";
 	private static final String SCOPUS_PARTNER_REGEX = "partner[iI][dD]=[A-Z0-9]+";
@@ -100,7 +103,7 @@ public class GraphUtils {
     private static final String PART_WWW3 = "www3.";
     private static final String PART_WEB = "web.";
     private static final String PART_ORCID_URI = "orcid.org/";
-    //private static final String PART_DOI_PERFIX = "doi:";
+    private static final String PART_DOI_PERFIX = "doi:";
     private static final String PART_DOI_URI = "dx.doi.org/";
     private static final String PART_SCOPUS_URL = "www.scopus.com/inward/authorDetails.url?authorID=%s&partnerID=%s";
     private static final String PART_SCOPUS_EID_URL = "www.scopus.com/inward/record.url?eid=%s&partnerID=%s";
@@ -261,7 +264,23 @@ public class GraphUtils {
 	 * @return String containing DOI or null if DOI can not be extracted
 	 */
 	public static String extractDoi(String str) {
-    	if (StringUtils.isNotEmpty(str)) {
+		if (StringUtils.isNotEmpty(str)) {
+			boolean found = false;
+			int pos = str.indexOf(PART_DOI_PERFIX);
+			if (pos >= 0) {
+				str = str.substring(pos + PART_DOI_PERFIX.length());
+				found = true;
+			}
+			
+			pos = str.indexOf(PART_DOI_URI);
+			if (pos >= 0) {
+				str = str.substring(pos + PART_DOI_URI.length());
+				found = true;
+			}
+			
+			if (found)
+				return str;
+			
     		Matcher matcher = patternDoi.matcher(str);
     		if (matcher.find()) 
     			return matcher.group();

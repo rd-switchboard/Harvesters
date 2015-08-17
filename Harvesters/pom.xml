@@ -4,7 +4,7 @@
   <groupId>org.rdswitchboard</groupId>
   <artifactId>harvesters</artifactId>
   <packaging>pom</packaging>
-  <version>1.1.0</version>
+  <version>1.2.0</version>
   <name>Harvesters</name>
 
   <properties>
@@ -27,7 +27,6 @@
   <modules>
   	<module>Libraries/graph_utils</module>
   	<module>Libraries/neo4j_utils</module>
-  	<module>Libraries/Neo4j/import_graph_neo4j</module>
   	<module>Libraries/Google/google_cache</module>
   	<module>Libraries/Google/google_cse</module>
 	<module>Libraries/ORCID/orcid_utils</module>

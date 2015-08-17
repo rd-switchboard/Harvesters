@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.Properties;
 
 import org.parboiled.common.StringUtils;
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -73,7 +74,7 @@ public class App {
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+			Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
 			importer.setVerbose(true);
 			importer.importSchemas(schemas);
 			
@@ -121,7 +122,7 @@ public class App {
 					System.out.println("Institution: " + formalizedUrl + ", host: " + host);
 		
 					GraphNode node = new GraphNode()
-						.withKey(host)
+						.withKey(new GraphKey(GraphUtils.SOURCE_WEB, host))
 						.withSource(GraphUtils.SOURCE_WEB)
 						.withType(GraphUtils.TYPE_INSTITUTION)
 						.withProperty(GraphUtils.PROPERTY_TITLE, title)

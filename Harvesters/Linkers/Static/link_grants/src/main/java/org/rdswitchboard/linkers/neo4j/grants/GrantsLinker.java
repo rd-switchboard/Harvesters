@@ -14,7 +14,7 @@ import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.Index;
 import org.neo4j.graphdb.index.IndexHits;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 
 public class GrantsLinker {
 	private GraphDatabaseService graphDb;

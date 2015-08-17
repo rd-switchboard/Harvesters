@@ -4,10 +4,10 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.rdswitchboard.importers.graph.neo4j.ImporterNeo4j;
 import org.rdswitchboard.importers.mets.CrosswalkMets;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
@@ -20,7 +20,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.amazonaws.util.StringUtils;
 
 public class App {
-private static final String PROPERTIES_FILE = "properties/import_dryad.properties";
+	private static final String PROPERTIES_FILE = "properties/import_dryad.properties";
 	
 	public static void main(String[] args) {
 		try {
@@ -89,9 +89,10 @@ private static final String PROPERTIES_FILE = "properties/import_dryad.propertie
         AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
         
         CrosswalkMets crosswalk = new CrosswalkMets();
+        crosswalk.setSource(GraphUtils.SOURCE_DRYAD);
         crosswalk.setVerbose(true);
         
-    	ImporterNeo4j importer = new ImporterNeo4j(neo4jFolder);
+    	Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
     	importer.setVerbose(true);
     	
     	ListObjectsRequest listObjectsRequest;
@@ -114,7 +115,7 @@ private static final String PROPERTIES_FILE = "properties/import_dryad.propertie
 				InputStream xml = object.getObjectContent();
 								
 				System.out.println("Parsing file: " + file);
-				Graph graph = crosswalk.process(GraphUtils.SOURCE_DRYAD, xml);
+				Graph graph = crosswalk.process(xml);
 				importer.importGraph(graph);
 			}
 			listObjectsRequest.setMarker(objectListing.getNextMarker());

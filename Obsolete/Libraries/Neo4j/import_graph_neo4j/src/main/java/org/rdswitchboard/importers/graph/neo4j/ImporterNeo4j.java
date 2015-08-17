@@ -24,7 +24,7 @@ import org.rdswitchboard.libraries.graph.GraphProperties;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
 import org.rdswitchboard.libraries.graph.GraphUtils;
-import org.rdswitchboard.libraries.graph.GraphImporter;
+import org.rdswitchboard.libraries.graph.interfaces.GraphImporter;
 import org.rdswitchboard.utils.neo4j.local.Neo4jUtils;
 
 public class ImporterNeo4j implements GraphImporter {

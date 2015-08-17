@@ -1,76 +1,102 @@
 package org.rdswitchboard.importers.crossref;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import org.rdswitchboard.libraries.crossref.Author;
 import org.rdswitchboard.libraries.crossref.CrossRef;
+import org.rdswitchboard.libraries.crossref.Item;
+import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphNode;
+import org.rdswitchboard.libraries.graph.GraphRelationship;
+import org.rdswitchboard.libraries.graph.GraphUtils;
 
-public class Importer {
+public class CrossrefGraph extends CrossRef{
+
+	/**
+	 * Function to Query CrossRef metadata 
+	 * @param doi An DOI in a format, returned by GraphUtils.extractDoi() function 
+	 * @return Grah
+	 */
 	
-	private CrossRef crossref;
-	
-/*	private static final String PROPERTY_URL = "url";
-	private static final String PROPERTY_PREFIX = "prefix";
-	private static final String PROPERTY_ISSN = "issn";
-	private static final String PROPERTY_TITLE = "title";
-	private static final String PROPERTY_SUBTITLE = "subtitle";
-//	private static final String PROPERTY_SUBJECT = "subject";
-//	private static final String PROPERTY_CONTAINER_TITLE = "title_container";
-	private static final String PROPERTY_AUTHOR = "author";
-	private static final String PROPERTY_EDITOR = "editor";
-	private static final String PROPERTY_ISSUED = "issued";
-	private static final String PROPERTY_DEPOSITED = "deposited";
-	private static final String PROPERTY_INDEXED = "indexed";
-	
-	private static final String PROPERTY_SUFFIX = "suffix";
-	private static final String PROPERTY_FAMILY_NAME = "family_name";
-	private static final String PROPERTY_GIVEN_NAME = "given_name";
-	private static final String PROPERTY_FULL_NAME = "full_name";
-	private static final String PROPERTY_ORCID = "orcid";
-		
-	private static final String PART_DOI = "doi:";*/
-	
-/*	private RestAPI graphDb;
-	private RestCypherQueryEngine engine;
-	
-	
-	private RestIndex<Node> indexCrossrefPublication;
-	private RestIndex<Node> indexCrossrefResearcher;
-	
-	private int crossrefPublications;
-	private int crossrefResearchers;
-	
-	private Map<String, RestNode> nodesCrossref = new HashMap<String, RestNode>();
-	
-	private static enum Labels implements Label {
-		CrossRef, Publication, Researcher
-	};
-	
-	private static enum Relationhips implements RelationshipType {
-		author, editor, knownAs
-	};*/
-		
-	public Importer(final String neo4jUrl, final String cacheFolder) {
-		System.out.println("Neo4j URL: " + neo4jUrl);
-		System.out.println("CrossRef Cache folder: " + cacheFolder);
-		
-		// connect to graph database
-/*		graphDb = new RestAPIFacade(neo4jUrl);  
+	public Graph queryGraph(String doi) {
+		// make sure we have doi
+		Item item = requestWork(doi);
+		if (null != item) {
+			Graph graph = new Graph();
+			String doiUri = GraphUtils.generateDoiUri(doi);
+			GraphNode nodePublication = new GraphNode()
+				.withKey(doiUri)
+				.withIndex(GraphUtils.SOURCE_CROSSREF)
+				.withSource(GraphUtils.SOURCE_CROSSREF)
+				.withType(GraphUtils.TYPE_PUBLICATION)
+				.withProperty(GraphUtils.PROPERTY_DOI, doi)
+				.withProperty(GraphUtils.PROPERTY_URL, doiUri)
+//				.withProperty(GraphUtils.PROPERTY_URL, item.getUrl())
+//				.withProperty(GraphUtils.PROPERTY_NAME_PREFIX, item.getPrefix())
+				.withProperty(GraphUtils.PROPERTY_ISSN, item.getIssn())
+				.withProperty(GraphUtils.PROPERTY_TITLE, item.getTitle())
+//				.withProperty(GraphUtils.PROPERTY_SUBTITLE, item.getSubject())
+//				.withProperty(GraphUtils.PROPERTY_CONTAINER_TITLE, item.getContainerTitle())
+//				.withProperty(GraphUtils.PROPERTY_AUTHORS, item.getAuthorString())
+//				.withProperty(GraphUtils.PROPERTY_EDITORS, item.getEditorString())
+				.withProperty(GraphUtils.PROPERTY_PUBLISHED_DATE, item.getIssuedString());
+//				.withProperty(GraphUtils.PROPERTY_DEPOSITED_DATE, item.getDepositedString())
+//				.withProperty(GraphUtils.PROPERTY_INDEXED_DATE, item.getIndexedString());
+			
+			graph.addNode(nodePublication);
+			
+			String url = GraphUtils.extractFormalizedUrl(item.getUrl());
+			if (null != url) {
+				GraphNode nodeWeb = new GraphNode()
+					.withKey(url)
+					.withIndex(GraphUtils.SOURCE_WEB)
+					.withSource(GraphUtils.SOURCE_WEB)
+					.withType(GraphUtils.TYPE_PUBLICATION)
+					.withProperty(GraphUtils.PROPERTY_URL, url)
+					.withProperty(GraphUtils.PROPERTY_TITLE, item.getTitle());
+					
+				graph.addNode(nodeWeb);
 				
-		// Create cypher engine
-		engine = new RestCypherQueryEngine(graphDb);  
-
-		Neo4jUtils.createConstraint(engine, Labels.CrossRef, Labels.Publication);
-		Neo4jUtils.createConstraint(engine, Labels.CrossRef, Labels.Researcher);
-	
-		indexCrossrefPublication = Neo4jUtils.getIndex(graphDb, Labels.CrossRef, Labels.Publication);
-		indexCrossrefResearcher = Neo4jUtils.getIndex(graphDb, Labels.CrossRef, Labels.Researcher);*/
+				graph.addRelationship(new GraphRelationship()
+					.withRelationship(GraphUtils.RELATIONSHIP_KNOWN_AS)
+					.withStartKey(doiUri)
+					.withStartIndex(GraphUtils.SOURCE_CROSSREF)
+					.withEndKey(url)
+					.withEndIndex(GraphUtils.SOURCE_WEB));
+			}
+			
+			if (null != item.getAuthor())
+				for (Author author : item.getAuthor()) {
+					String fullName = author.getFullName();
+					String key = doi + ":" + fullName;
+					
+					nodePublication.addProperty(GraphUtils.PROPERTY_AUTHORS, fullName);
+					
+					graph.addNode(new GraphNode()
+						.withKey(GraphUtils.generateDoiUri(key))
+						.withIndex(GraphUtils.SOURCE_CROSSREF)
+						.withSource(GraphUtils.SOURCE_CROSSREF)
+						.withType(GraphUtils.TYPE_RESEARCHER)
+						.withProperty(GraphUtils.PROPERTY_NAME_PREFIX, author.getSuffix())
+						.withProperty(GraphUtils.PROPERTY_FIRST_NAME, author.getGiven())
+						.withProperty(GraphUtils.PROPERTY_LAST_NAME, author.getFamily())
+						.withProperty(GraphUtils.PROPERTY_FULL_NAME, author.getFullName())
+						.withProperty(GraphUtils.PROPERTY_ORCID_ID, author.getOrcid()));
+					
+					graph.addRelationship(new GraphRelationship()
+						.withRelationship(GraphUtils.RELATIONSHIP_AUTHOR)
+						.withStartKey(doi)
+						.withStartIndex(GraphUtils.SOURCE_CROSSREF)
+						.withEndKey(key)
+						.withEndIndex(GraphUtils.SOURCE_CROSSREF));
+				}
+			
+			return graph;
+			
+		}
 		
-		crossref = new CrossRef();
-		crossref.setCacheFolder(cacheFolder);
+		return null;
 	}
 	
+	/*
 	public void process() {
 		crossrefPublications = crossrefResearchers = 0;
 		
@@ -128,7 +154,7 @@ public class Importer {
 		
 		RestNode nodeCrossrefPublication = null;
 		
-		Item item = crossref.requestWork(doi);
+		
 		if (null != item) {
 			Map<String, Object> map = new HashMap<String, Object>();
 			addProperty(map, PROPERTY_URL, item.getUrl());
