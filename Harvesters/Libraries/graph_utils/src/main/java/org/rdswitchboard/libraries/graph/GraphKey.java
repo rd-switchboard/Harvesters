@@ -88,7 +88,7 @@ public class GraphKey implements Cloneable {
 
 	@Override
 	public String toString() {
-		return "GraphConnection [index=" + index + ", key=" + key + ", value="
-				+ value + "]";
+		return "index=" + index + ", key=" + key + ", value="
+				+ value;
 	}
 }

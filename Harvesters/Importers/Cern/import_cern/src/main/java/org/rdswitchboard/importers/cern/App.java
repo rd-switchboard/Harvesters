@@ -1,31 +1,23 @@
 package org.rdswitchboard.importers.cern;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.InputStream;
+import java.util.Properties;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import org.rdswitchboard.libraries.graph.Graph;
+import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.marc21.CrosswalkMarc21;
+import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
-import org.neo4j.graphdb.Label;
-import org.neo4j.graphdb.Node;
-import org.neo4j.rest.graphdb.RestAPI;
-import org.neo4j.rest.graphdb.RestAPIFacade;
-import org.neo4j.rest.graphdb.entity.RestNode;
-import org.neo4j.rest.graphdb.index.RestIndex;
-import org.neo4j.rest.graphdb.query.RestCypherQueryEngine;
-import org.openarchives.oai._2.HeaderType;
-import org.openarchives.oai._2.RecordType;
-import org.openarchives.oai._2.StatusType;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.GetObjectRequest;
+import com.amazonaws.services.s3.model.ListObjectsRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.amazonaws.util.StringUtils;
 
 /**
  * Main class for CERN DC data importer
@@ -39,189 +31,164 @@ import org.w3c.dom.NodeList;
  *
  */
 public class App {
-
-	/**
-	 * CERN data lables
-	 */
-	private static enum Labels implements Label {
-		Publication, Cern
-	};
-
-	/**
-	 * Function to test is XML element has correct local name
-	 * @param xml Element
-	 * @param name String
-	 * @return Element or null if name is incorrect
-	 */
-	protected static Element findXmlElement(Element xml, String name) {
-		if (xml.getLocalName().equals(name))
-			return xml;
-
-		return null;
-	}
+	private static final String PROPERTIES_FILE = "properties/import_cern.properties";
 	
-	/**
-	 * Function to select correct xml element from a list
-	 * @param xmls {@code List<Object> xmls}
-	 * @param name String 
-	 * @return Element or null if name is incorrect
-	 */
-	protected static Element findXmlElement(List<Object> xmls, String name) {
-		for (Object xml : xmls) 
-			if (xml instanceof Element && ((Element) xml).getLocalName().equals(name))
-				return (Element) xml;
-
-		return null;
-	}
-	
-	/**
-	 * Function to select correct xml element from a NodeList
-	 * @param xmls NodeList
-	 * @param name String
-	 * @return Element or null if name is incorrect
-	 */
-	protected static Element findXmlElement(NodeList xmls, String name) {
-		if (null != xmls) {
-			int length = xmls.getLength();
-			for (int i = 0; i < length; ++i) {
-				org.w3c.dom.Node xml = xmls.item(i);
-				if (xml instanceof Element && ((Element) xml).getLocalName().equals(name))
-					return (Element) xml;
-			}
-		}
-
-		return null;
-	}
-	
-	/**
-	 * Function to select List of xml elements by local name
-	 * @param xmls {@code List<Object>}
-	 * @param name String
-	 * @return {@code List<Element>}
-	 */
-	protected static List<Element> findXmlElements(List<Object> xmls, String name) {
-		List<Element> list = null;		
-		for (Object xml : xmls) 
-			if (xml instanceof Element && ((Element) xml).getLocalName().equals(name)) {
-				if (null == list)
-					list = new ArrayList<Element>();
-				
-				list.add((Element) xml);
-			}
-
-		return list;
-	}
-	
-	/**
-	 * Function to add a property to the map. If there is already property with same name, 
-	 * it will be converted to a Set 
-	 * @param map {@code Map<String, Object>} A map to be changed
-	 * @param field String
-	 * @param data String
-	 */
-	@SuppressWarnings("unchecked")
-	protected static void addData(Map<String, Object> map, String field, String data) {
-		if (null != field && !field.isEmpty() && null != data && !data.isEmpty()) {
-			Object par = map.get(field);
-			if (null == par) 
-				map.put(field, data);
-			else if (par instanceof String) {
-				List<String> pars = new ArrayList<String>();
-				pars.add((String) par);
-				pars.add(data);
-				map.put(field, par);				
-			} else 
-				((List<String>)par).add(data);			
-		}
-	}
-	
-	/**
-	 * Main function
-	 * @param args String[] 
-	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
-		// connect to graph database
-		RestAPI graphDb = new RestAPIFacade("http://localhost:7474/db/data/");  
-		RestCypherQueryEngine engine=new RestCypherQueryEngine(graphDb);  
-		
-		engine.query("CREATE CONSTRAINT ON (n:Cern_Publication) ASSERT n.doi IS UNIQUE", Collections.<String, Object> emptyMap());
-		RestIndex<Node> index = graphDb.index().forNodes("Cern_Publication");
-		
 		try {
-			JAXBContext jc = JAXBContext.newInstance( "org.openarchives.oai._2:org.purl.dc.elements._1" );
-			Unmarshaller u = jc.createUnmarshaller();
-			
-			File[] folders = new File("cern/xml/oai_dc").listFiles();
-			for (File folder : folders)
-				if (folder.isDirectory() && !folder.getName().equals("_cache")) {
-					File[] files = folder.listFiles();
-					for (File file : files)  
-						if (!file.isDirectory()) {				
-							try {
-								JAXBElement<?> element = (JAXBElement<?>) u.unmarshal( new FileInputStream( file ) );
-								
-								RecordType record = (RecordType) element.getValue();	
-								HeaderType header = record.getHeader();
-								
-								if (header.getStatus() != StatusType.DELETED) {
-									
-									String idetifier = header.getIdentifier();
-									System.out.println("idetifier: " + idetifier);
-	//								System.out.println(idetifier.toString());
-								//	String datestamp = header.getDatestamp();
-		//							System.out.println(datestamp.toString());
-								//	List<String> specs = header.getSetSpec();
-									
-									if (null != idetifier && !idetifier.isEmpty() && null != record.getMetadata()) {
-										Element metadata = (Element) record.getMetadata().getAny();
-										if (null != metadata) {
-											Map<String, Object> map = new HashMap<String, Object>();
-											
-											for(org.w3c.dom.Node child = metadata.getFirstChild(); child != null; child = child.getNextSibling())
-										        if(child instanceof Element) {
-										        	String tag = ((Element) child).getLocalName();
-										        	if (tag.equals("identifier")) {
-										        		if (child.getTextContent().contains("cds.cern.ch"))
-										        			addData(map, "cern_url", child.getTextContent());
-										        	} else if (tag.equals("language")) {
-										        		addData(map, "language", child.getTextContent());
-										        	} else if (tag.equals("title")) {
-										        		addData(map, "title", child.getTextContent());
-										        	} else if (tag.equals("subject")) {
-										        		addData(map, "subject", child.getTextContent());
-										        	} else if (tag.equals("publisher")) {
-										        		addData(map, "publisher", child.getTextContent());
-										        	} else if (tag.equals("date")) {
-										        		addData(map, "date", child.getTextContent());
-										        	}
-										        }
-										
-											map.put("doi", idetifier);
-											map.put("node_source", "Cern");
-											map.put("node_type", "Publication");
-											
-										//	System.out.println("Create node");
-											
-											RestNode node = graphDb.getOrCreateNode(index, "doi", idetifier, map);
-											if (!node.hasLabel(Labels.Publication))
-												node.addLabel(Labels.Publication); 
-											if (!node.hasLabel(Labels.Cern))
-												node.addLabel(Labels.Cern);
-										}											
-									}
-								}
-							
-							} catch (FileNotFoundException e) {
-								e.printStackTrace();
-							}
-						}
-			}
-			
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+            String propertiesFile = PROPERTIES_FILE;
+            if (args.length > 0 && !StringUtils.isNullOrEmpty(args[0])) 
+                    propertiesFile = args[0];
+
+            Properties properties = new Properties();
+	        try (InputStream in = new FileInputStream(propertiesFile)) {
+	            properties.load(in);
+	        }
+	        
+	        String bucket = properties.getProperty("s3.bucket");
+	        
+	        if (StringUtils.isNullOrEmpty(bucket))
+                throw new IllegalArgumentException("AWS S3 Bucket can not be empty");
+
+	        System.out.println("S3 Bucket: " + bucket);
+	        
+	        String prefix = properties.getProperty("s3.prefix");
+	        	
+	        if (StringUtils.isNullOrEmpty(prefix))
+	            throw new IllegalArgumentException("AWS S3 Prefix can not be empty");
+        
+	        System.out.println("S3 Prefix: " + prefix);
+	        
+	        String neo4jFolder = properties.getProperty("neo4j");
+	        
+	        if (StringUtils.isNullOrEmpty(neo4jFolder))
+	            throw new IllegalArgumentException("Neo4j Folder can not be empty");
+	        
+	        System.out.println("Neo4J: " + neo4jFolder);
+	        
+	       /*debugFile(accessKey, secretKey, bucket, "rda/rif/class:collection/54800.xml");*/ 
+	        
+        	processFiles(bucket, prefix, neo4jFolder);
+		} catch (Exception e) {
+            e.printStackTrace();
+		}       
 	}
+	
+	/*
+	private static void debugFile(String accessKey, String secretKey, String bucket, String file) throws Exception {
+		AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3client = new AmazonS3Client(awsCredentials);
+        
+        Crosswalk crosswalk = new Crosswalk();
+        crosswalk.setVerbose(true);
+    	Importer importer = new Importer(awsCredentials);
+    	importer.setVerbose(true);
+
+    	System.out.println("Processing file: " + file);
+				
+		S3Object object = s3client.getObject(new GetObjectRequest(bucket, file));
+		InputStream xml = object.getObjectContent();
+								
+		System.out.println("Parsing file: " + file);
+		Collection<Record> records = crosswalk.process(xml).values();
+
+		System.out.println("Uploading " + records.size() + " records");
+		importer.importRecords(SOURCE_ANDS, records);
+	}
+	*/
+	
+	private static void processFiles(String bucket, String prefix, String neo4jFolder) throws Exception {
+        AmazonS3 s3client = new AmazonS3Client(new InstanceProfileCredentialsProvider());
+        
+        CrosswalkMarc21 crosswalk = new CrosswalkMarc21();
+        crosswalk.setSource(GraphUtils.SOURCE_CERN);
+        crosswalk.setVerbose(true);
+        
+    	Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
+    	importer.setVerbose(true);
+    	
+    	ListObjectsRequest listObjectsRequest;
+		ObjectListing objectListing;
+		S3Object object;
+		
+	    listObjectsRequest = new ListObjectsRequest()
+			.withBucketName(bucket)
+			.withPrefix(prefix);
+	    do {
+			objectListing = s3client.listObjects(listObjectsRequest);
+			for (S3ObjectSummary objectSummary : 
+				objectListing.getObjectSummaries()) {
+				
+				String file = objectSummary.getKey();
+
+		        System.out.println("Processing file: " + file);
+				
+				object = s3client.getObject(new GetObjectRequest(bucket, file));
+				InputStream xml = object.getObjectContent();
+								
+				System.out.println("Parsing file: " + file);
+				Graph graph = crosswalk.process(xml);
+				importer.importGraph(graph);
+			}
+			listObjectsRequest.setMarker(objectListing.getNextMarker());
+		} while (objectListing.isTruncated());
+		
+		System.out.println("Done");
+		
+		crosswalk.printStatistics(System.out);
+		importer.printStatistics(System.out);
+	}
+	
+	/*private static void processMultiThread(String accessKey, String secretKey, 
+			String bucket, String prefix, int maxThreads) throws Exception {
+		AWSCredentials awsCredentials = new BasicAWSCredentials(accessKey, secretKey);
+        AmazonS3 s3client = new AmazonS3Client(awsCredentials);
+
+		Semaphore semaphore = new Semaphore(maxThreads);
+
+		List<ImportThread> threads = new ArrayList<ImportThread>();
+		for (int i = 0; i < maxThreads; ++i) {
+			ImportThread thread = new ImportThread(SOURCE_ANDS, semaphore, awsCredentials);
+			thread.start();
+			threads.add(thread);
+		}		
+        
+    	ListObjectsRequest listObjectsRequest = new ListObjectsRequest()
+			.withBucketName(bucket)
+			.withPrefix(prefix);
+		ObjectListing objectListing;
+		S3Object object;	
+
+		do {
+			objectListing = s3client.listObjects(listObjectsRequest);
+			for (S3ObjectSummary objectSummary : 
+				objectListing.getObjectSummaries()) {
+				
+				semaphore.acquire(); 
+
+				String file = objectSummary.getKey();
+		        System.out.println("Processing file: " + file);
+				
+				object = s3client.getObject(new GetObjectRequest(bucket, file));
+				InputStream xml = object.getObjectContent();
+				
+				boolean importAssigned = false;
+				for (ImportThread thread : threads) 
+					if (thread.isFree()) {
+						thread.process(xml);
+						importAssigned = true;
+						
+						break;
+					}								
+				
+				if (!importAssigned)
+					throw new ImportThreadException("All matcher threads are busy");
+			}
+			listObjectsRequest.setMarker(objectListing.getNextMarker());
+		} while (objectListing.isTruncated());
+		
+		for (ImportThread thread : threads) {
+			thread.finishCurrentAndExit();
+			thread.join();
+		}
+	}*/
 }

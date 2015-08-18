@@ -20,6 +20,7 @@ import org.neo4j.graphdb.Relationship;
 import org.neo4j.graphdb.RelationshipType;
 import org.neo4j.graphdb.ResourceIterable;
 import org.neo4j.graphdb.ResourceIterator;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.index.AutoIndexer;
 import org.neo4j.graphdb.index.Index;
@@ -33,12 +34,12 @@ import org.rdswitchboard.libraries.graph.GraphKey;
 import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphSchema;
-import org.rdswitchboard.libraries.graph.GraphUtils;
 import org.rdswitchboard.libraries.graph.interfaces.GraphImporter;
 import org.rdswitchboard.libraries.neo4j.interfaces.ProcessNode;
 
 public class Neo4jDatabase implements GraphImporter {
-
+	private static final String COLUMN_N = "n";
+		
 	private GraphDatabaseService graphDb;
 	
 	private Map<String, Index<Node>> indexes = new HashMap<String, Index<Node>>();
@@ -64,6 +65,10 @@ public class Neo4jDatabase implements GraphImporter {
 				: Neo4jUtils.getGraphDb( neo4jFolder );
 	}
 	
+	public GraphDatabaseService getGraphDatabaseService() {
+		return graphDb;
+	}
+		
 	public GlobalGraphOperations getGlobalOperations() {
 		return GlobalGraphOperations.at(graphDb);
 	}
@@ -105,14 +110,67 @@ public class Neo4jDatabase implements GraphImporter {
 				nodesCreated, nodesUpdated, relationshipsCreated, relationshipsUpdated, unknownRelationships.size()) );
 	}
 	
+	
 	public void enumrateAllNodes(ProcessNode processNode) {
 		try ( Transaction tx = graphDb.beginTx() ) 
 		{
-			ResourceIterable<Node> srcNodes = getGlobalOperations().getAllNodes();
-			for (Node node : srcNodes) {
+			ResourceIterable<Node> nodes = getGlobalOperations().getAllNodes();
+			for (Node node : nodes) {
 				processNode.processNode(node);
 			}
 		
+			tx.success();
+		}
+	}
+	
+	public void enumrateAllNodesWithLabel(Label label, ProcessNode processNode) {
+		try ( Transaction tx = graphDb.beginTx() ) 
+		{
+//			GlobalGraphOperations global = Neo4jUtils.getGlobalOperations(graphDb);
+//			global.
+			
+			try (ResourceIterator<Node> nodes = graphDb.findNodes(label)) {
+				while (nodes.hasNext()) {
+					processNode.processNode(nodes.next());
+				}
+			}
+			
+			tx.success();
+		}
+	}
+	
+	public void enumrateAllNodesWithLabel(String label, ProcessNode processNode) {
+		enumrateAllNodesWithLabel(DynamicLabel.label(label), processNode);
+	}
+	
+	public void enumrateAllNodesWithProperty(String property, ProcessNode processNode) {
+		try ( Transaction tx = graphDb.beginTx() ) 
+		{
+			String cypher = "MATCH (n) WHERE HAS(n." + property + ") RETURN n";
+			try (Result result = graphDb.execute(cypher)) {
+				while ( result.hasNext() )
+			    {
+			        Map<String,Object> row = result.next();
+			        processNode.processNode((Node) row.get(COLUMN_N));
+			    }
+			}
+			
+			tx.success();
+		}
+	}
+	
+	public void enumrateAllNodesWithLabelAndProperty(String label, String property, ProcessNode processNode) {
+		try ( Transaction tx = graphDb.beginTx() ) 
+		{
+			String cypher = "MATCH (n:" + label + ") WHERE HAS(n." + property + ") RETURN n";
+			try (Result result = graphDb.execute(cypher)) {
+				while ( result.hasNext() )
+			    {
+			        Map<String,Object> row = result.next();
+			        processNode.processNode((Node) row.get(COLUMN_N));
+			    }
+			}
+			
 			tx.success();
 		}
 	}

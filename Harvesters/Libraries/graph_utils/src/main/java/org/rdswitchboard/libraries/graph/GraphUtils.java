@@ -51,6 +51,7 @@ public class GraphUtils {
 	public static final String PROPERTY_NHMRC_ID = "nhmrc_id";
 	public static final String PROPERTY_ISBN = "isbn";
 	public static final String PROPERTY_ISSN = "issn";
+	public static final String PROPERTY_INSPIRE_ID = "inspire_id";
 	//public static final String PROPERTY_OAI = "oai";
 	public static final String PROPERTY_AUTHORS = "authors";
 	public static final String PROPERTY_REFERENCED_BY = "referenced_by"; // temporary for Dryad
@@ -68,6 +69,8 @@ public class GraphUtils {
 	public static final String SOURCE_DRYAD = "dryad";
 	public static final String SOURCE_CROSSREF = "crossref";
 	public static final String SOURCE_FIGSHARE = "figshare";
+	public static final String SOURCE_CERN = "cern";
+	
 	// meta-data types
 	public static final String TYPE_DATASET = "dataset";
 	public static final String TYPE_GRANT = "grant";
@@ -109,6 +112,7 @@ public class GraphUtils {
     private static final String PART_SCOPUS_EID_URL = "www.scopus.com/inward/record.url?eid=%s&partnerID=%s";
     private static final String PART_ARC_PURL = "purl.org/au-research/grants/arc/";
     private static final String PART_NHMRC_PURL = "purl.org/au-research/grants/nhmrc/";
+    private static final String PART_INSPIRE_URL = "inspirehep.net/record/";
     
     private static final Pattern patternUrl = Pattern.compile(URL_REGEX);
     private static final Pattern patternDoi = Pattern.compile(DOI_REGEX);
@@ -432,6 +436,17 @@ public class GraphUtils {
     public static String generateNhmrcGrantPurl(String nhmrcId) {
     	return StringUtils.isEmpty(nhmrcId) ? null : (PART_NHMRC_PURL + nhmrcId);
     }
+
+    /**
+     * Function to generate NHMRC Grant Purl
+     * @param arcId
+     * @return NHMRC Grant purl
+     */
+
+    public static String generateInspireUrl(String inspireId) {
+    	return StringUtils.isEmpty(inspireId) ? null : (PART_INSPIRE_URL + inspireId);
+    }
+
     
     /*public static boolean isScopusRecordURL(String str) {
     	if (StringUtils.isNotEmpty(str)) {

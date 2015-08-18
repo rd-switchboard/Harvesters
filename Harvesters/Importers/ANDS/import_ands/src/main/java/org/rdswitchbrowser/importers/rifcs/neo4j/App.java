@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphUtils;
 import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
-import org.rdswitchboard.libraries.rifcs.graph.CrosswalkRifCs;
+import org.rdswitchboard.libraries.rifcs.CrosswalkRifCs;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;

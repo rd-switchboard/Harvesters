@@ -1,4 +1,4 @@
-package org.rdswitchboard.libraries.rifcs.graph;
+package org.rdswitchboard.libraries.rifcs;
 
 import java.io.InputStream;
 import java.io.PrintStream;

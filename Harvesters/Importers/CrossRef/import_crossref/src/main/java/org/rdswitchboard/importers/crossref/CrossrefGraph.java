@@ -8,7 +8,8 @@ import org.rdswitchboard.libraries.graph.GraphNode;
 import org.rdswitchboard.libraries.graph.GraphRelationship;
 import org.rdswitchboard.libraries.graph.GraphUtils;
 
-public class CrossrefGraph extends CrossRef{
+
+public class CrossrefGraph extends CrossRef {
 
 	/**
 	 * Function to Query CrossRef metadata 
@@ -16,15 +17,13 @@ public class CrossrefGraph extends CrossRef{
 	 * @return Grah
 	 */
 	
-	public Graph queryGraph(String doi) {
+	public GraphNode queryGraph(Graph graph, String doi) {
 		// make sure we have doi
 		Item item = requestWork(doi);
 		if (null != item) {
-			Graph graph = new Graph();
 			String doiUri = GraphUtils.generateDoiUri(doi);
 			GraphNode nodePublication = new GraphNode()
-				.withKey(doiUri)
-				.withIndex(GraphUtils.SOURCE_CROSSREF)
+				.withKey(GraphUtils.SOURCE_CROSSREF, doiUri)
 				.withSource(GraphUtils.SOURCE_CROSSREF)
 				.withType(GraphUtils.TYPE_PUBLICATION)
 				.withProperty(GraphUtils.PROPERTY_DOI, doi)
@@ -46,8 +45,7 @@ public class CrossrefGraph extends CrossRef{
 			String url = GraphUtils.extractFormalizedUrl(item.getUrl());
 			if (null != url) {
 				GraphNode nodeWeb = new GraphNode()
-					.withKey(url)
-					.withIndex(GraphUtils.SOURCE_WEB)
+					.withKey(GraphUtils.SOURCE_WEB, url)
 					.withSource(GraphUtils.SOURCE_WEB)
 					.withType(GraphUtils.TYPE_PUBLICATION)
 					.withProperty(GraphUtils.PROPERTY_URL, url)
@@ -57,10 +55,8 @@ public class CrossrefGraph extends CrossRef{
 				
 				graph.addRelationship(new GraphRelationship()
 					.withRelationship(GraphUtils.RELATIONSHIP_KNOWN_AS)
-					.withStartKey(doiUri)
-					.withStartIndex(GraphUtils.SOURCE_CROSSREF)
-					.withEndKey(url)
-					.withEndIndex(GraphUtils.SOURCE_WEB));
+					.withStart(GraphUtils.SOURCE_CROSSREF, doiUri)
+					.withEnd(GraphUtils.SOURCE_WEB, url));
 			}
 			
 			if (null != item.getAuthor())
@@ -71,8 +67,7 @@ public class CrossrefGraph extends CrossRef{
 					nodePublication.addProperty(GraphUtils.PROPERTY_AUTHORS, fullName);
 					
 					graph.addNode(new GraphNode()
-						.withKey(GraphUtils.generateDoiUri(key))
-						.withIndex(GraphUtils.SOURCE_CROSSREF)
+						.withKey(GraphUtils.SOURCE_CROSSREF, GraphUtils.generateDoiUri(key))
 						.withSource(GraphUtils.SOURCE_CROSSREF)
 						.withType(GraphUtils.TYPE_RESEARCHER)
 						.withProperty(GraphUtils.PROPERTY_NAME_PREFIX, author.getSuffix())
@@ -83,13 +78,11 @@ public class CrossrefGraph extends CrossRef{
 					
 					graph.addRelationship(new GraphRelationship()
 						.withRelationship(GraphUtils.RELATIONSHIP_AUTHOR)
-						.withStartKey(doi)
-						.withStartIndex(GraphUtils.SOURCE_CROSSREF)
-						.withEndKey(key)
-						.withEndIndex(GraphUtils.SOURCE_CROSSREF));
+						.withStart(GraphUtils.SOURCE_CROSSREF, doi)
+						.withEnd(GraphUtils.SOURCE_CROSSREF, key));
 				}
 			
-			return graph;
+			return nodePublication;
 			
 		}
 		

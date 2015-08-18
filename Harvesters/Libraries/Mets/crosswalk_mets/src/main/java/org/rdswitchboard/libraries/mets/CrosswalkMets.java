@@ -1,4 +1,4 @@
-package org.rdswitchboard.importers.mets;
+package org.rdswitchboard.libraries.mets;
 
 import gov.loc.mets.MdSecType;
 import gov.loc.mets.Mets;

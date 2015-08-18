@@ -4,9 +4,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.Properties;
 
-import org.rdswitchboard.importers.mets.CrosswalkMets;
 import org.rdswitchboard.libraries.graph.Graph;
 import org.rdswitchboard.libraries.graph.GraphUtils;
+import org.rdswitchboard.libraries.mets.CrosswalkMets;
 import org.rdswitchboard.libraries.neo4j.Neo4jDatabase;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;

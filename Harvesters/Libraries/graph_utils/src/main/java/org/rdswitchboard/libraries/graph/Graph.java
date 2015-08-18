@@ -1,35 +1,38 @@
 package org.rdswitchboard.libraries.graph;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 public class Graph {
 	private List<GraphNode> nodes;
 	private List<GraphRelationship> relationships;
-	private List<GraphSchema> schemas;
+	private Set<GraphSchema> schemas;
 	
-	public List<GraphNode> getNodes() {
+	public Collection<GraphNode> getNodes() {
 		return nodes;
 	}
 
-	public void setNodes(List<GraphNode> nodes) {
-		this.nodes = nodes;
+	public void setNodes(Collection<GraphNode> nodes) {
+		this.nodes = new ArrayList<GraphNode>(nodes);
 	}
 
-	public List<GraphRelationship> getRelationships() {
+	public Collection<GraphRelationship> getRelationships() {
 		return relationships;
 	}
 
-	public void setRelationships(List<GraphRelationship> relationships) {
-		this.relationships = relationships;
+	public void setRelationships(Collection<GraphRelationship> relationships) {
+		this.relationships = new ArrayList<GraphRelationship>(relationships);
 	}
 
-	public List<GraphSchema> getSchemas() {
+	public Collection<GraphSchema> getSchemas() {
 		return schemas;
 	}
-
-	public void setSchemas(List<GraphSchema> schemas) {
-		this.schemas = schemas;
+	
+	public void setSchemas(Collection<GraphSchema> schemas) {
+		this.schemas = new HashSet<GraphSchema>(schemas);
 	}
 
 	public void addNode(GraphNode node) {
@@ -46,7 +49,7 @@ public class Graph {
 	
 	public void addSchema(GraphSchema schema) {
 		if (null == schemas) 
-			schemas = new ArrayList<GraphSchema>();
+			schemas = new HashSet<GraphSchema>();
 		schemas.add(schema);
 	}
 
