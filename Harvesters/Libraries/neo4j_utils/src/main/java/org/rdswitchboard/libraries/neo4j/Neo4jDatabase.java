@@ -466,18 +466,21 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 	
 	public Node _createNode(Label label) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabel(node, label);
 		return node;
 	}
 
 	public Node _createNode(Label[] labels) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabels(node, labels);
 		return node;
 	}
 	
 	public Node _createNode(Map<String, Object> properties) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		if (null != properties)
 			_setProperties(node, properties);
@@ -485,6 +488,7 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 	
 	public Node _createNode(Label label, Map<String, Object> properties) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabel(node, label);
 		if (null != properties)
@@ -493,6 +497,7 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 
 	public Node _createNode(Label[] labels, Map<String, Object> properties) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabels(node, labels);
 		if (null != properties)
@@ -501,6 +506,7 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 	
 	public Node _createNode(String label, Map<String, Object> properties) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabel(node, label);
 		if (null != properties)
@@ -509,6 +515,7 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 
 	public Node _createNode(String[] labels, Map<String, Object> properties) {
+		++nodesCreated;
 		Node node = graphDb.createNode();
 		_addLabels(node, labels);
 		if (null != properties)
@@ -822,16 +829,13 @@ public class Neo4jDatabase implements GraphImporter {
 		String relationshipName = graphRelationship.getRelationship();
 		GraphKey start = graphRelationship.getStart();
 		GraphKey end = graphRelationship.getEnd();
-
-		if (verbose) 
-			System.out.println("Importing Relationship (" + start + ")-[" + relationshipName + "]->(" + end + ")");
 		
 		List<Node> nodesStart = _getRelatedNodes(start);
 		if (nodesStart.isEmpty() && storeUnknown) { 
 			storeUnknownRelationship(getRelationshipKey(start), graphRelationship);
 			
 			if (verbose)
-				System.out.println("Start Key (" + start + ") does not exists");
+				System.out.println("Relationship Start Key (" + start + ") does not exists");
 		}
 		
 		List<Node> nodesEnd = _getRelatedNodes(end);
@@ -839,14 +843,14 @@ public class Neo4jDatabase implements GraphImporter {
 			storeUnknownRelationship(getRelationshipKey(end), graphRelationship);
 			
 			if (verbose)
-				System.out.println("End Key (" + end + ") does not exists");
+				System.out.println("Relationship End Key (" + end + ") does not exists");
 		}
 		
 		if (nodesStart.isEmpty() || nodesEnd.isEmpty())
 			return;
 		
 		if (verbose) 
-			System.out.println("Creating relationship");
+			System.out.println("Importing Relationship (" + start + ")-[" + relationshipName + "]->(" + end + ")");
 		
 		RelationshipType relationshipType = DynamicRelationshipType.withName(relationshipName);
 		for (Node nodeStart : nodesStart)

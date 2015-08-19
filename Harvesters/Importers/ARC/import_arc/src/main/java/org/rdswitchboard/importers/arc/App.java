@@ -38,6 +38,9 @@ public class App {
 	private static final String NEW_GRANTS_CSV_PATH = "data/arc/new_projects.csv";
 	//private static final String NEW_ROLES_CSV_PATH = "data/arc/new_fellowships.csv";
 	
+	private static final String PART_NA = "n.a.";
+	private static final String PART_SEMICOLON = ";";
+	
 	private static final String[] TITLES = { "Mr ", "Ms ", "Dr ", "A/Prof ", "Adj/Prof ", "Asst Prof ", "Prof Dr ", "Prof " }; 
 			
 	private static final Set<String> institutions = new HashSet<String>();
@@ -75,28 +78,27 @@ public class App {
 	            throw new IllegalArgumentException("Invalid path to new grants CSV file");
 	        
 	        List<GraphSchema> schema = new ArrayList<GraphSchema>();
-	        schema.add( new GraphSchema()
+	        schema.add(new GraphSchema()
 	        		.withLabel(GraphUtils.SOURCE_ARC)
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
 	        
-			GraphImporter importer = new Neo4jDatabase(neo4jFolder);
-			importer.setVerbose(true);
+	        Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
+			//importer.setVerbose(true);
 			importer.importSchemas(schema);
 			
 			Graph graph = importGrantsCsv(completedGrants);
 			if (null == graph)
 				return;
 			
-			importer.importNodes(graph.getNodes());
-			importer.importRelationships(graph.getRelationships());
+			importer.importGraph(graph);
 			
 			graph = importGrantsCsv(newGrants);
 			if (null == graph)
 				return;
 			
-			importer.importNodes(graph.getNodes());
-			importer.importRelationships(graph.getRelationships());			
+			importer.importGraph(graph);
+			importer.printStatistics(System.out);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -126,7 +128,7 @@ public class App {
 					continue;
 						
 				String projectId = grant[0];
-				System.out.println("Project id: " + projectId);
+			//	System.out.println("Project id: " + projectId);
 				
 				if (!grants.contains(projectId)) {
 					grants.add(projectId);
@@ -141,30 +143,32 @@ public class App {
 						institutions.add(institutionKey);
 
 						graph.addNode(new GraphNode()
-							.withKey(new GraphKey(GraphUtils.SOURCE_ARC, institutionKey))
+							.withKey(GraphUtils.SOURCE_ARC, institutionKey)
+							.withSource(GraphUtils.SOURCE_ARC)
 							.withType(GraphUtils.TYPE_INSTITUTION)
 							.withProperty(GraphUtils.PROPERTY_TITLE, institutionName));
-						
 					}					
 					
-					graph.addNode(new GraphNode()
-						.withKey(new GraphKey(GraphUtils.SOURCE_ARC, purl))
+					GraphNode nodeGrant = new GraphNode()
+						.withKey(GraphUtils.SOURCE_ARC, purl)
 						.withSource(GraphUtils.SOURCE_ARC)
 						.withType(GraphUtils.TYPE_GRANT)
 						.withProperty(GraphUtils.PROPERTY_URL, purl)
 						.withProperty(GraphUtils.PROPERTY_PURL, purl)
 						.withProperty(GraphUtils.PROPERTY_LOCAL_ID, projectId)
-						.withProperty(GraphUtils.PROPERTY_TITLE, title));
+						.withProperty(GraphUtils.PROPERTY_TITLE, title);
+					
+					graph.addNode(nodeGrant);
 					
 					graph.addRelationship(new GraphRelationship()
-						.withRelationship("AdminInstitute")
-						.withStart(new GraphKey(GraphUtils.SOURCE_ARC, purl))
-						.withEnd(new GraphKey(GraphUtils.SOURCE_ARC, institutionKey)));
+						.withRelationship(GraphUtils.RELATIONSHIP_ADMINISTRATOR)
+						.withStart(nodeGrant.getKey())
+						.withEnd(GraphUtils.SOURCE_ARC, institutionKey));
 							
-					if (!investigatorString.contains("n.a.")) {
+					if (!investigatorString.contains(PART_NA)) {
 									
 						Set<String> investigators = null;
-						if (investigatorString.contains(";"))
+						if (investigatorString.contains(PART_SEMICOLON))
 							investigators = new HashSet<String>(Arrays.asList(investigatorString.split(";")));
 						else
 						{
@@ -211,16 +215,18 @@ public class App {
 								String granteeName = grantee.trim();
 								String granteeKey = "arc:researcher:" + projectId + ":" + granteeName;
 								
-								graph.addNode(new GraphNode()
-									.withKey(new GraphKey(GraphUtils.SOURCE_ARC, granteeKey))
+								GraphNode nodeResearcher  =new GraphNode()
+									.withKey(GraphUtils.SOURCE_ARC, granteeKey)
 									.withSource(GraphUtils.SOURCE_ARC)
 									.withType(GraphUtils.TYPE_RESEARCHER)
-									.withProperty(GraphUtils.PROPERTY_TITLE, granteeName));
-																
+									.withProperty(GraphUtils.PROPERTY_TITLE, granteeName);
+								
+								graph.addNode(nodeResearcher);
+									
 								graph.addRelationship(new GraphRelationship()
-									.withRelationship("Investigator")
-									.withStart(new GraphKey(GraphUtils.SOURCE_ARC, granteeKey))
-									.withEnd(new GraphKey(GraphUtils.SOURCE_ARC, purl)));
+									.withRelationship(GraphUtils.RELATIONSHIP_INVESTIGATOR)
+									.withStart(nodeResearcher.getKey())
+									.withEnd(nodeGrant.getKey()));
 							}
 						}
 					}

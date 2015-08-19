@@ -44,7 +44,7 @@ public class CrosswalkMets implements GraphCrosswalk {
 	//private static final String GENRE_DATASET = "dataset";
 	//private static final String GENRE_ARTICLE = "article";
 		
-	private static final String NODE_GENRE = "genre";
+	//private static final String NODE_GENRE = "genre";
 	private static final String NODE_IDENTIFIER = "identifier";
 	private static final String NODE_TITLE_INFO = "titleInfo";
 	private static final String NODE_NAME = "name";
@@ -247,23 +247,23 @@ public class CrosswalkMets implements GraphCrosswalk {
 						
 						// add it to the graph						
 						// check if record has been marked as deleted
-						if (status == StatusType.DELETED) 
-							setDeleted(node);
-						
-						// check if record has metadata
-						if (null != record.getMetadata()) {
+						if (status == StatusType.DELETED) {
+							// save deleted nodes so we can delete them from the database
+							graph.addNode(node.withDeleted(true));		
+							++deletedRecords;
+							++createdRecords;
+						} else if (null != record.getMetadata()) {
 							// we expect only one metadata object per record
 							Object metadata = record.getMetadata().getAny();
 							// check if metadata is in Mets format
-							if (null != metadata && metadata instanceof Mets) 
-								processMets(graph, node, (Mets) metadata);
-							else
-								setBroken(node);
-						} else
-							setBroken(node);
-						
-						graph.addNode(node);
-						++createdRecords;
+							if (null != metadata && metadata instanceof Mets 
+									&& processMets(graph, node, (Mets) metadata)) {
+								
+								// save only nodes who have passed metadata valiadtion
+								graph.addNode(node);
+								++createdRecords;
+							}						
+						} 
 					}
 				} 
 			} else 
@@ -288,23 +288,23 @@ public class CrosswalkMets implements GraphCrosswalk {
 	 * Function will marks node as deleted
 	 * @param node
 	 */
-	private void setDeleted(GraphNode node) {
+	/*private void setDeleted(GraphNode node) {
 		if (!node.isDeleted()) {
 			node.setDeleted(true);
 			++deletedRecords;
 		}
-	}
+	}*/
 	
 	/**
 	 * Function will marks node as broken
 	 * @param node
 	 */
-	private void setBroken(GraphNode node) {
+	/*private void setBroken(GraphNode node) {
 		if (!node.isBroken()) {
 			node.setBroken(true);
 			++brokenRecords;
 		}
-	}
+	}*/
 	
 	/**
 	 * Function will process Mets Object
@@ -320,8 +320,6 @@ public class CrosswalkMets implements GraphCrosswalk {
 			return processDmdSec(graph, node, mets.getDmdSec().get(0));
 		}
 		
-		// mark node as broken
-		setBroken(node);
 		return false;
 	}
 	
@@ -341,8 +339,6 @@ public class CrosswalkMets implements GraphCrosswalk {
 				return processXmlData(graph, node, mdWrap.getXmlData());
 		}
 		
-		// mark node as broken
-		setBroken(node);
 		return false;
 	} 
 	
@@ -374,14 +370,14 @@ public class CrosswalkMets implements GraphCrosswalk {
 					processNames(node, findXmlElements(xmlObjects, NODE_NAME));
 					processRelatedItems(graph, node,  
 							findXmlElements(xmlObjects, NODE_RELATED_ITEM));
-		
+					
+//					if (node.hasProperty(GraphUtils.PROPERTY_REFERENCED_BY)) 
 					return true;
 /*				}
 			}*/ 
 		} 
 		
 		// if we have reach this place, the record must be broken
-		setBroken(node);
 		return false;
 	}
 	
@@ -477,26 +473,26 @@ public class CrosswalkMets implements GraphCrosswalk {
 		if (null != relatedItems)
 			for (Element relatedItem : relatedItems) {
 				String relation = relatedItem.getTextContent();
-				if (relation.contains(PART_DOI)) {
-					String doi = GraphUtils.extractDoi(relation);
-					if (null != doi) {
-						String relationType = relatedItem.getAttribute(ATTRIBUTE_TYPE);
-						if (StringUtils.isNotEmpty(relationType)) {
-							if (relationType.equals(RELATION_HOST) 
-									|| relationType.equals(RELATION_CONSTITUENT)) {
+				String relationType = relatedItem.getAttribute(ATTRIBUTE_TYPE);
+				if (StringUtils.isNotEmpty(relationType)) {
+					if (relationType.equals(RELATION_HOST) 
+							|| relationType.equals(RELATION_CONSTITUENT)) {
+						if (relation.contains(PART_DOI)) {
+							String doi = GraphUtils.extractDoi(relation);
+							if (null != doi) {
 								graph.addRelationship(new GraphRelationship()
 									.withRelationship(relationType)
 									.withStart(start)
 									.withEnd(new GraphKey(start.getIndex(), GraphUtils.PROPERTY_DOI, doi)));
-								
-								++createdRelationships;
-							} else if (relationType.equals(RELATION_IS_REFERENCED_BY)) {
-								node.addProperty(GraphUtils.PROPERTY_REFERENCED_BY, doi);
-							}									
+							} else 
+								node.addProperty("invalid_doi", doi);
 						}
-					} else 
-						node.addProperty("invalid_doi", doi);
-				}		
+							
+						++createdRelationships;
+					} else if (relationType.equals(RELATION_IS_REFERENCED_BY)) {
+						node.addProperty(GraphUtils.PROPERTY_REFERENCED_BY, relation);					
+					}
+				}
 			}
 	}
 	

@@ -43,7 +43,7 @@ public class CrossrefGraph extends CrossRef {
 			graph.addNode(nodePublication);
 			
 			String url = GraphUtils.extractFormalizedUrl(item.getUrl());
-			if (null != url) {
+			if (null != url && !url.equals(doiUri)) {
 				GraphNode nodeWeb = new GraphNode()
 					.withKey(GraphUtils.SOURCE_WEB, url)
 					.withSource(GraphUtils.SOURCE_WEB)
@@ -55,8 +55,8 @@ public class CrossrefGraph extends CrossRef {
 				
 				graph.addRelationship(new GraphRelationship()
 					.withRelationship(GraphUtils.RELATIONSHIP_KNOWN_AS)
-					.withStart(GraphUtils.SOURCE_CROSSREF, doiUri)
-					.withEnd(GraphUtils.SOURCE_WEB, url));
+					.withStart(nodePublication.getKey())
+					.withEnd(nodeWeb.getKey()));
 			}
 			
 			if (null != item.getAuthor())
@@ -66,20 +66,21 @@ public class CrossrefGraph extends CrossRef {
 					
 					nodePublication.addProperty(GraphUtils.PROPERTY_AUTHORS, fullName);
 					
-					graph.addNode(new GraphNode()
-						.withKey(GraphUtils.SOURCE_CROSSREF, GraphUtils.generateDoiUri(key))
+					GraphNode nodeResearcher = new GraphNode()
+						.withKey(GraphUtils.SOURCE_CROSSREF, key)
 						.withSource(GraphUtils.SOURCE_CROSSREF)
 						.withType(GraphUtils.TYPE_RESEARCHER)
 						.withProperty(GraphUtils.PROPERTY_NAME_PREFIX, author.getSuffix())
 						.withProperty(GraphUtils.PROPERTY_FIRST_NAME, author.getGiven())
 						.withProperty(GraphUtils.PROPERTY_LAST_NAME, author.getFamily())
 						.withProperty(GraphUtils.PROPERTY_FULL_NAME, author.getFullName())
-						.withProperty(GraphUtils.PROPERTY_ORCID_ID, author.getOrcid()));
+						.withProperty(GraphUtils.PROPERTY_ORCID_ID, author.getOrcid());
 					
+					graph.addNode(nodeResearcher);						
 					graph.addRelationship(new GraphRelationship()
 						.withRelationship(GraphUtils.RELATIONSHIP_AUTHOR)
-						.withStart(GraphUtils.SOURCE_CROSSREF, doi)
-						.withEnd(GraphUtils.SOURCE_CROSSREF, key));
+						.withStart(nodePublication.getKey())
+						.withEnd(nodeResearcher.getKey()));
 				}
 			
 			return nodePublication;

@@ -11,6 +11,10 @@ public class Graph {
 	private List<GraphRelationship> relationships;
 	private Set<GraphSchema> schemas;
 	
+	public int getNodesCount() {
+		return null == nodes? 0 : nodes.size();
+	}
+	
 	public Collection<GraphNode> getNodes() {
 		return nodes;
 	}
@@ -23,9 +27,17 @@ public class Graph {
 		return relationships;
 	}
 
+	public int getRelationshipsCount() {
+		return null == relationships? 0 : relationships.size();
+	}
+
 	public void setRelationships(Collection<GraphRelationship> relationships) {
 		this.relationships = new ArrayList<GraphRelationship>(relationships);
 	}
+	
+	public int getSchemasCount() {
+		return null == schemas? 0 : schemas.size();
+	}	
 
 	public Collection<GraphSchema> getSchemas() {
 		return schemas;

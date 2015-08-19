@@ -51,8 +51,8 @@ public class CrosswalkMarc21Test {
 		assertNotNull("XML File can not be parsed", 
 				crosswalk);
 		
-		assertEquals("XML File should contain 174 records", 
-				174,
+		assertEquals("XML File should contain 71 records", 
+				71,
 				graph.getNodes().size());
 		
 		GraphNode node = graph.getNodes().iterator().next();

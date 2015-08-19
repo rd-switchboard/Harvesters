@@ -28,6 +28,9 @@ import org.rdswitchboard.libraries.graph.interfaces.GraphCrosswalk;
 public class CrosswalkMarc21 implements GraphCrosswalk {
 	private static final String TYPE_INSPIRE = "Inspire";
 	
+	private static final String COLLECTION_ARTICLE = "ARTICLE";
+	private static final String COLLECTION_BOOK = "BOOK";
+	
 /*	private static final String MD_TYPE_MODS = "MODS";
 	
 	//private static final String GENRE_DATASET = "dataset";
@@ -59,8 +62,8 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 	private Unmarshaller unmarshaller;
 	
 	private long processedFiles = 0;
+	private long processedRecords = 0;
 	private long deletedRecords = 0;
-	private long brokenRecords = 0;
 	private long createdRecords = 0;
 	private long createdRelationships = 0;
 
@@ -100,8 +103,8 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 	 * getBrokenRecords
 	 * @return
 	 */
-	public long getBrokenRecords() {
-		return brokenRecords;
+	public long getProcessedRecords() {
+		return processedRecords;
 	}
 	
 	/**
@@ -156,7 +159,7 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 	 * reset counters
 	 */
 	public void resetCounters() {
-		createdRecords = deletedRecords = brokenRecords = createdRelationships = processedFiles = markTime = 0;
+		createdRecords = deletedRecords = processedRecords = createdRelationships = processedFiles = markTime = 0;
 	}
 	
 	/**
@@ -217,6 +220,8 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 					if (StringUtils.isNotBlank(idetifier)) {
 						// String oai = GraphUtils.extractOai(idetifier);
 				
+						++processedRecords;
+						
 						// extract record status
 						StatusType status = header.getStatus();
 				
@@ -229,8 +234,10 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 						
 						// add it to the graph						
 						// check if record has been marked as deleted
-						if (status == StatusType.DELETED) 
-							setDeleted(node);
+						if (status == StatusType.DELETED) {
+							graph.addNode(node.withDeleted(true));
+							++deletedRecords;
+						}
 						
 						// check if record has metadata
 						if (null != record.getMetadata()) {
@@ -238,17 +245,12 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 							Object metadata = record.getMetadata().getAny();
 							// check if metadata is in Mets format
 							if (null != metadata && metadata instanceof JAXBElement)  {
-								if (!processMarc21(graph, node, ((JAXBElement<RecordType>) metadata).getValue())) 
-									setBroken(node);
+								if (processMarc21(graph, node, ((JAXBElement<RecordType>) metadata).getValue())) { 
+									graph.addNode(node);
+									++createdRecords;
+								}
 							}
-							else
-								setBroken(node);
-						} else
-							setBroken(node);
-						
-						graph.addNode(node);
-						++createdRecords;
-						
+						} 
 					}
 				} 
 			} else 
@@ -265,31 +267,38 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 	 */
 	public void printStatistics(PrintStream out) {
 		long spentTime = getSpentTime();
-		out.println( String.format("Processed %d files.\nSpent %d millisecods.\nFound %d records.Found %d relationships.\nFound %d deleted records.\nFound %d broken records.\nSpent ~ %f milliseconds per record.", 
-				processedFiles, spentTime, createdRecords, createdRelationships, deletedRecords, brokenRecords, (float) spentTime / (float) createdRecords));
+
+		out.println("Spent " + spentTime + " millisecods.");
+		out.println("Processed " + processedFiles + " files.");
+		out.println("Processed " + processedRecords + " records.");
+		out.println(createdRecords + " records has been created.");
+		out.println(createdRelationships + " relationships has been created.");
+		out.println(deletedRecords + " records has been deleted.");
+		out.println((processedRecords - deletedRecords - createdRecords) + " records has been broken.");
+		out.println("Spent ~ " + ((float) spentTime / (float) createdRecords) + " milliseconds per record.");
 	}
 	
 	/**
 	 * Function will marks node as deleted
 	 * @param node
 	 */
-	private void setDeleted(GraphNode node) {
+	/*private void setDeleted(GraphNode node) {
 		if (!node.isDeleted()) {
 			node.setDeleted(true);
 			++deletedRecords;
 		}
-	}
+	}*/
 	
 	/**
 	 * Function will marks node as broken
 	 * @param node
 	 */
-	private void setBroken(GraphNode node) {
+	/*private void setBroken(GraphNode node) {
 		if (!node.isBroken()) {
 			node.setBroken(true);
 			++brokenRecords;
 		}
-	}
+	}*/
 	
 	/**
 	 * Function will process Marc21 Object
@@ -303,6 +312,8 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 		if (null == fields || fields.isEmpty())
 			return false;
 				
+		boolean isArcticle = false;
+		
 		for (DataFieldType field : fields) {
 			String tag = field.getTag();
 			if (tag.equals("024")) {
@@ -325,11 +336,15 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 				node.addProperty(GraphUtils.PROPERTY_AUTHORS, extractSubField(field, "a"));
 			else if (tag.equals("245"))  // Title
 				node.addProperty(GraphUtils.PROPERTY_TITLE, extractSubField(field, "a"));
-			else if (tag.equals("980"))  // Collection identifier  
-				node.addProperty("collection_id", extractSubField(field, "a"));
+			else if (tag.equals("980"))  {// Collection identifier  
+				String type = extractSubField(field, "a");
+				if (null != type && (type.equals(COLLECTION_ARTICLE) || type.equals(COLLECTION_BOOK)))
+					isArcticle = true;
+				//node.addProperty("collection_id", );
+			}
 		}
 		
-		return true;
+		return isArcticle;
 	}
 
 	/*private boolean tag(DataFieldType field, String tag, String ind1, String ind2) {

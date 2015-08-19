@@ -76,22 +76,18 @@ public class App {
 	        		.withUnique(true));
 	        
 	        Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
-			importer.setVerbose(true);
+			//importer.setVerbose(true);
 			importer.importSchemas(schema);
 			
 			Graph graph = importGrantsCsv(grantsFile);
-			if (null == graph)
-				return;
-			
-			importer.importNodes(graph.getNodes());
-			importer.importRelationships(graph.getRelationships());
+			if (null != graph)
+				importer.importGraph(graph);
 			
 			graph = importRolesCsv(rolesFile);
-			if (null == graph)
-				return;
+			if (null != graph)
+				importer.importGraph(graph);
 			
-			importer.importNodes(graph.getNodes());
-			importer.importRelationships(graph.getRelationships());			
+			importer.printStatistics(System.out);
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -121,7 +117,7 @@ public class App {
 					continue;
 						
 				String grantId = grant[0];
-				System.out.println("Grant id: " + grantId);
+			//	System.out.println("Grant id: " + grantId);
 				
 				String purl = GraphUtils.generateNhmrcGrantPurl(grantId);
 				String institutionName = grant[6].trim();
@@ -133,26 +129,28 @@ public class App {
 					institutions.add(institutionKey);
 
 					graph.addNode(new GraphNode()
-						.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, institutionKey))
+						.withKey(GraphUtils.SOURCE_NHMRC, institutionKey)
 						.withSource(GraphUtils.SOURCE_NHMRC)
 						.withType(GraphUtils.TYPE_INSTITUTION)
 						.withProperty(GraphUtils.PROPERTY_TITLE, institutionName));
 					
-				}					
-					
-				graph.addNode(new GraphNode()
-					.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, purl))
+				}			
+				
+				GraphNode nodeGrant = new GraphNode()
+					.withKey(GraphUtils.SOURCE_NHMRC, purl)
 					.withSource(GraphUtils.SOURCE_NHMRC)
 					.withType(GraphUtils.TYPE_GRANT)
 					.withProperty(GraphUtils.PROPERTY_URL, purl)
 					.withProperty(GraphUtils.PROPERTY_PURL, purl)
 					.withProperty(GraphUtils.PROPERTY_LOCAL_ID, grantId)
-					.withProperty(GraphUtils.PROPERTY_TITLE, title));
+					.withProperty(GraphUtils.PROPERTY_TITLE, title);
+				
+				graph.addNode(nodeGrant);
 				
 				graph.addRelationship(new GraphRelationship()
-					.withRelationship("AdminInstitute")
-					.withStart(new GraphKey(GraphUtils.SOURCE_NHMRC, purl))
-					.withEnd(new GraphKey(GraphUtils.SOURCE_NHMRC, institutionKey)));
+					.withRelationship(GraphUtils.RELATIONSHIP_ADMINISTRATOR)
+					.withStart(nodeGrant.getKey())
+					.withEnd(GraphUtils.SOURCE_NHMRC, institutionKey));
 			}
 				
 			reader.close();			
@@ -189,9 +187,9 @@ public class App {
 						
 				String grantId = grantee[0];
 				String individualId = grantee[2];
-				System.out.println("Grant id: " + grantId + ", Individual ID: " + individualId);
+			//	System.out.println("Grant id: " + grantId + ", Individual ID: " + individualId);
 				
-				String purl = "http://purl.org/au-research/grants/nhmrc/" + grantId;
+				String purl = GraphUtils.generateNhmrcGrantPurl(grantId);
 				String key = "nhmrc:researcher:" + individualId;
 				
 				if (!researcher.contains(individualId)) {
@@ -204,7 +202,7 @@ public class App {
 					String fullName = grantee[8].trim();
 									
 					GraphNode node = new GraphNode()
-						.withKey(new GraphKey(GraphUtils.SOURCE_NHMRC, key))
+						.withKey(GraphUtils.SOURCE_NHMRC, key)
 						.withSource(GraphUtils.SOURCE_NHMRC)
 						.withType(GraphUtils.TYPE_RESEARCHER)
 						.withProperty(GraphUtils.PROPERTY_LOCAL_ID, individualId)
@@ -224,9 +222,9 @@ public class App {
 				}
 				
 				graph.addRelationship(new GraphRelationship()
-					.withRelationship("Investigator")
-					.withStart(new GraphKey(GraphUtils.SOURCE_NHMRC, key))
-					.withEnd(new GraphKey(GraphUtils.SOURCE_NHMRC, purl)));
+					.withRelationship(GraphUtils.RELATIONSHIP_INVESTIGATOR)
+					.withStart(GraphUtils.SOURCE_NHMRC, key)
+					.withEnd(GraphUtils.SOURCE_NHMRC, purl));
 			}
 				
 			reader.close();			

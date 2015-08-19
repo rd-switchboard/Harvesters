@@ -16,6 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
  *
  */
 
+//@JsonIgnoreProperties({ "license"})
 public class Item {
 	private String doi;
 	private String url;
@@ -29,16 +30,22 @@ public class Item {
 	private String referenceCount;
 	private String member;
 	private String updatePolicy;
-	
+		
 	private List<String> issn;
 	private List<String> title;
 	private List<String> subtitle;
 	private List<String> subject;	
 	private List<String> containerTitle;
+	private List<String> alternativeId;
+	private List<String> isbns;
+	private List<String> archives;
 	
 	private List<Author> author;
 	private List<Author> editor;
 	private List<Funder> funder;
+	private List<Link> links;
+	private List<Assertion> assertions;
+	private List<License> licenses;
 	
 	private Date issued;
 	private Date deposited;
@@ -291,10 +298,10 @@ public class Item {
 		return volume;
 	}
 	
-	public void SetVolume(final String volume) {
+	public void setVolume(final String volume) {
 		this.volume = volume;
 	}
-
+	
 	public String getMember() {
 		return member;
 	}
@@ -326,9 +333,63 @@ public class Item {
 			this.funder = null;
 	}
 	
+	@JsonProperty("alternative-id")
+	public List<String> getAlternativeId() {
+		return alternativeId;
+	}
+
+	public void setAlternativeId(List<String> alternativeId) {
+		this.alternativeId = alternativeId;
+	}
+
+	@JsonProperty("link")
+	public List<Link> getLinks() {
+		return links;
+	}
+
+	public void setLinks(List<Link> links) {
+		this.links = links;
+	}
+		
+	@JsonProperty("assertion")
+	public List<Assertion> getAssertions() {
+		return assertions;
+	}
+
+	public void setAssertions(List<Assertion> assertions) {
+		this.assertions = assertions;
+	}
+	
+	@JsonProperty("license")
+	public List<License> getLicenses() {
+		return licenses;
+	}
+
+	public void setLicenses(List<License> licenses) {
+		this.licenses = licenses;
+	}
+
+	@JsonProperty("archive")
+	public List<String> getArchives() {
+		return archives;
+	}
+
+	public void setArchives(List<String> archives) {
+		this.archives = archives;
+	}
+	
+	@JsonProperty("ISBN")
+	public List<String> getIsbns() {
+		return isbns;
+	}
+
+	public void setIsbns(List<String> isbns) {
+		this.isbns = isbns;
+	}
+
 	@JsonAnySetter
 	public void handleUnknown(String key, Object value) {
-		System.out.println("Warning. Ignoring property: " + key + " with value: " + value);			
+		System.out.println("Warning. Ignoring Item property: " + key + " with value: " + value);			
 	}
 	
 	@Override
@@ -357,6 +418,12 @@ public class Item {
 				", deposited=" + deposited +
 				", indexed=" + indexed +
 				", score=" + score +
+				", alternativeId=" + alternativeId +
+				", links=" + links +
+				", assertions=" + assertions +
+				", licenses=" + licenses +
+				", archive=" + archives +
+				", isbns=" + isbns +
 				"]";	
 	}	
 }

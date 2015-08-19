@@ -90,10 +90,10 @@ public class App {
         
         CrosswalkMets crosswalk = new CrosswalkMets();
         crosswalk.setSource(GraphUtils.SOURCE_DRYAD);
-        crosswalk.setVerbose(true);
+   //    crosswalk.setVerbose(true);
         
     	Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
-    	importer.setVerbose(true);
+    //	importer.setVerbose(true);
     	
     	ListObjectsRequest listObjectsRequest;
 		ObjectListing objectListing;

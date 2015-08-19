@@ -1,5 +1,8 @@
 package org.rdswitchboard.libraries.crossref;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 
@@ -8,11 +11,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Dima Kudriavcev, dmitrij@kudriavcev.info
  *
  */
+
 public class Author {
 	private String family;
 	private String given;
 	private String suffix;
 	private String orcid;
+	
+	private List<Affiliation> affiliations;
 	
 	public String getFamily() {
 		return family;		
@@ -62,8 +68,26 @@ public class Author {
 		return sb.toString();				
 	}
 	
+	@JsonProperty("affiliation")
+	public List<Affiliation> getAffiliations() {
+		return affiliations;
+	}
+
+	public void setAffiliations(List<Affiliation> affiliations) {
+		this.affiliations = affiliations;
+	}
+	
+	@JsonAnySetter
+	public void handleUnknown(String key, Object value) {
+		System.out.println("Warning. Ignoring Author property: " + key + " with value: " + value);			
+	}
+	
 	@Override
 	public String toString() {
-		return "Author [suffix=" + suffix + ", family=" + family + ", given=" + given + ", orcid=" + orcid + "]";
+		return "Author [suffix=" + suffix + 
+				", family=" + family + 
+				", given=" + given + 
+				", orcid=" + orcid + 
+				", affiliations=" + affiliations + "]";
 	}
 }

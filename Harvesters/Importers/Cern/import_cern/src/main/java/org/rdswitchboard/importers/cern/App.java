@@ -101,10 +101,10 @@ public class App {
         
         CrosswalkMarc21 crosswalk = new CrosswalkMarc21();
         crosswalk.setSource(GraphUtils.SOURCE_CERN);
-        crosswalk.setVerbose(true);
+        //crosswalk.setVerbose(true);
         
     	Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
-    	importer.setVerbose(true);
+    	//importer.setVerbose(true);
     	
     	ListObjectsRequest listObjectsRequest;
 		ObjectListing objectListing;

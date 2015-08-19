@@ -75,14 +75,15 @@ public class App {
 	        		.withUnique(true));
 	        
 			Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
-			importer.setVerbose(true);
+			//importer.setVerbose(true);
 			importer.importSchemas(schemas);
 			
 			Graph graph = importInstitutionsCsv(institutions);
 			if (null == graph)
 				return;
 			
-			importer.importNodes(graph.getNodes());
+			importer.importGraph(graph);
+			importer.printStatistics(System.out);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
@@ -119,10 +120,10 @@ public class App {
 				String host = GraphUtils.extractHost(url);
 				
 				if (null != host) {
-					System.out.println("Institution: " + formalizedUrl + ", host: " + host);
+				//	System.out.println("Institution: " + formalizedUrl + ", host: " + host);
 		
 					GraphNode node = new GraphNode()
-						.withKey(new GraphKey(GraphUtils.SOURCE_WEB, host))
+						.withKey(GraphUtils.SOURCE_WEB, host)
 						.withSource(GraphUtils.SOURCE_WEB)
 						.withType(GraphUtils.TYPE_INSTITUTION)
 						.withProperty(GraphUtils.PROPERTY_TITLE, title)

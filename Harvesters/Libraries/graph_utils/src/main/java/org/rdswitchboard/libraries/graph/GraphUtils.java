@@ -86,12 +86,14 @@ public class GraphUtils {
 	public static final String RELATIONSHIP_KNOWN_AS = "knownAs";
 	public static final String RELATIONSHIP_AUTHOR = "author";
 	public static final String RELATIONSHIP_PATTERN = "pattern";
+	public static final String RELATIONSHIP_ADMINISTRATOR = "administrator";
+	public static final String RELATIONSHIP_INVESTIGATOR = "investigator";
 	
 	public static final String SCOPUS_PARTNER_ID = "MN8TOARS";
 	
 	private static final String URL_REGEX = "^((https?|ftp)://|(www|ftp)\\.)?[a-z0-9-]+(\\.[a-z0-9-]+)+([/?].*)?$";
 	//private static final String DOI_REGEX = "\\d{2,}(\\.\\d{4,})?/.+$";
-	private static final String DOI_REGEX = "\\d+(\\.\\d+)?/.+$";
+	private static final String DOI_REGEX = "\\d+(\\.\\d+)*/.+$";
 	private static final String ORCID_REGEX = "\\d{4}-\\d{4}-\\d{4}-\\d{3}(\\d|X)";
 	private static final String SCOPUS_AUTHOR_REGEX = "author[iI][dD]=\\d+";
 	private static final String SCOPUS_PARTNER_REGEX = "partner[iI][dD]=[A-Z0-9]+";
@@ -269,21 +271,13 @@ public class GraphUtils {
 	 */
 	public static String extractDoi(String str) {
 		if (StringUtils.isNotEmpty(str)) {
-			boolean found = false;
 			int pos = str.indexOf(PART_DOI_PERFIX);
-			if (pos >= 0) {
+			if (pos >= 0) 
 				str = str.substring(pos + PART_DOI_PERFIX.length());
-				found = true;
-			}
 			
 			pos = str.indexOf(PART_DOI_URI);
-			if (pos >= 0) {
+			if (pos >= 0) 
 				str = str.substring(pos + PART_DOI_URI.length());
-				found = true;
-			}
-			
-			if (found)
-				return str;
 			
     		Matcher matcher = patternDoi.matcher(str);
     		if (matcher.find()) 

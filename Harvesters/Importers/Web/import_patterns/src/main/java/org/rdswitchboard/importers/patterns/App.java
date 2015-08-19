@@ -58,6 +58,7 @@ public class App {
 				return;
 			
 			importer.importGraph(graph);
+			importer.printStatistics(System.out);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}		
