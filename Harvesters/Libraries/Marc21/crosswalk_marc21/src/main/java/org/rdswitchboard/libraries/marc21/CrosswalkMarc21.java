@@ -201,6 +201,8 @@ public class CrosswalkMarc21 implements GraphCrosswalk {
 		Graph graph = new Graph();
 		// setup graph schema
 		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_KEY, true));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_INSPIRE_ID, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_URL, false));
 		// extract root object
 		if (element.getValue() instanceof OAIPMHtype) {
 			OAIPMHtype root = (OAIPMHtype) element.getValue();

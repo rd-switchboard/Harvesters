@@ -82,6 +82,14 @@ public class App {
 	        		.withLabel(GraphUtils.SOURCE_ARC)
 	        		.withIndex(GraphUtils.PROPERTY_KEY)
 	        		.withUnique(true));
+	        schema.add(new GraphSchema()
+	        		.withLabel(GraphUtils.SOURCE_ARC)
+	        		.withIndex(GraphUtils.PROPERTY_ARC_ID)
+	        		.withUnique(false));
+	        schema.add(new GraphSchema()
+    				.withLabel(GraphUtils.SOURCE_ARC)
+    				.withIndex(GraphUtils.PROPERTY_PURL)
+    				.withUnique(false));
 	        
 	        Neo4jDatabase importer = new Neo4jDatabase(neo4jFolder);
 			//importer.setVerbose(true);
@@ -155,7 +163,7 @@ public class App {
 						.withType(GraphUtils.TYPE_GRANT)
 						.withProperty(GraphUtils.PROPERTY_URL, purl)
 						.withProperty(GraphUtils.PROPERTY_PURL, purl)
-						.withProperty(GraphUtils.PROPERTY_LOCAL_ID, projectId)
+						.withProperty(GraphUtils.PROPERTY_ARC_ID, projectId)
 						.withProperty(GraphUtils.PROPERTY_TITLE, title);
 					
 					graph.addNode(nodeGrant);

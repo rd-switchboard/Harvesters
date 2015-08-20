@@ -6,13 +6,12 @@
     <version>1.2.0</version>
     <relativePath>../../../pom.xml</relativePath>
   </parent>
-  <groupId>org.rdswitchboard.linkers</groupId>
-  <artifactId>link_web_researchers</artifactId>
-  <name>Link Web:Researcher by Google Search</name>
-  <description>Link Web:Researcher to the Grant and Publication nodes by Google CSE Result</description>
+  <groupId>org.rdswitchbrowser.linkers</groupId>
+  <artifactId>link_nodes</artifactId>
+  <name>Link Variose Nodes by property</name>
   
   <properties>
-    <main.class>org.rdswitchboard.linkers.neo4j.web.researcher.App</main.class>
+    <main.class>org.rdswitchboard.linkers.neo4j.grants.App</main.class>
   </properties>
   
   <build>
@@ -61,19 +60,15 @@
       </plugin>
           
     </plugins>
-  </build>  
+  </build>
+  
   
   <dependencies>
-    <dependency>
+     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
-    </dependency>
-  	<dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons.io.version}</version>
     </dependency>
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
@@ -85,10 +80,6 @@
       <artifactId>neo4j_utils</artifactId>
       <version>1.2.0</version>
   	</dependency>
-  	<dependency>
-  	  <groupId>org.rdswitchboard.libraries</groupId>
-      <artifactId>google_cache</artifactId>
-      <version>1.2.0</version>
-  	</dependency>
   </dependencies>
+  
 </project>

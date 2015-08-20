@@ -2,6 +2,7 @@ package org.rdswitchboard.libraries.rifcs;
 
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
@@ -143,6 +144,12 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 		JAXBElement<?> element = (JAXBElement<?>) unmarshaller.unmarshal( xml );
 		Graph graph = new Graph();
 		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_KEY, true));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_NLA, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_NHMRC_ID, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_ARC_ID, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_ORCID_ID, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_DOI, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_PURL, false));
 		
 		OAIPMHtype root = (OAIPMHtype) element.getValue();
 		ListRecordsType records = root.getListRecords();
@@ -164,9 +171,17 @@ public class CrosswalkRifCs implements GraphCrosswalk {
 								if (verbose) 
 									System.out.println("Key: " + key);
 								
+								String url = null;
+								try {
+									url = GraphUtils.generateAndsUrl(key);
+								} catch(UnsupportedEncodingException e) {
+									e.printStackTrace();
+								}								
+								
 								GraphNode node = new GraphNode()
 									.withKey(new GraphKey(source, key))
 									.withSource(source)
+									.withProperty(GraphUtils.PROPERTY_URL, url)
 									.withProperty(GraphUtils.PROPERTY_ANDS_GROUP, group);
 								
 								if (deleted) {

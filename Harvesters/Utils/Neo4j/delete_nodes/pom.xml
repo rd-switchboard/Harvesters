@@ -6,12 +6,11 @@
   	<version>1.2.0</version>
   	<relativePath>../../../pom.xml</relativePath>
   </parent>
-  <groupId>org.rdswitchboard.exporters</groupId>
-  <artifactId>export_graph_json</artifactId>
-  <name>Export Graph Library</name>
-  
-  <properties>
-    <main.class>org.rdswitchboard.exporters.graph.App</main.class>
+  <groupId>org.rdswitchboard.utils</groupId>
+  <artifactId>delete_nodes</artifactId>
+
+<properties>
+    <main.class>org.rdswitchboard.utils.neo4j.delete.App</main.class>
   </properties>
   
   <build>
@@ -53,31 +52,6 @@
   </build>
   
   <dependencies>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-	  <artifactId>jackson-core</artifactId>
-	  <version>${jackson.version}</version>
-    </dependency>
-	<dependency>
-	  <groupId>com.fasterxml.jackson.core</groupId>
-	  <artifactId>jackson-databind</artifactId>
-	  <version>${jackson.version}</version>
-	</dependency>
-	<dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons.io.version}</version>
-    </dependency>
-	  <dependency>
-	  <groupId>com.amazonaws</groupId>
-	  <artifactId>aws-java-sdk</artifactId>
-	  <version>${aws-java-sdk.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.rdswitchboard.libraries</groupId>
-      <artifactId>graph_utils</artifactId>
-      <version>1.2.0</version>
-    </dependency>
     <dependency>
       <groupId>org.rdswitchboard.libraries</groupId>
       <artifactId>neo4j_utils</artifactId>

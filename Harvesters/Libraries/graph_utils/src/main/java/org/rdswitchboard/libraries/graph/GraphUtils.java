@@ -1,7 +1,10 @@
 package org.rdswitchboard.libraries.graph;
 
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -55,6 +58,7 @@ public class GraphUtils {
 	//public static final String PROPERTY_OAI = "oai";
 	public static final String PROPERTY_AUTHORS = "authors";
 	public static final String PROPERTY_REFERENCED_BY = "referenced_by"; // temporary for Dryad
+	public static final String PROPERTY_ORIGINAL_KEY = "original_key";
 	
 	// control properties
 	public static final String PROPERTY_DELETED = "deleted";
@@ -115,6 +119,7 @@ public class GraphUtils {
     private static final String PART_ARC_PURL = "purl.org/au-research/grants/arc/";
     private static final String PART_NHMRC_PURL = "purl.org/au-research/grants/nhmrc/";
     private static final String PART_INSPIRE_URL = "inspirehep.net/record/";
+    private static final String PART_ANDS_URL = "https://researchdata.ands.org.au/view/?key=";
     
     private static final Pattern patternUrl = Pattern.compile(URL_REGEX);
     private static final Pattern patternDoi = Pattern.compile(DOI_REGEX);
@@ -440,7 +445,11 @@ public class GraphUtils {
     public static String generateInspireUrl(String inspireId) {
     	return StringUtils.isEmpty(inspireId) ? null : (PART_INSPIRE_URL + inspireId);
     }
-
+    
+    public static String generateAndsUrl(String key) throws UnsupportedEncodingException {
+    	return StringUtils.isEmpty(key) ? null : (PART_ANDS_URL + URLEncoder.encode(key, StandardCharsets.UTF_8.name()));
+    }
+    
     
     /*public static boolean isScopusRecordURL(String str) {
     	if (StringUtils.isNotEmpty(str)) {

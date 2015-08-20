@@ -11,6 +11,7 @@ import org.rdswitchboard.libraries.graph.GraphUtils;
 
 public class CrossrefGraph extends CrossRef {
 
+	private static final String PART_DOI = "doi:";
 	/**
 	 * Function to Query CrossRef metadata 
 	 * @param doi An DOI in a format, returned by GraphUtils.extractDoi() function 
@@ -19,7 +20,7 @@ public class CrossrefGraph extends CrossRef {
 	
 	public GraphNode queryGraph(Graph graph, String doi) {
 		// make sure we have doi
-		Item item = requestWork(doi);
+		Item item = requestWork(PART_DOI + doi);
 		if (null != item) {
 			String doiUri = GraphUtils.generateDoiUri(doi);
 			GraphNode nodePublication = new GraphNode()
@@ -42,7 +43,7 @@ public class CrossrefGraph extends CrossRef {
 			
 			graph.addNode(nodePublication);
 			
-			String url = GraphUtils.extractFormalizedUrl(item.getUrl());
+		/*	String url = GraphUtils.extractFormalizedUrl(item.getUrl());
 			if (null != url && !url.equals(doiUri)) {
 				GraphNode nodeWeb = new GraphNode()
 					.withKey(GraphUtils.SOURCE_WEB, url)
@@ -57,7 +58,7 @@ public class CrossrefGraph extends CrossRef {
 					.withRelationship(GraphUtils.RELATIONSHIP_KNOWN_AS)
 					.withStart(nodePublication.getKey())
 					.withEnd(nodeWeb.getKey()));
-			}
+			}*/
 			
 			if (null != item.getAuthor())
 				for (Author author : item.getAuthor()) {

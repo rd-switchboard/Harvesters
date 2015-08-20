@@ -30,8 +30,6 @@ public class App {
 	private static final String NEO4J_FOLDER = "neo4j";
 	private static final String CROSSREF_FOLDER = "crossref/cahce";
 	
-	private static final String PART_DOI = "doi:";
-	
 	private static CrossrefGraph crossref;
 	private static Neo4jDatabase neo4j;
 	
@@ -72,14 +70,13 @@ public class App {
 	        
 	        neo4j = new Neo4jDatabase(neo4jFolder);
 	        List<GraphSchema> schemas = new ArrayList<GraphSchema>();
-	        schemas.add(new GraphSchema()
-	        		.withLabel(GraphUtils.SOURCE_CROSSREF)
-	        		.withIndex(GraphUtils.PROPERTY_KEY)
-	        		.withUnique(true));
-	        schemas.add(new GraphSchema()
-	        		.withLabel(GraphUtils.SOURCE_WEB)
-	        		.withIndex(GraphUtils.PROPERTY_KEY)
-	        		.withUnique(true));
+	        schemas.add(new GraphSchema(GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_KEY, true));
+	        schemas.add(new GraphSchema(GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_DOI, false));
+	        schemas.add(new GraphSchema(GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_URL, false));
+	        schemas.add(new GraphSchema(GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_ISSN, false));
+	        schemas.add(new GraphSchema(GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_ORCID_ID, false));
+	        //schemas.add(new 1GraphSchema(GraphUtils.SOURCE_WEB, GraphUtils.PROPERTY_KEY, true));
+	        //schemas.add(new GraphSchema(GraphUtils.SOURCE_WEB, GraphUtils.PROPERTY_URL, false));
 	        
 	        neo4j.importSchemas(schemas);
 	    //    neo4j.setVerbose(true);
@@ -134,7 +131,7 @@ public class App {
 		
 		Graph graph = new Graph();
 		for (Map.Entry<String, Set<GraphKey>> entry : references.entrySet()) {
-			GraphNode node = crossref.queryGraph(graph, PART_DOI + entry.getKey());
+			GraphNode node = crossref.queryGraph(graph, entry.getKey());
 			if (null != node) {
 				for (GraphKey key : entry.getValue()) {
 					graph.addRelationship(new GraphRelationship() 

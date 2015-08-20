@@ -3,6 +3,7 @@ package org.rdswitchboard.importers.orcid;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -182,10 +183,16 @@ public class ImporterOrcid {
 	 */
 	public void importOrcid(final String orcdiFolder) {
 		
-		importer.importSchema(new GraphSchema()
-			.withLabel(GraphUtils.SOURCE_ORCID)
-			.withIndex(GraphUtils.PROPERTY_KEY)
-			.withUnique(true));
+		List<GraphSchema> schemas = new ArrayList<GraphSchema>();
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_KEY, true));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_URL, false));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_ORCID_ID, false));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_SCOPUS_ID, false));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_ISSN, false));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_ISBN, false));
+		schemas.add(new GraphSchema(GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_DOI, false));
+		
+		importer.importSchemas(schemas);
 		
 		File[] files = new File(orcdiFolder).listFiles();
 		for (File file : files) 

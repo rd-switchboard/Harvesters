@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
@@ -32,9 +33,6 @@ import org.rdswitchboard.libraries.neo4j.Neo4jUtils;
 import org.rdswitchboard.utils.google.cache2.Link;
 import org.rdswitchboard.utils.google.cache2.Result;
 import org.rdswitchboard.utils.google.cache2.GoogleUtils;
-import org.rdswitchboard.utils.google.cse.Item;
-import org.rdswitchboard.utils.google.cse.Query;
-import org.rdswitchboard.utils.google.cse.QueryResponse;
 
 public class Linker {	
 	private static final String FIELD_PATTERN = "pattern";
@@ -43,6 +41,9 @@ public class Linker {
 	
 	private static final String CACHE_PUBLICATION = "publication";
 	private static final String CACHE_GRANT = "grant";
+	
+	// for Dryad titles
+	private static final String PART_DATA_FROM = "data from:";
 	
 	private GraphDatabaseService graphDb;
 	private Index<Node> indexWeb;
@@ -55,12 +56,11 @@ public class Linker {
 	private Set<String> blackList;
 	private List<Pattern> webPatterns;
 	
-	private Query googleQuery;
-	
 	private JAXBContext jaxbContext;
 	private Unmarshaller jaxbUnmarshaller;
 	
 	private final int minTitleLength;
+	private int maxThreads;
 	
 	public Linker(final String neo4jFolder, final String blackList, final int minTitleLength, boolean verbose) throws FileNotFoundException, IOException, JAXBException {
 		this.minTitleLength = minTitleLength;
@@ -71,8 +71,6 @@ public class Linker {
 		
 		graphDb = Neo4jUtils.getGraphDb( neo4jFolder );
 		
-		googleQuery = new Query(null, blackList);
-		
 		try ( Transaction tx = graphDb.beginTx() ) {
 			indexWeb = Neo4jUtils.getNodeIndex(graphDb, GraphUtils.SOURCE_WEB);
 		}
@@ -81,6 +79,14 @@ public class Linker {
 		loadWebPatterns();
 	}
 	
+	public int getMaxThreads() {
+		return maxThreads;
+	}
+
+	public void setMaxThreads(int maxThreads) {
+		this.maxThreads = maxThreads;
+	}
+
 	public boolean isVerbose() {
 		return verbose;
 	}
@@ -90,23 +96,59 @@ public class Linker {
 	}
 	
 	public void link(String googleCache) throws Exception {
-		Map<String, Set<Long>> nodes = new HashMap<String, Set<Long>>();
+		Map<String, Set<Long>> nodes;
+		
+		/*nodes = new HashMap<String, Set<Long>>();
 		
 		if (verbose)
-			System.out.println("Loading Nodes");
+			System.out.println("Processing ANDS:Grant");
 		
 		loadNodes( nodes, GraphUtils.SOURCE_ANDS, GraphUtils.TYPE_GRANT, 
 				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );
-		/*loadNodes( nodes, GraphUtils.SOURCE_ARC, GraphUtils.TYPE_GRANT, 
-				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );
-		loadNodes( nodes, GraphUtils.SOURCE_NHMRC, GraphUtils.TYPE_GRANT, 
-				GraphUtils.PROPERTY_TITLE, filterHas(GraphUtils.PROPERTY_PURL) );*/
 		
 		if (verbose)
 			System.out.println("Done. Loaded " + nodes.size() + " Nodes\nProcessing Nodes");
 				
 		try ( Transaction tx = graphDb.beginTx() ) {
-			processNodes(nodes, googleCache, CACHE_GRANT);
+			linkCached(nodes, googleCache, CACHE_GRANT);
+			
+			tx.success();
+		}
+		*/		
+		
+		/*if (verbose)
+			System.out.println("Processing Dryad:Publication");
+		
+		nodes = new HashMap<String, Set<Long>>();
+		loadNodes( nodes, GraphUtils.SOURCE_CROSSREF, GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.PROPERTY_TITLE, null );
+		
+		if (verbose)
+			System.out.println("Done. Loaded " + nodes.size() + " Nodes\nProcessing Nodes");
+				
+		try ( Transaction tx = graphDb.beginTx() ) {
+			linkCached(nodes, googleCache, CACHE_PUBLICATION);
+			
+			tx.success();
+		}
+		*/
+		
+		if (verbose)
+			System.out.println("Processing Simple Search");
+		
+		nodes = new HashMap<String, Set<Long>>();
+		
+		loadNodes( nodes, GraphUtils.SOURCE_DRYAD, GraphUtils.TYPE_DATASET, 
+				GraphUtils.PROPERTY_TITLE, null );
+		loadNodes( nodes, GraphUtils.SOURCE_CROSSREF, GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.PROPERTY_TITLE, null );
+		/*loadNodes( nodes, GraphUtils.SOURCE_CERN, GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.PROPERTY_TITLE, null );*/
+		/*loadNodes( nodes, GraphUtils.SOURCE_ORCID, GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.PROPERTY_TITLE, null );*/
+		
+		try ( Transaction tx = graphDb.beginTx() ) {
+			linkSimpleSearch(nodes, googleCache);
 			
 			tx.success();
 		}
@@ -174,32 +216,31 @@ public class Linker {
     	    while ( result.hasNext() ) {
     	        Map<String,Object> row = result.next();
     	        long nodeId = (Long) row.get(FIELD_ID);
-    	        String title = (String) row.get(FIELD_TITLE);
-    	        
-    	        if (null != title) {
-    	        	title = title.trim().toLowerCase();
-    	        	 if (title.length() > minTitleLength && !blackList.contains(title)) 
-    	        		 putUnique(nodes, title, nodeId);
-    	        
+    	        Object titles = row.get(FIELD_TITLE);
+    	        if (null != titles) {
+    	        	if (titles instanceof String)
+    	        		putUnique(nodes, (String) titles, nodeId);
+    	        	else if (titles instanceof String[])
+    	        		for (String title : (String[]) titles)
+    	        			putUnique(nodes, title, nodeId);
     	        }
     	    }
     	}    		
 	}
 	
-	private void processNodes(Map<String, Set<Long>> nodes, String googleCache, String folderName) throws Exception {
+	private void linkCached(Map<String, Set<Long>> nodes, String googleCache, String folderName) throws Exception {
 		if (verbose)
 			System.out.println("Processing cached pages: " + folderName);
 		
-		googleQuery.setJsonFolder(GoogleUtils.getJsonFolder(googleCache).toString());
-		
 		File linksFolder = GoogleUtils.getLinkFolder(googleCache);
 		File cacheFolder = GoogleUtils.getCacheFolder(googleCache, folderName);
+		File metadataFolder = GoogleUtils.getMetadataFolder(googleCache);
 		File[] files = cacheFolder.listFiles();
 		for (File file : files) 
 			if (!file.isDirectory())
 				try {
-					if (verbose)
-						System.out.println("Processing file: " + file.toString());
+					/*if (verbose)
+						System.out.println("Processing file: " + file.toString());*/
 					
 					Result result = (Result) jaxbUnmarshaller.unmarshal(file);
 					if (result != null) {
@@ -221,7 +262,7 @@ public class Linker {
 										if (verbose)
 											System.out.println("Found matching URL: " + link.getLink() + " for grant: " + text);
 									
-										Node nodeResearcher = getOrCreateWebResearcher(link.getLink(), text);
+										Node nodeResearcher = getOrCreateWebResearcher(link, metadataFolder);
 										for (Long nodeId : nodeIds) 
 											Neo4jUtils.createUniqueRelationship(graphDb.getNodeById(nodeId), 
 													nodeResearcher, relRelatedTo, Direction.OUTGOING, null);	
@@ -238,15 +279,90 @@ public class Linker {
 				}
 	}	
 	
-	private void putUnique(Map<String, Set<Long>> nodes, String key, Long id) {
-        if (nodes.containsKey(key))
-            nodes.get(key).add(id);
-        else {
-            Set<Long> set = new HashSet<Long>();
-            set.add(id);
+	private void linkSimpleSearch(Map<String, Set<Long>> nodes, String googleCache) throws Exception {
+		if (verbose)
+			System.out.println("Processing Simple Search");
+		
+		Semaphore semaphore = new Semaphore(maxThreads);
+		
+		List<MatcherThread> threads = new ArrayList<MatcherThread>();
+		for (int i = 0; i < maxThreads; ++i) {
+			MatcherThread thread = new MatcherThread(semaphore);
+			thread.start();
+			threads.add(thread);
+		}
+		
+		File linksFolder = GoogleUtils.getLinkFolder(googleCache);
+		File metadataFolder = GoogleUtils.getMetadataFolder(googleCache);
+		File[] files = linksFolder.listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					/*if (verbose)
+						System.out.println("Processing file: " + file.toString());*/
+					
+					Link link = (Link) jaxbUnmarshaller.unmarshal(file);
+					if (link != null && isLinkFollowAPattern(link.getLink())) {
+						if (verbose)
+							System.out.println("Testing link: " + link.getLink());
+							
+						MatcherSimple matcher = new MatcherSimple(googleCache, link, nodes);
 
-            nodes.put(key, set);
-        }
+						semaphore.acquire(); 
+						
+						boolean matcherAssigned = false;
+						for (MatcherThread thread : threads) 
+							if (thread.isFree()) {
+								processResult(thread.getResult(), metadataFolder); 
+								thread.addMatcher(matcher);
+								matcherAssigned = true;
+								
+								break;
+							}
+						
+						if (!matcherAssigned)
+							throw new MatcherThreadException("All matcher threads are busy");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					
+					break;
+				}
+		for (MatcherThread thread : threads) {
+			processResult(thread.getResult(), metadataFolder);
+			
+			thread.finishCurrentAndExit();
+			thread.join();
+		}	
+	}
+	
+	private void processResult(MatcherResult result, File metadataFolder) {
+		if (null != result) {
+			if (verbose)
+				System.out.println("Found " + result.getNodes().size() + " macthing texts in: " + result.getLink().getLink());
+
+			try {
+				Node nodeResearcher = getOrCreateWebResearcher(result.getLink(), metadataFolder);
+				for (Long nodeId : result.getNodes()) 
+					Neo4jUtils.createUniqueRelationship(graphDb.getNodeById(nodeId), 
+							nodeResearcher, relRelatedTo, Direction.OUTGOING, null);	
+				
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void putUnique(Map<String, Set<Long>> nodes, String key, Long id) {
+    	key = key.trim().toLowerCase();
+    	if (key.startsWith(PART_DATA_FROM))
+    		key = key.substring(PART_DATA_FROM.length()).trim();
+   	 	if (key.length() > minTitleLength && !blackList.contains(key)) { 
+			Set<Long> set = nodes.get(key);
+			if (null == set) 
+				nodes.put(key, set = new HashSet<Long>());
+			set.add(id);
+   	 	}
 	}
 	
 	private String filterHas(String field) {
@@ -268,8 +384,8 @@ public class Linker {
 		return null;
 	}
 	
-	private Node getOrCreateWebResearcher(String url, String searchString) throws Exception {
-		url = GraphUtils.extractFormalizedUrl(url);
+	private Node getOrCreateWebResearcher(Link link,File metadataFolder) throws Exception {
+		String url = GraphUtils.extractFormalizedUrl(link.getLink());
 		
 		Node node = findWebResearcher(url);
 		if (null != node) {
@@ -285,7 +401,8 @@ public class Linker {
 		node.setProperty(GraphUtils.PROPERTY_TYPE, GraphUtils.TYPE_RESEARCHER);
 		node.setProperty(GraphUtils.PROPERTY_URL, url);
 		
-		String author = getAuthor(url, searchString);
+		String author = GoogleUtils.getMetatag(new File(metadataFolder, link.getMetadata()), 
+				GoogleUtils.METDATA_DC_TITLE);				
 		if (null != author)
 			node.setProperty(GraphUtils.PROPERTY_TITLE, author);
 		
@@ -297,7 +414,7 @@ public class Linker {
 		return node;
 	}
 	
-	private Map<String, Object> getPageMap(String link, String searchString) {
+	/*private Map<String, Object> getPageMap(String link, String searchString) {
 		QueryResponse response = googleQuery.queryCache(searchString);
 		if (null != response) 
 			for (Item item : response.getItems()) 
@@ -305,9 +422,9 @@ public class Linker {
 					return item.getPagemap();
 
 		return null;
-	}
+	}*/
 	
-	private String getAuthor(String link, String searchString) {
+	/*private String getAuthor(String link, String searchString) {
 		try {
 			Map<String, Object> pagemap = getPageMap(link, searchString);
 			if (null != pagemap) {
@@ -342,5 +459,5 @@ public class Linker {
 		}
 		 
 		return null;
-	}
+	}*/
 }

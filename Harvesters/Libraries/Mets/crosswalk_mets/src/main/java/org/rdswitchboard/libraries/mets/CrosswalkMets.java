@@ -206,16 +206,12 @@ public class CrosswalkMets implements GraphCrosswalk {
 
 		// create graph object
 		Graph graph = new Graph();
-		graph.addSchema(new GraphSchema()
-				.withLabel(GraphUtils.SOURCE_DRYAD)
-				.withIndex(GraphUtils.PROPERTY_KEY)
-				.withUnique(true));
-		graph.addSchema(new GraphSchema()
-				.withLabel(GraphUtils.SOURCE_DRYAD)
-				.withIndex(GraphUtils.PROPERTY_DOI)
-				.withUnique(false));
 		// setup graph schema
 		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_KEY, true));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_DOI, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_PURL, false));
+		graph.addSchema(new GraphSchema(source, GraphUtils.PROPERTY_URL, false));
+
 		// extract root object
 		if (element.getValue() instanceof OAIPMHtype) {
 			OAIPMHtype root = (OAIPMHtype) element.getValue();

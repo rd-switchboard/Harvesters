@@ -49,16 +49,17 @@
 	<module>Importers/Cern/import_cern</module>
 	<module>Importers/CrossRef/import_crossref</module>
 	<module>Linkers/Google/link_web_researchers</module>
-	<module>Linkers/Static/link_grants</module>
+	<module>Linkers/Static/link_nodes</module>
 	<module>Utils/RDS/export_rds_urls</module>
 	<module>Utils/RDS/clean_rds_records</module>
 	<module>Utils/RDS/sync_solr</module>
 	<module>Utils/Neo4j/import_rds_urls</module>
 	<module>Utils/Neo4j/copy_nodes</module>
 	<module>Utils/Neo4j/copy_harmonized</module>
+	<module>Utils/Neo4j/delete_nodes</module>
 	<module>Utils/XSLT/test_crosswalk</module>
 	<module>Exporters/Graph/export_graph_json</module>
-	<module>Exporters/Graph/export_ands_json</module>
+<!--	<module>Exporters/Graph/export_ands_json</module> -->
   </modules>
 
   <build>

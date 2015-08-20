@@ -2,12 +2,16 @@ package org.rdswitchboard.exporters.graph;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Label;
@@ -62,7 +66,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *    4.0.0 - Created library from the old code
  */
 
-public abstract class Exporter {
+public class Exporter {
 	
 	private static final String CONTENT_ENCODING = "UTF-8";
 	private static final String CONTENT_TYPE = "application/json";
@@ -263,13 +267,13 @@ public abstract class Exporter {
 	 */
 	private void processNode(Node node) {
 		try {
-			String jsonName = generateName(node);
-			if (null == jsonName) {
+			Set<String> jsonNames = generateName(node);
+			if (null == jsonNames) {
 				System.out.println("Unable to generate json name for node: " + node.getId());
 				return;
 			}
 			
-			jsonName += ".json";
+		//	jsonName += ".json";
 			
 			long rootId = node.getId();
 			Map<Long, Node> graphNodes = new HashMap<Long, Node>();
@@ -336,7 +340,8 @@ public abstract class Exporter {
 					}
 			}
 			
-			String jsonString = mapper.writeValueAsString(jsonGraph);
+			if (jsonGraph.getNodes() != null && jsonGraph.getNodes().size() > 1) {
+				String jsonString = mapper.writeValueAsString(jsonGraph);
 			
 			/*File jsonFile = new File(outputFolder, JSON_FILE);
 			Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(jsonFile), "utf-8"));
@@ -345,24 +350,27 @@ public abstract class Exporter {
 			writer.close();
 			*/
 			
-			System.out.println("Put Object: " + s3Bucket + "/" + s3Key + jsonName);
-			
-			byte[] bytes = jsonString.getBytes(charset);
-			
-			ObjectMetadata metadata = new ObjectMetadata();
-			metadata.setContentEncoding(CONTENT_ENCODING);
-			metadata.setContentType(CONTENT_TYPE);
-			metadata.setContentLength(bytes.length);
-			
-			InputStream inputStream = new ByteArrayInputStream(bytes);
-			
-			PutObjectRequest request = new PutObjectRequest(s3Bucket, s3Key + jsonName, inputStream, metadata);
-			if (publicReadRights)
-				request.setCannedAcl(CannedAccessControlList.PublicRead);
-			
-			s3client.putObject(request);
-									
-			++nodeCounter;
+				for (String jsonName : jsonNames) {
+					System.out.println("Put Object: " + s3Bucket + "/" + s3Key + jsonName);
+					
+					byte[] bytes = jsonString.getBytes(charset);
+					
+					ObjectMetadata metadata = new ObjectMetadata();
+					metadata.setContentEncoding(CONTENT_ENCODING);
+					metadata.setContentType(CONTENT_TYPE);
+					metadata.setContentLength(bytes.length);
+					
+					InputStream inputStream = new ByteArrayInputStream(bytes);
+					
+					PutObjectRequest request = new PutObjectRequest(s3Bucket, s3Key + jsonName, inputStream, metadata);
+					if (publicReadRights)
+						request.setCannedAcl(CannedAccessControlList.PublicRead);
+					
+					s3client.putObject(request);
+											
+					++nodeCounter;
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -374,7 +382,30 @@ public abstract class Exporter {
 	 * @param node Node The node to export
 	 * @return json - JSON file name
 	 */
-	public abstract String generateName(Node node);
+	public Set<String> generateName(Node node) {
+		if (node.hasProperty(GraphUtils.PROPERTY_ORIGINAL_KEY)) {
+			Set<String> keys = new HashSet<String>();
+			
+			Object originalKeys = node.getProperty(GraphUtils.PROPERTY_ORIGINAL_KEY);
+			if (originalKeys instanceof String) {
+				try {
+					keys.add(URLEncoder.encode((String) originalKeys, StandardCharsets.UTF_8.name()) + ".json");
+				} catch (Exception e) { }
+				
+			} else if (originalKeys instanceof String[]) {
+				for (String originalKey : (String[]) originalKeys) { 
+					try {
+						keys.add(URLEncoder.encode(originalKey, StandardCharsets.UTF_8.name()) + ".json");
+					} catch (Exception e) { }
+				}
+			}
+			
+			if (!keys.isEmpty())
+				return keys;
+		}
+		
+		return null;
+	}
 	
 	/**
 	 * Function to extract all syblings

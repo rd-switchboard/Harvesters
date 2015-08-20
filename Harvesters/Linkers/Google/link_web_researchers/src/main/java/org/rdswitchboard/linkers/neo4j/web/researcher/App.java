@@ -12,6 +12,7 @@ public class App {
 	private static final String GOOGLE_CACHE = "google";
 	private static final String BLACK_LIST = "conf/black.list";
 	private static final String MIN_TITLE_LENGTH = "30";
+	private static final String MAX_THREADS = "100";
 	
 	public static void main(String[] args) {
 		try {
@@ -40,11 +41,13 @@ public class App {
 	        System.out.println("Black List: " +  blackList);
 
 	        int minTitleLength = Integer.parseInt(properties.getProperty("min.title.length", MIN_TITLE_LENGTH));
-	        if (StringUtils.isEmpty( blackList))
-	            throw new IllegalArgumentException("Invalid Min Title Length");
 	        System.out.println("Min Title Length: " +  minTitleLength);
 	        
+	        int maxThreads = Integer.parseInt(properties.getProperty("max.threads", MAX_THREADS));
+	        System.out.println("Max Threads: " +  maxThreads);
+
 	        Linker linker = new Linker(neo4jFolder, blackList, minTitleLength, true);
+	        linker.setMaxThreads(maxThreads);
 	        linker.link(googleCache);
 	        
 		} catch (Exception e) {
