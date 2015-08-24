@@ -161,7 +161,7 @@ public class App {
 						.withKey(GraphUtils.SOURCE_ARC, purl)
 						.withSource(GraphUtils.SOURCE_ARC)
 						.withType(GraphUtils.TYPE_GRANT)
-						.withProperty(GraphUtils.PROPERTY_URL, purl)
+				//		.withProperty(GraphUtils.PROPERTY_URL, purl)
 						.withProperty(GraphUtils.PROPERTY_PURL, purl)
 						.withProperty(GraphUtils.PROPERTY_ARC_ID, projectId)
 						.withProperty(GraphUtils.PROPERTY_TITLE, title);

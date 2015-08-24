@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -115,9 +117,17 @@ public class Harvester {
 	private static final String URL_LIST_METADATA_FORMATS = "?verb=ListMetadataFormats";
 	private static final String URL_LIST_SETS = "?verb=ListSets";
 	private static final String URL_LIST_RECORDS = "?verb=ListRecords&set=%s&metadataPrefix=%s";
+	private static final String URL_LIST_DEFAULT_RECORDS = "?verb=ListRecords&metadataPrefix=%s";
 	private static final String URL_LIST_RECORDS_RESUMPTION_TOKEN = "?verb=ListRecords&resumptionToken=%s";
 	
-	protected static final String ELEMENT_ROOT = "OAI-PMH";
+	//private static final String ELEMENT_ROOT = "OAI-PMH";
+	
+	private static final String REG_RESUMPTION_TOKEN = "<.*resumptionToken.*>.*<.*/.*resumptionToken.*>";
+	private static final String REG_RESUMPTION_TOKEN_START = "<.*resumptionToken.*>";
+	private static final String REG_RESUMPTION_TOKEN_END = "<.*/.*resumptionToken.*>";
+//	private static final String REG_RESUMPTION_TOKEN_SIZE = "completeListSize.*=";
+//	private static final String REG_RESUMPTION_TOKEN_CURSOR = "cursor.*=";
+//	private static final String REG_RESUMPTION_TOKEN_VALUE = "\".*\"";
 	
 	private static XPathExpression XPATH_OAI_PMH;
 	private static XPathExpression XPATH_ERROR;
@@ -131,7 +141,14 @@ public class Harvester {
 	private static XPathExpression XPATH_SET_NAME;
 	private static XPathExpression XPATH_SET_SPEC;
 	private static XPathExpression XPATH_RESUMPTION_TOKEN; 
-
+	
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN = Pattern.compile(REG_RESUMPTION_TOKEN);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_START = Pattern.compile(REG_RESUMPTION_TOKEN_START);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_END = Pattern.compile(REG_RESUMPTION_TOKEN_END);
+//	private static final Pattern PATTERN_RESUMPTUON_TOKEN_SIZE = Pattern.compile(REG_RESUMPTION_TOKEN_SIZE);
+//	private static final Pattern PATTERN_RESUMPTUON_TOKEN_CURSOR = Pattern.compile(REG_RESUMPTION_TOKEN_CURSOR);
+//	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
+	
 	static {
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		try {
@@ -525,15 +542,12 @@ public class Harvester {
 		try {
 			Document doc = dbf.newDocumentBuilder().parse(url);
 			
-			Map<String, String> mapSets = null; 
+			Map<String, String> mapSets = new HashMap<String, String>();
 			NodeList sets = (NodeList) XPATH_LIST_SETS.evaluate(doc, XPathConstants.NODESET);
 			for (int i = 0; i < sets.getLength(); i++) {
 				Node set = sets.item(i);
 				String setName = (String) XPATH_SET_NAME.evaluate(set, XPathConstants.STRING);
 				String setGroup = (String) XPATH_SET_SPEC.evaluate(set, XPathConstants.STRING);
-				
-				if (null == mapSets)
-					mapSets = new HashMap<String, String>();
 				
 				if (mapSets.put(setGroup, setName) != null)
 					throw new Exception("The group already exists in the set");
@@ -609,8 +623,12 @@ public class Harvester {
 				e.printStackTrace();
 			}
 		}
-		if (null == url)
-			url = repoUrl + String.format(URL_LIST_RECORDS, set, metadataPrefix);
+		if (null == url) {
+			if (null == set)
+				url = repoUrl + String.format(URL_LIST_DEFAULT_RECORDS, metadataPrefix);
+			else
+				url = repoUrl + String.format(URL_LIST_RECORDS,  URLEncoder.encode(set, "UTF-8"), metadataPrefix);
+		}
 		
 		System.out.println("Downloading records: " + url);
 		
@@ -623,24 +641,8 @@ public class Harvester {
 	    }
 	    
 	    // Check if xml has been returned and check what it had a valid root element
-		if (null == xml)
-			throw new Exception("The XML document is not exists");
-								
-		// Parse the xml
-		Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
-
-		// Extract root node
-		Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
-		if (null == root)
-			throw new Exception("The document is not an OAI:PMH file");
-		
-		// Check for error node
-		Node error = (Node) XPATH_ERROR.evaluate(root, XPathConstants.NODE); 
-		if (null != error && error instanceof Element) {
-			String code = ((Element) error).getAttribute("code");
-			String message = ((Element) error).getTextContent();
-			
-			System.out.println("Error: [" + code + "] " + message);
+		if (null == xml) {
+			System.err.println("The XML document is empty");
 			return null;
 		}
 		
@@ -658,27 +660,93 @@ public class Harvester {
         PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
 
         s3client.putObject(request);
+        String tokenString = null;
+
+		try {
+			// Parse the xml 
+			// if xml document is mailformed, this will throw an exception
+			Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+
+			// Extract root node
+			Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
+			if (null == root)
+				throw new Exception("The document is not an OAI:PMH file");
 		
-		Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
-		
-		if (null != token && token instanceof Element) {
-			String tokenString = ((Element) token).getTextContent();
-			if (null != tokenString && !tokenString.isEmpty()) {
-				String cursor = ((Element) token).getAttribute("cursor");
-				String size = ((Element) token).getAttribute("completeListSize");
-				try {
-					setSize = Integer.parseInt(size);
-				} catch(Exception e) {
-					setSize = 0;
-				}
-				try {
-					setOffset = Integer.parseInt(cursor);
-				} catch(Exception e) {
-					++setOffset;
-				}
-				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
-				return token.getTextContent();
+			// Check for error node
+			Node error = (Node) XPATH_ERROR.evaluate(root, XPathConstants.NODE); 
+			if (null != error && error instanceof Element) {
+				String code = ((Element) error).getAttribute("code");
+				String message = ((Element) error).getTextContent();
+			
+				throw new Exception ("[" + code + "] " + message);
 			}
+					
+			Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
+			
+			if (null != token && token instanceof Element) {
+				tokenString = ((Element) token).getTextContent();
+				if (null != tokenString && !tokenString.isEmpty()) {
+					String cursor = ((Element) token).getAttribute("cursor");
+					String size = ((Element) token).getAttribute("completeListSize");
+					try {
+						setSize = Integer.parseInt(size);
+					} catch(Exception e) {
+						setSize = 0;
+					}
+					try {
+						setOffset = Integer.parseInt(cursor);
+					} catch(Exception e) {
+						++setOffset;
+					}
+					System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
+					return tokenString;
+				}
+			}
+		} catch (Exception e) {
+			System.err.println("Error: " + e.getMessage());
+			
+			// failback;
+			return extractResumptionToken(xml);
+			
+/*	private static final String PART_RESUMPTION_TOKEN = "resumptionToken";
+	private static final String PART_CURSOR = "cursor";
+	private static final String PART_COMPLETE_LIST_SIZE = "completeListSize";
+*/
+			
+		}
+		
+	
+		return null;
+	}
+	
+	/*	private static final Pattern  = Pattern.compile(REG_RESUMPTION_TOKEN_START);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_END = Pattern.compile(REG_RESUMPTION_TOKEN_END);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_SIZE = Pattern.compile(REG_RESUMPTION_TOKEN_SIZE);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_CURSOR = Pattern.compile(REG_RESUMPTION_TOKEN_CURSOR);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
+*/
+	
+	protected String extractResumptionToken(String xml) throws Exception {
+		Matcher t = PATTERN_RESUMPTUON_TOKEN.matcher(xml);
+		if (t.find()) {
+			String token = t.group();
+			
+			Matcher s = PATTERN_RESUMPTUON_TOKEN_START.matcher(token);
+			Matcher e = PATTERN_RESUMPTUON_TOKEN_END.matcher(token);
+			if (s.find() && e.find()) {
+				int start = s.end();
+				int end = e.start();
+				if (end > start) {
+					String _token = token.substring(start, end);
+					if (!StringUtils.isNullOrEmpty(_token)) {
+						setSize = 0;
+						++setOffset;
+						
+						return _token;
+					}
+				}
+			} else 
+				throw new Exception ("Error in Regular Expression");
 		}
 		
 		return null;
@@ -825,40 +893,30 @@ public class Harvester {
 		System.out.println("Downloading set list...");
 		
 		Map<String, String> mapSets = listSets();
-		if (null == mapSets )
-			throw new Exception("The sets collection is empty");
-		
-			// try to load whole database into memory
-		for (Map.Entry<String, String> entry : mapSets.entrySet()) {
-		    String set = entry.getKey();
-		    if (status.getProcessedSets().contains(set))
-		    	continue;
-		    
-		    String resumptionToken = null;
-		    
-		    setSize = 0;
+		String resumptionToken = null;
+		if (null == mapSets || mapSets.isEmpty()) {
+			
+			setSize = 0;
 		    setOffset = 0;
 		    
-		    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set)) {
+		    if (null != status.getCurrentSet() && status.getCurrentSet().equals("default")) {
 		    	resumptionToken = status.getResumptionToken();
 		    	
 		    	setSize = status.getSetSize();
 		    	setOffset = status.getSetOffset();
 		    } else {
-		    	status.setCurrentSet(set);
+		    	status.setCurrentSet("default");
 		    	status.setResumptionToken(null);
 		    	status.setSetSize(0);
 		    	status.setSetOffset(0);
 		    }
 		    
-		    String setName = entry.getValue();
+		    System.out.println("Processing deafult set");
 		    
-		    System.out.println("Processing set: " +  URLDecoder.decode(setName, StandardCharsets.UTF_8.name()));
-		    		    
 		    int nError = 0;
 		    do {
 		    	try {
-		    		resumptionToken = downloadRecords(set, resumptionToken);		
+		    		resumptionToken = downloadRecords(null, resumptionToken);		
 		    		
 		    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
 		    			status.setResumptionToken(resumptionToken);
@@ -883,16 +941,74 @@ public class Harvester {
 		    	
 		    } while (nError > 0 || null != resumptionToken && !resumptionToken.isEmpty());		 
 		    
-		    status.addProcessedSet(set);
-		    status.setCurrentSet(null);
-		    status.setResumptionToken(null);
-		    status.setSetSize(0);
-		    status.setSetOffset(0);
-		    saveStatus(status, fileStatus);
+		    if (fileStatus.exists())
+				fileStatus.delete();
+			
+		} else {
+			// try to load whole database into memory
+			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
+			    String set = entry.getKey();
+			    if (status.getProcessedSets().contains(set))
+			    	continue;
+			    
+			    setSize = 0;
+			    setOffset = 0;
+			    
+			    if (null != status.getCurrentSet() && status.getCurrentSet().equals(set)) {
+			    	resumptionToken = status.getResumptionToken();
+			    	
+			    	setSize = status.getSetSize();
+			    	setOffset = status.getSetOffset();
+			    } else {
+			    	status.setCurrentSet(set);
+			    	status.setResumptionToken(null);
+			    	status.setSetSize(0);
+			    	status.setSetOffset(0);
+			    }
+			    
+			    String setName = entry.getValue();
+			    
+			    System.out.println("Processing set: " +  URLDecoder.decode(setName, StandardCharsets.UTF_8.name()));
+			    		    
+			    int nError = 0;
+			    do {
+			    	try {
+			    		resumptionToken = downloadRecords(set, resumptionToken);		
+			    		
+			    		if (null != resumptionToken && !resumptionToken.isEmpty()) {
+			    			status.setResumptionToken(resumptionToken);
+			    			status.setSetSize(setSize);
+			    			status.setSetOffset(setOffset);
+			    			saveStatus(status, fileStatus);
+			    		}
+			    		
+			    		nError = 0;		    		
+			    	}
+			    	catch (Exception e) {
+			    		if (++nError >= 10) {
+			    			System.out.println("Too much errors has been detected, abort download");
+			    			
+			    			throw e;
+			    		} else { 
+			    			System.out.println("Error downloading data");
+			    		
+			    			e.printStackTrace();
+			    		}
+			    	}
+			    	
+			    } while (nError > 0 || null != resumptionToken && !resumptionToken.isEmpty());		 
+			    
+			    status.addProcessedSet(set);
+			    status.setCurrentSet(null);
+			    status.setResumptionToken(null);
+			    status.setSetSize(0);
+			    status.setSetOffset(0);
+			    saveStatus(status, fileStatus);
+			}
+			
+			if (fileStatus.exists())
+				fileStatus.delete();
 		}
-		
-		if (fileStatus.exists())
-			fileStatus.delete();
 	}
 	
 	/**

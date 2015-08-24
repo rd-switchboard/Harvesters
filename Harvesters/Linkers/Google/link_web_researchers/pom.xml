@@ -90,5 +90,10 @@
       <artifactId>google_cache</artifactId>
       <version>1.2.0</version>
   	</dependency>
+  	<dependency>
+  	  <groupId>org.rdswitchboard.libraries</groupId>
+      <artifactId>fuzzy_search</artifactId>
+      <version>1.2.0</version>
+  	</dependency>
   </dependencies>
 </project>

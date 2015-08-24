@@ -144,7 +144,7 @@ public class App {
 					.withKey(GraphUtils.SOURCE_NHMRC, purl)
 					.withSource(GraphUtils.SOURCE_NHMRC)
 					.withType(GraphUtils.TYPE_GRANT)
-					.withProperty(GraphUtils.PROPERTY_URL, purl)
+				//	.withProperty(GraphUtils.PROPERTY_URL, purl)
 					.withProperty(GraphUtils.PROPERTY_PURL, purl)
 					.withProperty(GraphUtils.PROPERTY_NHMRC_ID, grantId)
 					.withProperty(GraphUtils.PROPERTY_TITLE, title);

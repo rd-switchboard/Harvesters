@@ -75,7 +75,7 @@ public class Linker {
 			indexWeb = Neo4jUtils.getNodeIndex(graphDb, GraphUtils.SOURCE_WEB);
 		}
 		
-		loadBlackList( blackList );
+		this.blackList = GoogleUtils.loadBlackList( blackList );
 		loadWebPatterns();
 	}
 	
@@ -142,37 +142,19 @@ public class Linker {
 				GraphUtils.PROPERTY_TITLE, null );
 		loadNodes( nodes, GraphUtils.SOURCE_CROSSREF, GraphUtils.TYPE_PUBLICATION, 
 				GraphUtils.PROPERTY_TITLE, null );
-		/*loadNodes( nodes, GraphUtils.SOURCE_CERN, GraphUtils.TYPE_PUBLICATION, 
-				GraphUtils.PROPERTY_TITLE, null );*/
+		loadNodes( nodes, GraphUtils.SOURCE_CERN, GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.PROPERTY_TITLE, null );
 		/*loadNodes( nodes, GraphUtils.SOURCE_ORCID, GraphUtils.TYPE_PUBLICATION, 
 				GraphUtils.PROPERTY_TITLE, null );*/
 		
 		try ( Transaction tx = graphDb.beginTx() ) {
-			linkSimpleSearch(nodes, googleCache);
+			linkFuzzySearch(nodes, googleCache);
 			
 			tx.success();
 		}
 		
 		// add publication linking here
 	}
-	
-	private void loadBlackList(String blackList) throws FileNotFoundException, IOException {
-		if (verbose)
-			System.out.println("Loading Black List");
-				
-		this.blackList = new HashSet<String>();
-        
-        try(BufferedReader br = new BufferedReader(new FileReader(new File(blackList)))) {
-            for(String line; (line = br.readLine()) != null; ) {
-            	String s = line.trim().toLowerCase();
-            	
-            	if (verbose)
-            		System.out.println("Black List: " + s);
-            	
-            	this.blackList.add(s);
-            }            
-        }
-    }
 	
 	private void loadWebPatterns() {
 		if (verbose)
@@ -307,6 +289,63 @@ public class Linker {
 							System.out.println("Testing link: " + link.getLink());
 							
 						MatcherSimple matcher = new MatcherSimple(googleCache, link, nodes);
+
+						semaphore.acquire(); 
+						
+						boolean matcherAssigned = false;
+						for (MatcherThread thread : threads) 
+							if (thread.isFree()) {
+								processResult(thread.getResult(), metadataFolder); 
+								thread.addMatcher(matcher);
+								matcherAssigned = true;
+								
+								break;
+							}
+						
+						if (!matcherAssigned)
+							throw new MatcherThreadException("All matcher threads are busy");
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					
+					break;
+				}
+		for (MatcherThread thread : threads) {
+			processResult(thread.getResult(), metadataFolder);
+			
+			thread.finishCurrentAndExit();
+			thread.join();
+		}	
+	}
+	
+	private void linkFuzzySearch(Map<String, Set<Long>> nodes, String googleCache) throws Exception {
+		if (verbose)
+			System.out.println("Processing Simple Search");
+		
+		Semaphore semaphore = new Semaphore(maxThreads);
+		
+		List<MatcherThread> threads = new ArrayList<MatcherThread>();
+		for (int i = 0; i < maxThreads; ++i) {
+			MatcherThread thread = new MatcherThread(semaphore);
+			thread.start();
+			threads.add(thread);
+		}
+		
+		File linksFolder = GoogleUtils.getLinkFolder(googleCache);
+		File metadataFolder = GoogleUtils.getMetadataFolder(googleCache);
+		File[] files = linksFolder.listFiles();
+		for (File file : files) 
+			if (!file.isDirectory())
+				try {
+					/*if (verbose)
+						System.out.println("Processing file: " + file.toString());*/
+					
+					Link link = (Link) jaxbUnmarshaller.unmarshal(file);
+					if (link != null && isLinkFollowAPattern(link.getLink())) {
+						if (verbose)
+							System.out.println("Testing link: " + link.getLink());
+							
+						Matcher matcher = new MatcherFuzzy(googleCache, link, nodes);
 
 						semaphore.acquire(); 
 						
