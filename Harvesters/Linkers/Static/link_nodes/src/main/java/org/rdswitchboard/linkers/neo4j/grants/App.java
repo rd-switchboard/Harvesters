@@ -7,7 +7,7 @@ import java.util.Properties;
 import org.parboiled.common.StringUtils;
 
 public class App {
-private static final String PROPERTIES_FILE = "properties/link_nodes.properties";
+	private static final String PROPERTIES_FILE = "properties/link_nodes.properties";
 	
 	private static final String GOOGLE_CACHE = "google";
 	private static final String BLACK_LIST = "conf/black.list";
@@ -24,7 +24,7 @@ private static final String PROPERTIES_FILE = "properties/link_nodes.properties"
 	            properties.load(in);
 	        }
 	        
-	        System.out.println("Linking Grants");
+	        System.out.println("Linking Nodes");
 	        	        
 	        String neo4jFolder = properties.getProperty("neo4j");
 	        if (StringUtils.isEmpty(neo4jFolder))

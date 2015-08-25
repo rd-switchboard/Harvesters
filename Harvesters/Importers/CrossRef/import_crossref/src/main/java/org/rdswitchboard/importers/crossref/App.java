@@ -98,22 +98,28 @@ public class App {
 	private static void loadReferences(final String source, final String property) {
 		System.out.println("Loading source: " + source + ", reference: " + property);
 	
-		neo4j.createIndex(DynamicLabel.label(source), property);
-		neo4j.enumrateAllNodesWithLabelAndProperty(source, property, new ProcessNode() {
-
-			@Override
-			public void processNode(Node node) {
-				String keyValue = (String) node.getProperty(GraphUtils.PROPERTY_KEY);
-				GraphKey key = new GraphKey(source, keyValue);
-				Object dois = node.getProperty(property);
-				if (dois instanceof String) {
-					loadDoi(key, (String)dois); 	
-				} else if (dois instanceof String[]) {
-					for (String doi : (String[])dois)
-						loadDoi(key, doi);
-				}
-			}			
-		});
+		try {
+			neo4j.createIndex(DynamicLabel.label(source), property);
+			neo4j.enumrateAllNodesWithLabelAndProperty(source, property, new ProcessNode() {
+	
+				@Override
+				public boolean processNode(Node node) throws Exception {
+					String keyValue = (String) node.getProperty(GraphUtils.PROPERTY_KEY);
+					GraphKey key = new GraphKey(source, keyValue);
+					Object dois = node.getProperty(property);
+					if (dois instanceof String) {
+						loadDoi(key, (String)dois); 	
+					} else if (dois instanceof String[]) {
+						for (String doi : (String[])dois)
+							loadDoi(key, doi);
+					}
+					
+					return true;
+				}			
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private static void loadDoi(GraphKey key, String ref) {

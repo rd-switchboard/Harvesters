@@ -35,6 +35,7 @@
 	<module>Libraries/Mets/crosswalk_mets</module>
 	<module>Libraries/CrossRef/crossref_utils</module>
 	<module>Libraries/Marc21/crosswalk_marc21</module>
+	<module>Libraries/Dli/crosswalk_dli</module>
 	<module>Libraries/Fuzzy/fuzzy_search</module>
   	<module>Harvesters/OAI:PMH/harvester_pmh</module>
   	<module>Harvesters/OAI:PMH/harvester_pmh_s3</module>
@@ -50,6 +51,7 @@
 	<module>Importers/Dryad/import_dryad</module>
 	<module>Importers/Cern/import_cern</module>
 	<module>Importers/CrossRef/import_crossref</module>
+	<module>Importers/OpenAIRE/import_openaire</module>
 	<module>Linkers/Google/link_web_researchers</module>
 	<module>Linkers/Static/link_nodes</module>
 	<module>Utils/RDS/export_rds_urls</module>

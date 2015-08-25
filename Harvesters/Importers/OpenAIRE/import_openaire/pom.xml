@@ -7,11 +7,11 @@
     <relativePath>../../../pom.xml</relativePath>
   </parent>
   <groupId>org.rdswitchboard.importers</groupId>
-  <artifactId>import_cern</artifactId>
-  <name>Import CERN Records into Neo4j Database</name>
+  <artifactId>import_openaire</artifactId>
+  <name>Import OpenAIRE Records into Neo4j Database</name>
   
   <properties>
-    <main.class>org.rdswitchboard.importers.cern.App</main.class>
+    <main.class>org.rdswitchboard.importers.openaire.App</main.class>
   </properties>
   
   <build>
@@ -60,7 +60,7 @@
     </dependency>
   	<dependency>
   	  <groupId>org.rdswitchboard.libraries</groupId>
-  	  <artifactId>crosswalk_marc21</artifactId>
+  	  <artifactId>crosswalk_dli</artifactId>
       <version>1.2.0</version>
   	</dependency>
   	<dependency>
@@ -69,5 +69,6 @@
   	  <version>1.2.0</version>
   	</dependency>
   </dependencies>
+  
   
 </project>

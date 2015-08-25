@@ -25,6 +25,7 @@ public class GoogleUtils {
 	public static final String FOLDER_RESULT = "result";
 	public static final String FOLDER_CACHE = "cache";
 	public static final String FOLDER_LINK = "link";
+	public static final String FOLDER_BROKEN_LINK = "broken_link";
 	public static final String FOLDER_DATA = "data";
 	public static final String FOLDER_METADATA = "metadata";
 	//public static final String FOLDER_GRANT = "grant";
@@ -133,6 +134,10 @@ public class GoogleUtils {
 		return getCacheFolder(folder, FOLDER_LINK);
 	}
 
+	public static final File getBrokenLinkFolder(String folder) {
+		return getCacheFolder(folder, FOLDER_BROKEN_LINK);
+	}
+
 	public static final File getDataFolder(String folder) {
 		return getCacheFolder(folder, FOLDER_DATA);
 	}
@@ -170,8 +175,9 @@ public class GoogleUtils {
         return blackList;
     }	
 	
-	public static Map<String, Link> loadLinks(final File linksFolder) {
-		Map<String, Link> links = new HashMap<String, Link>();
+	public static Map<String, Link> loadLinks(final File linksFolder, Map<String, Link> links) {
+		if (null == links)
+			links = new HashMap<String, Link>();
 		
 		File[] files = linksFolder.listFiles();
 		for (File file : files) 

@@ -111,19 +111,20 @@ public class Neo4jDatabase implements GraphImporter {
 	}
 	
 	
-	public void enumrateAllNodes(ProcessNode processNode) {
+	public void enumrateAllNodes(ProcessNode processNode) throws Exception {
 		try ( Transaction tx = graphDb.beginTx() ) 
 		{
 			ResourceIterable<Node> nodes = getGlobalOperations().getAllNodes();
 			for (Node node : nodes) {
-				processNode.processNode(node);
+				if (!processNode.processNode(node))
+					break;
 			}
 		
 			tx.success();
 		}
 	}
 	
-	public void enumrateAllNodesWithLabel(Label label, ProcessNode processNode) {
+	public void enumrateAllNodesWithLabel(Label label, ProcessNode processNode) throws Exception {
 		try ( Transaction tx = graphDb.beginTx() ) 
 		{
 //			GlobalGraphOperations global = Neo4jUtils.getGlobalOperations(graphDb);
@@ -131,7 +132,8 @@ public class Neo4jDatabase implements GraphImporter {
 			
 			try (ResourceIterator<Node> nodes = graphDb.findNodes(label)) {
 				while (nodes.hasNext()) {
-					processNode.processNode(nodes.next());
+					if (!processNode.processNode(nodes.next()))
+						break;
 				}
 			}
 			
@@ -139,11 +141,11 @@ public class Neo4jDatabase implements GraphImporter {
 		}
 	}
 	
-	public void enumrateAllNodesWithLabel(String label, ProcessNode processNode) {
+	public void enumrateAllNodesWithLabel(String label, ProcessNode processNode) throws Exception {
 		enumrateAllNodesWithLabel(DynamicLabel.label(label), processNode);
 	}
 	
-	public void enumrateAllNodesWithProperty(String property, ProcessNode processNode) {
+	public void enumrateAllNodesWithProperty(String property, ProcessNode processNode) throws Exception {
 		try ( Transaction tx = graphDb.beginTx() ) 
 		{
 			String cypher = "MATCH (n) WHERE HAS(n." + property + ") RETURN n";
@@ -151,7 +153,8 @@ public class Neo4jDatabase implements GraphImporter {
 				while ( result.hasNext() )
 			    {
 			        Map<String,Object> row = result.next();
-			        processNode.processNode((Node) row.get(COLUMN_N));
+			        if (!processNode.processNode((Node) row.get(COLUMN_N)))
+			        	break;
 			    }
 			}
 			
@@ -159,7 +162,7 @@ public class Neo4jDatabase implements GraphImporter {
 		}
 	}
 	
-	public void enumrateAllNodesWithLabelAndProperty(String label, String property, ProcessNode processNode) {
+	public void enumrateAllNodesWithLabelAndProperty(String label, String property, ProcessNode processNode)  throws Exception {
 		try ( Transaction tx = graphDb.beginTx() ) 
 		{
 			String cypher = "MATCH (n:" + label + ") WHERE HAS(n." + property + ") RETURN n";
@@ -167,7 +170,8 @@ public class Neo4jDatabase implements GraphImporter {
 				while ( result.hasNext() )
 			    {
 			        Map<String,Object> row = result.next();
-			        processNode.processNode((Node) row.get(COLUMN_N));
+			        if (!processNode.processNode((Node) row.get(COLUMN_N)))
+			        	break;
 			    }
 			}
 			

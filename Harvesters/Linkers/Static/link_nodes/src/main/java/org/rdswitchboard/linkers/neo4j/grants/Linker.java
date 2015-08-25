@@ -50,6 +50,15 @@ public class Linker {
 		linkNodes(GraphUtils.TYPE_PUBLICATION, 
 				GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_DOI, 
 				GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_DOI);
+		linkNodes(GraphUtils.TYPE_DATASET, 
+				GraphUtils.SOURCE_OPEN_AIRE, GraphUtils.PROPERTY_DOI, 
+				GraphUtils.SOURCE_ANDS, GraphUtils.PROPERTY_DOI);
+		linkNodes(GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.SOURCE_OPEN_AIRE, GraphUtils.PROPERTY_DOI, 
+				GraphUtils.SOURCE_CROSSREF, GraphUtils.PROPERTY_DOI);
+		linkNodes(GraphUtils.TYPE_PUBLICATION, 
+				GraphUtils.SOURCE_OPEN_AIRE, GraphUtils.PROPERTY_DOI, 
+				GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_DOI);
 		linkNodes(GraphUtils.TYPE_RESEARCHER, 
 				GraphUtils.SOURCE_ANDS, GraphUtils.PROPERTY_ORCID_ID, 
 				GraphUtils.SOURCE_ORCID, GraphUtils.PROPERTY_ORCID_ID);

@@ -35,8 +35,8 @@ public class App {
 	private static final String MIN_TITLE_LENGTH = "30";
 	private static final String MAX_ATTEMPTS = "2";
 	private static final String ATTEMPT_DELAY = "1000";
-	private static final String CONNECTION_TIMEOUT = "1000";
-	private static final String READ_TIMEOUT = "1000";
+	private static final String CONNECTION_TIMEOUT = "30000";
+	private static final String READ_TIMEOUT = "30000";
 	
 	//private static final String PART_DATA_FROM = "Data from:";
 	private static final String PART_PDF = ".pdf";
@@ -51,11 +51,12 @@ public class App {
 	private static int attemptDelay;
 	
 	private static Map<String, Link> links;
-	private static Map<String, Result> results;
+	//private static Map<String, Result> results;
 	
 	private static File dataFolder;
 	private static File metadataFolder;
 	private static File linkFolder;
+	private static File brokenFolder;
 	private static File resultFolder;
 		
 	public static void main(String[] args) {
@@ -90,15 +91,19 @@ public class App {
 	        
 	        metadataFolder = GoogleUtils.getMetadataFolder(googleCache);
 	        metadataFolder.mkdirs();
-	        System.out.println("Metadata Folder: " + dataFolder);
+	        System.out.println("Metadata Folder: " + metadataFolder);
 	        
 	        linkFolder = GoogleUtils.getLinkFolder(googleCache);
 	        linkFolder.mkdirs();
-	        System.out.println("Link Folder: " + dataFolder);
-	        
+	        System.out.println("Link Folder: " + linkFolder);
+
+	        brokenFolder = GoogleUtils.getBrokenLinkFolder(googleCache);
+	        brokenFolder.mkdirs();
+	        System.out.println("Broken Link Folder: " + brokenFolder);
+
 	        resultFolder = GoogleUtils.getResultFolder(googleCache);
 	        resultFolder.mkdirs();
-	        System.out.println("Result Folder: " + dataFolder);
+	        System.out.println("Result Folder: " + resultFolder);
 	        
 	        String neo4jFolder = properties.getProperty("neo4j", NEO4J_FOLDER);
 	        if (StringUtils.isEmpty(neo4jFolder))
@@ -117,12 +122,11 @@ public class App {
 	        attemptDelay = Integer.parseInt(properties.getProperty("attempt.delay", ATTEMPT_DELAY));
 	        int connectionTimeout = Integer.parseInt(properties.getProperty("connection.timeout", CONNECTION_TIMEOUT));
 	        int readTimeout = Integer.parseInt(properties.getProperty("read.timeout", READ_TIMEOUT));
-	        
-	       
-	        
+	        	       
 	        blackList = GoogleUtils.loadBlackList(blackListPath);
-	        links =  GoogleUtils.loadLinks(linkFolder);
-	        results = GoogleUtils.loadResuls(resultFolder);
+	        links =  GoogleUtils.loadLinks(brokenFolder, links);
+	        links =  GoogleUtils.loadLinks(linkFolder, links);
+	      //  results = GoogleUtils.loadResuls(resultFolder);
 	        
 	        query = new Query(googleCseId, googleApiKey);
 	        query.setJsonFolder(GoogleUtils.getJsonFolder(googleCache).toString());
@@ -143,83 +147,96 @@ public class App {
 	}
 	
 	private static void processNodes(final Label source, final Label type, final String titleProperty) {
-		neo4j.enumrateAllNodesWithLabel(source, new ProcessNode() {
-
-			@Override
-			public void processNode(Node node) {
-				if (node.hasLabel(type) && node.hasProperty(titleProperty)) {
-					Object titles = node.getProperty(titleProperty);
-					if (titles instanceof String)
-						processTitle((String) titles);
-					else if (titles instanceof String[])
-						for (String title : (String[]) titles)
-							processTitle(title);
-				}
-			}			
-		});
+		try {
+			neo4j.enumrateAllNodesWithLabel(source, new ProcessNode() {
+	
+				@Override
+				public boolean processNode(Node node) throws Exception {
+					try {
+						if (node.hasLabel(type) && node.hasProperty(titleProperty)) {
+							Object titles = node.getProperty(titleProperty);
+							if (titles instanceof String)
+								processTitle((String) titles);
+							else if (titles instanceof String[])
+								for (String title : (String[]) titles)
+									processTitle(title);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+						
+						return false;
+					}					
+					
+					return true;
+				}			
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-	private static void processTitle(String title) {
+	private static void processTitle(String title) throws Exception {
 		if (null != title) {
 			title = title.trim().toLowerCase();
 		
 			if (title.length() > minTitleLength && !blackList.contains(title)) {
 				
-				Result result = results.get(title);
-				if (null == result) {
-					result = new Result();
-					result.setText(title);
-										
-					System.out.println("Quering: " + title);
+				Result result = new Result();
+				result.setText(title);
+					
+				System.out.println("Quering: " + title);
 			
-					QueryResponse response = query.query(title);
-					if (null != response && response.getItems() != null && response.getItems().size() > 0) {
-						System.out.println("found " + response.getItems().size() + " sites");
+				QueryResponse response = query.query(title);
+				if (null == response)
+					throw new Exception("Google Query has return unexpected result");
+				if (response.getItems() != null && response.getItems().size() > 0) {
+					System.out.println("found " + response.getItems().size() + " sites");
 						
-						for (Item item : response.getItems()) {
-							String _link = item.getLink();
-							try {
+					for (Item item : response.getItems()) {
+						String url = item.getLink();
+						try {
+							Link link = links.get(url);
+							if (null == link) {
 								
-								URL linkUrl = new URL(_link);
+								URL linkUrl = new URL(url);
 								String path = linkUrl.getPath().toLowerCase();
 								
 								if (path.endsWith(PART_PDF))
 									continue;
 								
-								Link link = links.get(_link);
-								if (null == link) {
-									String html = download(_link);
-									if (null != html) {
-										String dataFile = GoogleUtils.saveData(dataFolder, html);
-										if (null != dataFile) {
-											
-											link = new Link();
-											link.setLink(_link);
-											link.setData(dataFile);
+								link = new Link();
+								link.setLink(url);
+								links.put(url, link);
+							
+								String html = download(url);
+								if (null != html) {
+									String dataFile = GoogleUtils.saveData(dataFolder, html);
+									if (null != dataFile) {
 										
-											Map<String, Object> pagemap = item.getPagemap();
-											if (null != pagemap) {
-												String metadataFile = GoogleUtils.savePagemap(metadataFolder, pagemap);
-												if (null != metadataFile)
-													link.setMetadata(metadataFile);
-											}
-										
-											if (GoogleUtils.saveLink(linkFolder, link))
-												links.put(_link, link);
+										link.setData(dataFile);
+									
+										Map<String, Object> pagemap = item.getPagemap();
+										if (null != pagemap) {
+											String metadataFile = GoogleUtils.savePagemap(metadataFolder, pagemap);
+											if (null != metadataFile)
+												link.setMetadata(metadataFile);
 										}
 									}
 								}
 								
-								if (null != link) 
-									result.addLink(link.getLink());
-							} catch (MalformedURLException e) {
-								e.printStackTrace();
-							} 
-						}
-						
-						if (GoogleUtils.saveResult(resultFolder, result))
-							results.put(title, result);		
-					}			
+								GoogleUtils.saveLink(
+										link.getData() != null ? linkFolder : brokenFolder, link);
+							}
+							
+							if (null != link && null != link.getData())
+								result.addLink(link.getSelf());
+						} catch (MalformedURLException e) {
+							e.printStackTrace();
+						} 
+					}
+					
+					if (result.getLinks() != null && result.getLinks().size() > 0)
+						GoogleUtils.saveResult(resultFolder, result);
 				}
 			}
 		}
@@ -242,10 +259,12 @@ public class App {
 				ex.printStackTrace();
 			}
 			
-			try {
-				Thread.sleep(attemptDelay);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+			if (i < maxAttempts - 1) {
+				try {
+					Thread.sleep(attemptDelay);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		

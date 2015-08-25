@@ -74,6 +74,7 @@ public class GraphUtils {
 	public static final String SOURCE_CROSSREF = "crossref";
 	public static final String SOURCE_FIGSHARE = "figshare";
 	public static final String SOURCE_CERN = "cern";
+	public static final String SOURCE_OPEN_AIRE = "openaire";
 	
 	// meta-data types
 	public static final String TYPE_DATASET = "dataset";
