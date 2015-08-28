@@ -1,11 +1,15 @@
-# Gateway
-Harvesters and API code.
+# Harvesters
 
-# To build a project, please execute (from a main pom location):
+RD-Switchboard Harvesters code. At this moment only OAI:PMH harvesting are supported and data source such as CrossRef will be harvested during Inference process. 
 
-mvn package
+This Document contains only list of existsing projects in this repository. Please refer to the 
+actual project README.md file for a information about how to install and use each tool. The project README.md 
+located in each project folder.
+
+# OAI:PMH
+
+## [OAI:PMH Harvester](https://github.com/rd-switchboard/Harvesters/tree/master/OAI_PMH/harester_oai)
+
+Tool will harvest given OAI:PMH Repository and will store all data into S3 Bucket.
 
 
-# To set project version, please execute (from a main pom location):
-
-mvn versions:set -DgenerateBackupPoms=false
