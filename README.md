@@ -8,7 +8,7 @@ located in each project folder.
 
 # OAI:PMH
 
-## [OAI:PMH Harvester](https://github.com/rd-switchboard/Harvesters/tree/master/OAI_PMH/harester_oai)
+## [OAI:PMH Harvester](https://github.com/rd-switchboard/Harvesters/tree/master/OAI_PMH/harvester_oai)
 
 Tool will harvest given OAI:PMH Repository and will store all data into S3 Bucket.
 
