@@ -682,60 +682,55 @@ public class Harvester {
         s3client.putObject(request);
         String tokenString = null;
 
+        Document doc;
+        
 		try {
 			// Parse the xml 
 			// if xml document is mailformed, this will throw an exception
-			Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
-
-			// Extract root node
-			Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
-			if (null == root)
-				throw new Exception("The document is not an OAI:PMH file");
-		
-			// Check for error node
-			Node error = (Node) XPATH_ERROR.evaluate(root, XPathConstants.NODE); 
-			if (null != error && error instanceof Element) {
-				String code = ((Element) error).getAttribute("code");
-				String message = ((Element) error).getTextContent();
-			
-				throw new Exception ("[" + code + "] " + message);
-			}
-					
-			Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
-			
-			if (null != token && token instanceof Element) {
-				tokenString = ((Element) token).getTextContent();
-				if (null != tokenString && !tokenString.isEmpty()) {
-					String cursor = ((Element) token).getAttribute("cursor");
-					String size = ((Element) token).getAttribute("completeListSize");
-					try {
-						setSize = Integer.parseInt(size);
-					} catch(Exception e) {
-						setSize = 0;
-					}
-					try {
-						setOffset = Integer.parseInt(cursor);
-					} catch(Exception e) {
-						++setOffset;
-					}
-					System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
-					return tokenString;
-				}
-			}
+			doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 			
 			// failback;
 			return extractResumptionToken(xml);
-			
-/*	private static final String PART_RESUMPTION_TOKEN = "resumptionToken";
-	private static final String PART_CURSOR = "cursor";
-	private static final String PART_COMPLETE_LIST_SIZE = "completeListSize";
-*/
-			
+					
+		}
+		// Extract root node
+		Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
+		if (null == root)
+			throw new Exception("The document is not an OAI:PMH file");
+	
+		// Check for error node
+		Node error = (Node) XPATH_ERROR.evaluate(root, XPathConstants.NODE); 
+		if (null != error && error instanceof Element) {
+			String code = ((Element) error).getAttribute("code");
+			String message = ((Element) error).getTextContent();
+		
+			throw new Exception ("[" + code + "] " + message);
+		}
+				
+		Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
+		
+		if (null != token && token instanceof Element) {
+			tokenString = ((Element) token).getTextContent();
+			if (null != tokenString && !tokenString.isEmpty()) {
+				String cursor = ((Element) token).getAttribute("cursor");
+				String size = ((Element) token).getAttribute("completeListSize");
+				try {
+					setSize = Integer.parseInt(size);
+				} catch(Exception e) {
+					setSize = 0;
+				}
+				try {
+					setOffset = Integer.parseInt(cursor);
+				} catch(Exception e) {
+					++setOffset;
+				}
+				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
+				return tokenString;
+			}
 		}
 		
-	
 		return null;
 	}
 	
