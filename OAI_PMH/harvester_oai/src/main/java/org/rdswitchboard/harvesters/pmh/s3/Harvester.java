@@ -172,7 +172,7 @@ public class Harvester {
 			XPATH_ERROR = xPath.compile("./error");
 			XPATH_RESUMPTION_TOKEN = xPath.compile("./ListRecords/resumptionToken");
 			
-			harvestDate = new SimpleDateFormat("yyyy-MM-dd").format(DateTime.now());
+			harvestDate = new SimpleDateFormat("yyyy-MM-dd").format(DateTime.now().toDate());
 			
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
