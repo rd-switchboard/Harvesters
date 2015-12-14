@@ -11,6 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Dmitrij Kudriavcev, dmitrij@kudriavcev.info
  *
  */
+
+/*
 @XmlRootElement
 public class Status {
 	private Set<String> processedSets;
@@ -22,7 +24,7 @@ public class Status {
 	/**
 	 * Return collecton of processed sets
 	 * @return {@code Set<String>} - set if processed sets
-	 */
+	 * /
 	public Set<String> getProcessedSets() {
 		if (null == processedSets)
 			processedSets = new HashSet<String>();
@@ -32,7 +34,7 @@ public class Status {
 	/**
 	 * Init collection of processed sets
 	 * @param processedSets {@code Set<String>}
-	 */
+	 * /
 	@XmlElement
 	public void setProcessedSets(Set<String> processedSets) {
 		this.processedSets = processedSets;
@@ -41,7 +43,7 @@ public class Status {
 	/**
 	 * Add set to collection
 	 * @param processedSet String
-	 */
+	 * /
 	public void addProcessedSet(String processedSet) {
 		getProcessedSets().add(processedSet);
 	}
@@ -49,7 +51,7 @@ public class Status {
 	/**
 	 * Returns current set
 	 * @return String - current set
-	 */
+	 * /
 	public String getCurrentSet() {
 		return currentSet;
 	}
@@ -57,7 +59,7 @@ public class Status {
 	/**
 	 * Store current set
 	 * @param currentSet - String
-	 */
+	 * /
 	@XmlElement
 	public void setCurrentSet(String currentSet) {
 		this.currentSet = currentSet;
@@ -66,7 +68,7 @@ public class Status {
 	/**
 	 * Returns resumption token
 	 * @return String - resumption token
-	 */
+	 * /
 	public String getResumptionToken() {
 		return resumptionToken;
 	}
@@ -74,7 +76,7 @@ public class Status {
 	/**
 	 * Store resumption token
 	 * @param resumptionToken - String
-	 */
+	 * /
 	@XmlElement
 	public void setResumptionToken(String resumptionToken) {
 		this.resumptionToken = resumptionToken;
@@ -103,4 +105,4 @@ public class Status {
 		return "Status [processedSets=" + processedSets + ", currentSet="
 				+ currentSet + ", resumptionToken=" + resumptionToken + "]";
 	}
-}
+}*/

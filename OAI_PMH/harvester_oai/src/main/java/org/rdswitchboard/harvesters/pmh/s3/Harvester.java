@@ -2,6 +2,7 @@ package org.rdswitchboard.harvesters.pmh.s3;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -10,17 +11,17 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPath;
@@ -29,7 +30,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.joda.time.DateTime;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -149,6 +152,8 @@ public class Harvester {
 //	private static final Pattern PATTERN_RESUMPTUON_TOKEN_CURSOR = Pattern.compile(REG_RESUMPTION_TOKEN_CURSOR);
 //	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
 	
+	private static String harvestDate;
+	
 	static {
 		XPath xPath = XPathFactory.newInstance().newXPath();
 		try {
@@ -166,6 +171,9 @@ public class Harvester {
 			XPATH_OAI_PMH = xPath.compile("/OAI-PMH");
 			XPATH_ERROR = xPath.compile("./error");
 			XPATH_RESUMPTION_TOKEN = xPath.compile("./ListRecords/resumptionToken");
+			
+			harvestDate = new SimpleDateFormat("yyyy-MM-dd").format(DateTime.now());
+			
 		} catch (XPathExpressionException e) {
 			e.printStackTrace();
 		}
@@ -181,6 +189,7 @@ public class Harvester {
 	private String repoPrefix;
 	
 	private String metadataPrefix;
+	
 	
 	
 	/**
@@ -229,14 +238,17 @@ public class Harvester {
 	private String granularity;
 	private String adminEmail;
 	
+	private Set<String> blackList;
+	private Set<String> whiteList;
+	
 	private int setSize;
 	private int setOffset;
 	
 	private AmazonS3 s3client;
 	
-	private JAXBContext jaxbContext;
+/*	private JAXBContext jaxbContext;
 	private Marshaller jaxbMarshaller;
-	private Unmarshaller jaxbUnmarshaller;
+	private Unmarshaller jaxbUnmarshaller;*/
 	
 //	private DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH:mm:ss");
 //	private TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -246,9 +258,10 @@ public class Harvester {
 	 * @param repoUrl : The Repository URL
 	 * @param folderBase : The address of the folder, there received data must be saved.
 	 * @throws JAXBException 
+	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	public Harvester( final Properties properties ) throws JAXBException {
+	public Harvester( final Properties properties ) throws IOException {
 		repoUrl = properties.getProperty("url");
 		if (StringUtils.isNullOrEmpty(repoUrl))
 			throw new IllegalArgumentException("The OAI:PMH Repository URL can not be empty");
@@ -271,11 +284,18 @@ public class Harvester {
 		if (StringUtils.isNullOrEmpty(bucketName))
 			throw new IllegalArgumentException("The AWS S3 Bucket name can not be empty");
 	
-		jaxbContext = JAXBContext.newInstance(Status.class);
+/*		jaxbContext = JAXBContext.newInstance(Status.class);
 		jaxbMarshaller = jaxbContext.createMarshaller();
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-	
+		jaxbUnmarshaller = jaxbContext.createUnmarshaller();*/
+		
+		File fileBlackList = new File(properties.getProperty("black.list"));
+		if (fileBlackList.isFile())
+			blackList = new HashSet<String>(FileUtils.readLines(fileBlackList));
+		
+		File fileWhiteList = new File(properties.getProperty("white.list"));
+		if (fileWhiteList.isFile())
+			whiteList = new HashSet<String>(FileUtils.readLines(fileWhiteList));
 	}
 	
 	/**
@@ -639,7 +659,7 @@ public class Harvester {
 			return null;
 		}
 		
-		String filePath = repoPrefix + "/" + metadataPrefix + "/" + set + "/" + setOffset + ".xml";
+		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + (null == set ? "default" : set) + "/" + setOffset + ".xml";
 		
 		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
 		
@@ -880,14 +900,37 @@ public class Harvester {
 		if (StringUtils.isNullOrEmpty(metadataPrefix))
 			throw new IllegalArgumentException("The OAI:PMH Metadata Prefix can not be empty");
 		
-		File fileStatus = new File(repoPrefix + "_" + metadataPrefix + "_status.xml");
-		Status status = loadStatus(fileStatus);
-	
-		System.out.println("Downloading set list...");
+	//	File fileStatus = new File(repoPrefix + "_" + metadataPrefix + "_status.xml");
+	//	Status status = loadStatus(fileStatus);
+
+		System.out.println("Downloading set list");
 		
+		// download all sets in the repository
 		Map<String, String> mapSets = listSets();
-		String resumptionToken = null;
+		
 		if (null == mapSets || mapSets.isEmpty()) {
+			System.out.println("Processing deafult set");
+
+			harvestSet(null);
+		} else {
+			
+			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
+			    
+				String set = entry.getKey();
+			    
+			    // if black list exists and item is blacklisted, continue
+			    if (null != blackList && blackList.contains(set))
+			    	continue;			    
+			    
+			    if (null != whiteList && !whiteList.isEmpty() && !whiteList.contains(set))
+			    	continue;
+			    
+			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
+			    
+			    harvestSet(null);
+			}
+			
+		/*if (null == mapSets || mapSets.isEmpty()) {
 			
 			setSize = 0;
 		    setOffset = 0;
@@ -992,7 +1035,34 @@ public class Harvester {
 			
 			if (fileStatus.exists())
 				fileStatus.delete();
-		}
+				*/
+		}	
+		
+		String filePath = repoPrefix + "/" + metadataPrefix + "/latest.txt";
+		
+		byte[] bytes = harvestDate.getBytes(StandardCharsets.UTF_8);
+		
+		ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
+        metadata.setContentType("text/xml");
+        metadata.setContentLength(bytes.length);
+
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+
+        s3client.putObject(request);
+	}
+	
+	private void harvestSet(String set) throws Exception {
+		String resumptionToken = null;
+		
+		setSize = 0;
+		setOffset = 0;
+		
+		do {
+	    	resumptionToken = downloadRecords(set, resumptionToken);					    	
+	    } while (null != resumptionToken && !resumptionToken.isEmpty());
 	}
 	
 	/**
@@ -1032,7 +1102,7 @@ public class Harvester {
 	 * @param file a harvest status file
 	 * @return Status - Harvesting status
 	 */
-	protected Status loadStatus(File file) {
+	/*protected Status loadStatus(File file) {
         try {
             if (file.exists() && !file.isDirectory())
             	return (Status) jaxbUnmarshaller.unmarshal(file);
@@ -1041,7 +1111,7 @@ public class Harvester {
         }
         
         return new Status();
-	}
+	}*/
 	 
 	/**
 	 * Protected function to save harvesting status 
@@ -1049,11 +1119,11 @@ public class Harvester {
 	 * @param file Status file
 	 */
 	
-	protected void saveStatus(Status status, File file) {
+	/*protected void saveStatus(Status status, File file) {
         try {
             jaxbMarshaller.marshal(status, file);
         } catch (Exception e) {
             e.printStackTrace();
         }
-	}   
+	}  */ 
 }
