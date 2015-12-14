@@ -242,6 +242,8 @@ public class Harvester {
 	
 	private int setSize;
 	private int setOffset;
+	private int maxAttempts;
+	private int attemptDelay;
 	
 	private AmazonS3 s3client;
 	
@@ -303,6 +305,9 @@ public class Harvester {
 		} catch (Exception e) {
 			whiteList = null;
 		}
+		
+		maxAttempts = Integer.parseInt(properties.getProperty("max.attempts", "0"));
+		attemptDelay = Integer.parseInt(properties.getProperty("attempt.delay", "0"));
 	}
 	
 	/**
@@ -652,13 +657,26 @@ public class Harvester {
 		
 		System.out.println("Downloading records: " + url);
 		
-		// Get XML document 
-		URLConnection conn = new URL(url).openConnection();
 		String xml = null;
-	    try (InputStream is = conn.getInputStream()) {
-	    	if (null != is) 
-	    		xml = IOUtils.toString(is, StandardCharsets.UTF_8.name()); 
-	    }
+		
+		for (int nAttempt = 0; nAttempt <= maxAttempts; ++nAttempt)
+			try {
+				// Get XML document 
+				URLConnection conn = new URL(url).openConnection();
+				
+			    try (InputStream is = conn.getInputStream()) {
+			    	if (null != is) 
+			    		xml = IOUtils.toString(is, StandardCharsets.UTF_8.name()); 
+			    } 
+			    
+			    break;
+			} catch (Exception e) {
+				if (nAttempt == maxAttempts)
+					throw e;
+				
+				Thread.sleep(attemptDelay);
+			}
+		
 	    
 	    // Check if xml has been returned and check what it had a valid root element
 		if (null == xml) {
