@@ -919,11 +919,11 @@ public class Harvester {
 				String set = entry.getKey();
 			    
 			    // if black list exists and item is blacklisted, continue
-			    if (null != blackList && blackList.contains(set))
+				if (null != whiteList && !whiteList.isEmpty()) {
+				    if (!whiteList.contains(set))
+				    	continue;					
+				} else if (null != blackList && blackList.contains(set))
 			    	continue;			    
-			    
-			    if (null != whiteList && !whiteList.isEmpty() && !whiteList.contains(set))
-			    	continue;
 			    
 			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
 			    
