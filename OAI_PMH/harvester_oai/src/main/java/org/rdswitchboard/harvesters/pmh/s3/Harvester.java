@@ -929,7 +929,7 @@ public class Harvester {
 			    
 			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
 			    
-			    harvestSet(null);
+			    harvestSet(set);
 			}
 			
 		/*if (null == mapSets || mapSets.isEmpty()) {
