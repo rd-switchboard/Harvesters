@@ -11,7 +11,6 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -289,13 +288,21 @@ public class Harvester {
 		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 		jaxbUnmarshaller = jaxbContext.createUnmarshaller();*/
 		
-		File fileBlackList = new File(properties.getProperty("black.list"));
-		if (fileBlackList.isFile())
-			blackList = new HashSet<String>(FileUtils.readLines(fileBlackList));
+		try {
+			File fileBlackList = new File(properties.getProperty("black.list"));
+			if (fileBlackList.isFile())
+				blackList = new HashSet<String>(FileUtils.readLines(fileBlackList));
+		} catch (Exception e) {
+			blackList = null;
+		}
 		
-		File fileWhiteList = new File(properties.getProperty("white.list"));
-		if (fileWhiteList.isFile())
-			whiteList = new HashSet<String>(FileUtils.readLines(fileWhiteList));
+		try {
+			File fileWhiteList = new File(properties.getProperty("white.list"));
+			if (fileWhiteList.isFile())
+				whiteList = new HashSet<String>(FileUtils.readLines(fileWhiteList));
+		} catch (Exception e) {
+			whiteList = null;
+		}
 	}
 	
 	/**
