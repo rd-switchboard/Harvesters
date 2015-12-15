@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -189,7 +190,7 @@ public class Harvester {
 	
 	private String metadataPrefix;
 	
-	
+	private final Map<String, Integer> processedSets = new HashMap<String, Integer>(); 
 	
 	/**
 	 * Variable to store base folder for harvested data. Can not be null.
@@ -242,6 +243,7 @@ public class Harvester {
 	
 	private int setSize;
 	private int setOffset;
+	private int filesCounter;
 	private int maxAttempts;
 	private int attemptDelay;
 	
@@ -292,16 +294,30 @@ public class Harvester {
 		
 		try {
 			File fileBlackList = new File(properties.getProperty("black.list"));
-			if (fileBlackList.isFile())
-				blackList = new HashSet<String>(FileUtils.readLines(fileBlackList));
+			if (fileBlackList.isFile()) {
+				List<String> list = FileUtils.readLines(fileBlackList);
+				blackList = new HashSet<String>();
+				for (String l : list) {
+					String s = l.trim();
+					if (!s.isEmpty())
+						blackList.add(s); 
+				}
+			}
 		} catch (Exception e) {
 			blackList = null;
 		}
 		
 		try {
 			File fileWhiteList = new File(properties.getProperty("white.list"));
-			if (fileWhiteList.isFile())
-				whiteList = new HashSet<String>(FileUtils.readLines(fileWhiteList));
+			if (fileWhiteList.isFile()) {
+				List<String> list = FileUtils.readLines(fileWhiteList);
+				whiteList = new HashSet<String>();
+				for (String l : list) {
+					String s = l.trim();
+					if (!s.isEmpty())
+						whiteList.add(s); 
+				}
+			}
 		} catch (Exception e) {
 			whiteList = null;
 		}
@@ -684,7 +700,7 @@ public class Harvester {
 			return null;
 		}
 		
-		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + (null == set ? "default" : set) + "/" + setOffset + ".xml";
+		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + (null == set ? "default" : set) + "/" + filesCounter + ".xml";
 		
 		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
 		
@@ -728,6 +744,8 @@ public class Harvester {
 		}
 				
 		Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
+		
+		++filesCounter;
 		
 		if (null != token && token instanceof Element) {
 			tokenString = ((Element) token).getTextContent();
@@ -936,14 +954,20 @@ public class Harvester {
 			
 			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
 			    
-				String set = entry.getKey();
+				String set = entry.getKey().trim();
 			    
 			    // if black list exists and item is blacklisted, continue
 				if (null != whiteList && !whiteList.isEmpty()) {
-				    if (!whiteList.contains(set))
+				    if (!whiteList.contains(set)) {
+				    	
+				    	saveSetStats(set, -1); // set was ignored
 				    	continue;					
-				} else if (null != blackList && blackList.contains(set))
-			    	continue;			    
+				    }
+				} else if (null != blackList && blackList.contains(set)) {
+				
+					saveSetStats(set, -2); // set was blacklisted
+					continue;
+				}
 			    
 			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
 			    
@@ -1076,13 +1100,73 @@ public class Harvester {
 	
 	private void harvestSet(String set) throws Exception {
 		String resumptionToken = null;
-		
-		setSize = 0;
-		setOffset = 0;
+		setSize = setOffset = filesCounter = 0;
 		
 		do {
 	    	resumptionToken = downloadRecords(set, resumptionToken);					    	
 	    } while (null != resumptionToken && !resumptionToken.isEmpty());
+		
+		saveSetStats(set, filesCounter);
+	}
+	
+	public void printStatistics(PrintStream out) {
+		out.println();
+		out.println("The harvesting process has been finished successfull");
+		int harvestedSets = 0;
+		int emptySets = 0;
+		int ignoredSets = 0;
+		int blacklistedSets = 0;
+		
+		for (Integer stats : processedSets.values()) {
+			if (stats == 0)
+				++emptySets;
+			else if (stats > 0)
+				++harvestedSets;
+			else if (stats == -1)
+				++ignoredSets;
+			else if (stats == -2)
+				++blacklistedSets;
+		}
+		
+		if (harvestedSets > 0)
+		{
+			out.println();
+			out.println(String.format("%d %s has been harvested:", harvestedSets, harvestedSets == 1 ? "set" : "sets"));
+			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
+				if (set.getValue() > 0)
+					out.println(String.format("%s: %d %s has been harvested", set.getKey(), set.getValue(), set.getValue() == 1 ? "file" : "files" ));
+		}
+
+		if (emptySets > 0)
+		{
+			out.println();
+			out.println(String.format("%d %s has been empty:", emptySets, emptySets == 1 ? "set" : "sets"));
+			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
+				if (set.getValue() == 0)
+					out.println(set.getKey());
+		}
+		
+		if (ignoredSets > 0)
+		{
+			out.println();
+			out.println(String.format("%d %s has been ignored by the white list:", ignoredSets, ignoredSets == 1 ? "set" : "sets"));
+			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
+				if (set.getValue() == -1)
+					out.println(set.getKey());
+		}
+
+		if (blacklistedSets > 0)
+		{
+			out.println();
+			out.println(String.format("%d %s has been ignored by the black list:", blacklistedSets, blacklistedSets == 1 ? "set" : "sets"));
+			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
+				if (set.getValue() == -2)
+					out.println(set.getKey());
+		}
+	}
+	
+	private void saveSetStats(String str, int stat) {
+		processedSets.put(str == null ? "default" : str, stat);
 	}
 	
 	/**

@@ -50,12 +50,12 @@ public class App {
 				e.printStackTrace();
 			}*/
 			
+			harvester.printStatistics(System.out);
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
 			System.exit(1);
 		}
-
 	}
-
 }
