@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.rdswitchboard.harvesters</groupId>
   <artifactId>harvester_oai</artifactId>
-  <version>1.3.2</version>   
+  <version>1.3.3</version>   
   <name>OAI-PMH Harvester to AWS S3 bucket</name>
   
   <properties>

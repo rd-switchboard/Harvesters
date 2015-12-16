@@ -47,8 +47,22 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.StringUtils;
 
-
-/**
+/**	
+ * This file is part of RD-Switchboard.
+ *
+ * RD-Switchboard is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ * 
  * OAI:PMH Harvester Library
  * 
  * This Library is designed to harvest any OAI:PMH repository and store the data locally.
@@ -132,6 +146,8 @@ public class Harvester {
 //	private static final String REG_RESUMPTION_TOKEN_CURSOR = "cursor.*=";
 //	private static final String REG_RESUMPTION_TOKEN_VALUE = "\".*\"";
 	
+	private static final String ERR_NO_RECORDS_MATCH = "noRecordsMatch";
+	
 	private static XPathExpression XPATH_OAI_PMH;
 	private static XPathExpression XPATH_ERROR;
 	private static XPathExpression XPATH_REPOSITORY_NAME;
@@ -190,7 +206,7 @@ public class Harvester {
 	
 	private String metadataPrefix;
 	
-	private final Map<String, Integer> processedSets = new HashMap<String, Integer>(); 
+	private final Map<String, SetStatus> processedSets = new HashMap<String, SetStatus>(); 
 	
 	/**
 	 * Variable to store base folder for harvested data. Can not be null.
@@ -241,9 +257,8 @@ public class Harvester {
 	private Set<String> blackList;
 	private Set<String> whiteList;
 	
-	private int setSize;
-	private int setOffset;
-	private int filesCounter;
+//	private int filesCounter;
+	private boolean failOnError;
 	private int maxAttempts;
 	private int attemptDelay;
 	
@@ -324,6 +339,7 @@ public class Harvester {
 		
 		maxAttempts = Integer.parseInt(properties.getProperty("max.attempts", "0"));
 		attemptDelay = Integer.parseInt(properties.getProperty("attempt.delay", "0"));
+		failOnError = Boolean.parseBoolean(properties.getProperty("fail.on.error", "true"));
 	}
 	
 	/**
@@ -654,21 +670,22 @@ public class Harvester {
 	 * @throws Exception 
 	 * @throws XPathExpressionException 
 	 */
-	public String downloadRecords( final String set, final String resumptionToken) throws Exception {
+	public boolean downloadRecords( SetStatus set ) 
+			throws HarvesterException, UnsupportedEncodingException, IOException, InterruptedException, XPathExpressionException {
 		// Generate the URL of request
 		String url = null; ;
-		if (null != resumptionToken) {
+		if (set.hasToken()) {
 			try {
-				url = repoUrl + String.format(URL_LIST_RECORDS_RESUMPTION_TOKEN, URLEncoder.encode(resumptionToken, "UTF-8"));
+				url = repoUrl + String.format(URL_LIST_RECORDS_RESUMPTION_TOKEN, URLEncoder.encode(set.getToken(), "UTF-8"));
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
 		}
 		if (null == url) {
-			if (null == set)
+			if (set.hasName())
 				url = repoUrl + String.format(URL_LIST_DEFAULT_RECORDS, metadataPrefix);
 			else
-				url = repoUrl + String.format(URL_LIST_RECORDS,  URLEncoder.encode(set, "UTF-8"), metadataPrefix);
+				url = repoUrl + String.format(URL_LIST_RECORDS,  URLEncoder.encode(set.getName(), "UTF-8"), metadataPrefix);
 		}
 		
 		System.out.println("Downloading records: " + url);
@@ -686,7 +703,7 @@ public class Harvester {
 			    } 
 			    
 			    break;
-			} catch (Exception e) {
+			} catch (IOException e) {
 				if (nAttempt == maxAttempts)
 					throw e;
 				
@@ -695,12 +712,10 @@ public class Harvester {
 		
 	    
 	    // Check if xml has been returned and check what it had a valid root element
-		if (null == xml) {
-			System.err.println("The XML document is empty");
-			return null;
-		}
-		
-		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + (null == set ? "default" : set) + "/" + filesCounter + ".xml";
+		if (null == xml) 
+			throw new HarvesterException("The XML document is empty");
+			
+		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getTitle() + "/" + set.getFiles() + ".xml";
 		
 		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
 		
@@ -714,8 +729,6 @@ public class Harvester {
         PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
 
         s3client.putObject(request);
-        String tokenString = null;
-
         Document doc;
         
 		try {
@@ -726,48 +739,46 @@ public class Harvester {
 			System.err.println("Error: " + e.getMessage());
 			
 			// failback;
-			return extractResumptionToken(xml);
-					
+			String tokenString = extractResumptionToken(xml);
+			if (null == tokenString || tokenString.isEmpty())
+				return false;
+			
+			set.setToken(tokenString);
+			set.incCursor();
+			set.dumpToken(System.out);
+			
+			return true;
 		}
 		// Extract root node
 		Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
 		if (null == root)
-			throw new Exception("The document is not an OAI:PMH file");
+			throw new HarvesterException("The document is not an OAI:PMH file");
 	
 		// Check for error node
 		Node error = (Node) XPATH_ERROR.evaluate(root, XPathConstants.NODE); 
 		if (null != error && error instanceof Element) {
 			String code = ((Element) error).getAttribute("code");
 			String message = ((Element) error).getTextContent();
-		
-			throw new Exception ("[" + code + "] " + message);
+							
+			throw new HarvesterException (code, message);
 		}
 				
-		Node token = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
-		
-		++filesCounter;
-		
-		if (null != token && token instanceof Element) {
-			tokenString = ((Element) token).getTextContent();
+		Node nodeToken = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
+				
+		if (null != nodeToken && nodeToken instanceof Element) {
+			String tokenString = ((Element) nodeToken).getTextContent();
 			if (null != tokenString && !tokenString.isEmpty()) {
-				String cursor = ((Element) token).getAttribute("cursor");
-				String size = ((Element) token).getAttribute("completeListSize");
-				try {
-					setSize = Integer.parseInt(size);
-				} catch(Exception e) {
-					setSize = 0;
-				}
-				try {
-					setOffset = Integer.parseInt(cursor);
-				} catch(Exception e) {
-					++setOffset;
-				}
-				System.out.println("ResumptionToken Detected. Cursor: " + setOffset + ", size: " + setSize);
-				return tokenString;
+			
+				set.setToken(tokenString);
+				set.setCursor(((Element) nodeToken).getAttribute("cursor"));
+				set.setSize(((Element) nodeToken).getAttribute("completeListSize"));
+				set.dumpToken(System.out);
+				
+				return true;
 			}
 		}
 		
-		return null;
+		return false;
 	}
 	
 	/*	private static final Pattern  = Pattern.compile(REG_RESUMPTION_TOKEN_START);
@@ -777,7 +788,7 @@ public class Harvester {
 	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
 */
 	
-	protected String extractResumptionToken(String xml) throws Exception {
+	protected String extractResumptionToken(String xml) throws HarvesterException {
 		Matcher t = PATTERN_RESUMPTUON_TOKEN.matcher(xml);
 		if (t.find()) {
 			String token = t.group();
@@ -789,15 +800,11 @@ public class Harvester {
 				int end = e.start();
 				if (end > start) {
 					String _token = token.substring(start, end);
-					if (!StringUtils.isNullOrEmpty(_token)) {
-						setSize = 0;
-						++setOffset;
-						
+					if (!StringUtils.isNullOrEmpty(_token)) 
 						return _token;
-					}
 				}
 			} else 
-				throw new Exception ("Error in Regular Expression");
+				throw new HarvesterException ("Error in Regular Expression");
 		}
 		
 		return null;
@@ -949,29 +956,37 @@ public class Harvester {
 		if (null == mapSets || mapSets.isEmpty()) {
 			System.out.println("Processing deafult set");
 
-			harvestSet(null);
+			harvestSet(new SetStatus(null, "default"));
 		} else {
 			
 			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
 			    
-				String set = entry.getKey().trim();
+				SetStatus set = new SetStatus(entry.getKey().trim(), URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
 			    
 			    // if black list exists and item is blacklisted, continue
 				if (null != whiteList && !whiteList.isEmpty()) {
-				    if (!whiteList.contains(set)) {
+				    if (!whiteList.contains(set.getName())) {
 				    	
-				    	saveSetStats(set, -1); // set was ignored
+				    	set.setFiles(-1);
+				    	
+				    	saveSetStats(set); // set was ignored
 				    	continue;					
 				    }
 				} else if (null != blackList && blackList.contains(set)) {
 				
-					saveSetStats(set, -2); // set was blacklisted
+					set.setFiles(-2);
+					
+					saveSetStats(set); // set was ignored
 					continue;
 				}
 			    
 			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
 			    
-			    harvestSet(set);
+			    if (!harvestSet(set)) {
+			    	System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
+			    	
+			    	break;
+			    }
 			}
 			
 		/*if (null == mapSets || mapSets.isEmpty()) {
@@ -1098,75 +1113,116 @@ public class Harvester {
         s3client.putObject(request);
 	}
 	
-	private void harvestSet(String set) throws Exception {
-		String resumptionToken = null;
-		setSize = setOffset = filesCounter = 0;
+	private boolean harvestSet(SetStatus set) throws Exception {
+		long mark = System.currentTimeMillis();
 		
-		do {
-	    	resumptionToken = downloadRecords(set, resumptionToken);					    	
-	    } while (null != resumptionToken && !resumptionToken.isEmpty());
+		try {
+			while (downloadRecords(set))
+				set.incFiles();			
+		} catch (HarvesterException e) {
+			// if server has return noRecodsMatch, just abort the download and ignore this error
+			if (ERR_NO_RECORDS_MATCH.equals(e.getCode()))
+				System.out.println("The set is empty");
+			else {
+				System.err.println("Error: " + e.getMessage());
+			
+				set.setError(e.getMessage());
+			}
+		} catch (Exception e) {
+			e.printStackTrace(System.err);
+			
+			set.setError(e.getMessage());
+		}
 		
-		saveSetStats(set, filesCounter);
+		set.setMilliseconds(System.currentTimeMillis() - mark);
+		saveSetStats(set);
+
+		if (failOnError && set.hasError())
+			return false; 
+		
+		return true;
 	}
 	
 	public void printStatistics(PrintStream out) {
 		out.println();
 		out.println("The harvesting process has been finished successfull");
+		int errorSets = 0;
 		int harvestedSets = 0;
 		int emptySets = 0;
 		int ignoredSets = 0;
 		int blacklistedSets = 0;
 		
-		for (Integer stats : processedSets.values()) {
-			if (stats == 0)
+		for (SetStatus set : processedSets.values()) {
+			if (set.getFiles() == 0)
 				++emptySets;
-			else if (stats > 0)
+			else if (set.getFiles() > 0)
 				++harvestedSets;
-			else if (stats == -1)
+			else if (set.getFiles() == -1)
 				++ignoredSets;
-			else if (stats == -2)
+			else if (set.getFiles() == -2)
 				++blacklistedSets;
+			else if (set.getFiles() == -3)
+				++errorSets;
 		}
 		
 		if (harvestedSets > 0)
 		{
 			out.println();
-			out.println(String.format("%d %s has been harvested:", harvestedSets, harvestedSets == 1 ? "set" : "sets"));
-			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
-				if (set.getValue() > 0)
-					out.println(String.format("%s: %d %s has been harvested", set.getKey(), set.getValue(), set.getValue() == 1 ? "file" : "files" ));
+			out.println(String.format("Successfully harvested %s %s:", harvestedSets, harvestedSets == 1 ? "set" : "sets"));
+			int counter = 1;
+			for (SetStatus set : processedSets.values()) 
+				if (set.getFiles() > 0)
+					out.println(String.format("Set %d. %s (%s): %d %s has been harvested in %s", 
+							counter++, set.getTitle(), set.getName(), set.getFiles(), set.getFiles() == 1 ? "file" : "files", set.getEllapsedTime()));
 		}
 
 		if (emptySets > 0)
 		{
 			out.println();
 			out.println(String.format("%d %s has been empty:", emptySets, emptySets == 1 ? "set" : "sets"));
-			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
-				if (set.getValue() == 0)
-					out.println(set.getKey());
-		}
+			int counter = 1;
+			for (SetStatus set : processedSets.values()) 
+				if (set.getFiles() == 0)
+					out.println(String.format("Set %d. %s (%s)", 
+							counter++, set.getTitle(), set.getName()));		
+			}
 		
 		if (ignoredSets > 0)
 		{
 			out.println();
 			out.println(String.format("%d %s has been ignored by the white list:", ignoredSets, ignoredSets == 1 ? "set" : "sets"));
-			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
-				if (set.getValue() == -1)
-					out.println(set.getKey());
+			int counter = 1;
+			for (SetStatus set : processedSets.values()) 
+				if (set.getFiles() == -1)
+					out.println(String.format("Set %d. %s (%s)", 
+							counter++, set.getTitle(), set.getName()));
 		}
 
 		if (blacklistedSets > 0)
 		{
 			out.println();
 			out.println(String.format("%d %s has been ignored by the black list:", blacklistedSets, blacklistedSets == 1 ? "set" : "sets"));
-			for (Map.Entry<String, Integer> set : processedSets.entrySet()) 
-				if (set.getValue() == -2)
-					out.println(set.getKey());
+			int counter = 1;
+			for (SetStatus set : processedSets.values()) 
+				if (set.getFiles() == -2)
+					out.println(String.format("Set %d. %s (%s)", 
+							counter++, set.getTitle(), set.getName()));
+		}
+		
+		if (errorSets > 0)
+		{
+			out.println();
+			out.println(String.format("%d %s has got an error:", errorSets, errorSets == 1 ? "set" : "sets"));
+			int counter = 1;
+			for (SetStatus set : processedSets.values()) 
+				if (set.getFiles() == -3)
+					out.println(String.format("Set %d. %s (%s) error: %s", 
+							counter++, set.getTitle(), set.getName(), set.getError()));
 		}
 	}
 	
-	private void saveSetStats(String str, int stat) {
-		processedSets.put(str == null ? "default" : str, stat);
+	private void saveSetStats(SetStatus set) {
+		processedSets.put(set.getName() == null ? "default" : set.getName(), set);
 	}
 	
 	/**
