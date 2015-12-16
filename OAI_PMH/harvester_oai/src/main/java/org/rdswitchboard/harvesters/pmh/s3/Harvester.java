@@ -1145,7 +1145,7 @@ public class Harvester {
 	
 	public void printStatistics(PrintStream out) {
 		out.println();
-		out.println("The harvesting process has been finished successfull");
+		out.println("The harvesting process has been finished successfully");
 		int errorSets = 0;
 		int harvestedSets = 0;
 		int emptySets = 0;

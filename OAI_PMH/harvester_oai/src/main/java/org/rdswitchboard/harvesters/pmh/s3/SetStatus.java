@@ -18,7 +18,7 @@ public class SetStatus {
 	private int records;
 	private long milliseconds;
 	
-	public SetStatus(String title, String name) {
+	public SetStatus(String name, String title) {
 		this.name = name;
 		this.title = title;
 	}
