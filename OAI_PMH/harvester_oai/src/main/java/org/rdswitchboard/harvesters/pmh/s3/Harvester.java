@@ -682,7 +682,7 @@ public class Harvester {
 			}
 		}
 		if (null == url) {
-			if (set.hasName())
+			if (!set.hasName())
 				url = repoUrl + String.format(URL_LIST_DEFAULT_RECORDS, metadataPrefix);
 			else
 				url = repoUrl + String.format(URL_LIST_RECORDS,  URLEncoder.encode(set.getName(), "UTF-8"), metadataPrefix);
