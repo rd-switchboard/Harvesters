@@ -19,10 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -38,6 +37,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
@@ -139,9 +139,9 @@ public class Harvester {
 	
 	//private static final String ELEMENT_ROOT = "OAI-PMH";
 	
-	private static final String REG_RESUMPTION_TOKEN = "<.*resumptionToken.*>.*<.*/.*resumptionToken.*>";
-	private static final String REG_RESUMPTION_TOKEN_START = "<.*resumptionToken.*>";
-	private static final String REG_RESUMPTION_TOKEN_END = "<.*/.*resumptionToken.*>";
+//	private static final String REG_RESUMPTION_TOKEN = "<.*resumptionToken.*>.*<.*/.*resumptionToken.*>";
+//	private static final String REG_RESUMPTION_TOKEN_START = "<.*resumptionToken.*>";
+//	private static final String REG_RESUMPTION_TOKEN_END = "<.*/.*resumptionToken.*>";
 //	private static final String REG_RESUMPTION_TOKEN_SIZE = "completeListSize.*=";
 //	private static final String REG_RESUMPTION_TOKEN_CURSOR = "cursor.*=";
 //	private static final String REG_RESUMPTION_TOKEN_VALUE = "\".*\"";
@@ -161,9 +161,9 @@ public class Harvester {
 	private static XPathExpression XPATH_SET_SPEC;
 	private static XPathExpression XPATH_RESUMPTION_TOKEN; 
 	
-	private static final Pattern PATTERN_RESUMPTUON_TOKEN = Pattern.compile(REG_RESUMPTION_TOKEN);
+/*	private static final Pattern PATTERN_RESUMPTUON_TOKEN = Pattern.compile(REG_RESUMPTION_TOKEN);
 	private static final Pattern PATTERN_RESUMPTUON_TOKEN_START = Pattern.compile(REG_RESUMPTION_TOKEN_START);
-	private static final Pattern PATTERN_RESUMPTUON_TOKEN_END = Pattern.compile(REG_RESUMPTION_TOKEN_END);
+	private static final Pattern PATTERN_RESUMPTUON_TOKEN_END = Pattern.compile(REG_RESUMPTION_TOKEN_END);*/
 //	private static final Pattern PATTERN_RESUMPTUON_TOKEN_SIZE = Pattern.compile(REG_RESUMPTION_TOKEN_SIZE);
 //	private static final Pattern PATTERN_RESUMPTUON_TOKEN_CURSOR = Pattern.compile(REG_RESUMPTION_TOKEN_CURSOR);
 //	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
@@ -669,9 +669,11 @@ public class Harvester {
 	 * @throws TransformerFactoryConfigurationError
 	 * @throws Exception 
 	 * @throws XPathExpressionException 
+	 * @throws ParserConfigurationException 
+	 * @throws SAXException 
 	 */
 	public boolean downloadRecords( SetStatus set ) 
-			throws HarvesterException, UnsupportedEncodingException, IOException, InterruptedException, XPathExpressionException {
+			throws HarvesterException, UnsupportedEncodingException, IOException, InterruptedException, XPathExpressionException, SAXException, ParserConfigurationException {
 		// Generate the URL of request
 		String url = null; ;
 		if (set.hasToken()) {
@@ -729,13 +731,15 @@ public class Harvester {
         PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
 
         s3client.putObject(request);
+        set.incFiles();
+        
         Document doc;
         
-		try {
+		//try {
 			// Parse the xml 
 			// if xml document is mailformed, this will throw an exception
 			doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
-		} catch (Exception e) {
+		/*} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 			
 			// failback;
@@ -748,7 +752,10 @@ public class Harvester {
 			set.dumpToken(System.out);
 			
 			return true;
-		}
+			
+			// removed workaround because it has been conflicted with CERN server
+		}*/
+			
 		// Extract root node
 		Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
 		if (null == root)
@@ -788,6 +795,7 @@ public class Harvester {
 	private static final Pattern PATTERN_RESUMPTUON_TOKEN_VALUE = Pattern.compile(REG_RESUMPTION_TOKEN_VALUE);
 */
 	
+	/*
 	protected String extractResumptionToken(String xml) throws HarvesterException {
 		Matcher t = PATTERN_RESUMPTUON_TOKEN.matcher(xml);
 		if (t.find()) {
@@ -808,7 +816,7 @@ public class Harvester {
 		}
 		
 		return null;
-	}
+	}*/
 	
 	/**
 	 * Protected function to generate index file name
@@ -1117,13 +1125,15 @@ public class Harvester {
 		long mark = System.currentTimeMillis();
 		
 		try {
-			while (downloadRecords(set))
-				set.incFiles();			
+			while (downloadRecords(set));
 		} catch (HarvesterException e) {
 			// if server has return noRecodsMatch, just abort the download and ignore this error
 			if (ERR_NO_RECORDS_MATCH.equals(e.getCode()))
-				System.out.println("The set is empty");
-			else {
+			{
+				System.out.println("Error: The set is empty");
+
+				set.setFiles(0);
+			} else {
 				System.err.println("Error: " + e.getMessage());
 			
 				set.setError(e.getMessage());
