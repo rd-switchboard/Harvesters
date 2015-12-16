@@ -27,6 +27,11 @@ public class SetStatus {
 		return name;
 	}
 
+	public String getNameSafe() {
+		return name == null || name.isEmpty() ? "default" : name;
+	}
+
+	
 	public void setName(String name) {
 		this.name = name;
 	}

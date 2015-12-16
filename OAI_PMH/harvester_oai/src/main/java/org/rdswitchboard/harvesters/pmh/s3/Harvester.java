@@ -715,7 +715,7 @@ public class Harvester {
 		if (null == xml) 
 			throw new HarvesterException("The XML document is empty");
 			
-		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getTitle() + "/" + set.getFiles() + ".xml";
+		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getNameSafe() + "/" + set.getFiles() + ".xml";
 		
 		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
 		
@@ -956,7 +956,7 @@ public class Harvester {
 		if (null == mapSets || mapSets.isEmpty()) {
 			System.out.println("Processing deafult set");
 
-			harvestSet(new SetStatus(null, "default"));
+			harvestSet(new SetStatus(null, "Default"));
 		} else {
 			
 			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
@@ -1222,7 +1222,7 @@ public class Harvester {
 	}
 	
 	private void saveSetStats(SetStatus set) {
-		processedSets.put(set.getName() == null ? "default" : set.getName(), set);
+		processedSets.put(set.getNameSafe(), set);
 	}
 	
 	/**
