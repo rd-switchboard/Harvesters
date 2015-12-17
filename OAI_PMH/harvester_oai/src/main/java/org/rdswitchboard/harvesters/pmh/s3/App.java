@@ -26,7 +26,7 @@ public class App {
 			Harvester harvester = new Harvester(properties);
 			
 			harvester.identify();
-
+			
 			if (StringUtils.isNullOrEmpty(harvester.getMetadataPrefix())) {
 				// List and display supported metadata formats
 				List<MetadataFormat> formats = harvester.listMetadataFormats();
@@ -34,8 +34,14 @@ public class App {
 				for (MetadataFormat format : formats) {
 					System.out.println(format.toString());
 				}
-			} else 
-				harvester.harvest();
+			} else {
+				boolean result = harvester.harvest();
+				
+				harvester.printStatistics(result, System.out);
+								
+				if (!result)
+					System.exit(1);
+			}
 			
 			// Set default encoding for MARC21
 			//harvester.setEncoding(ENCODING);
@@ -50,12 +56,12 @@ public class App {
 				e.printStackTrace();
 			}*/
 			
-			harvester.printStatistics(System.out);
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
-			
-			System.exit(1);
+					
+			System.exit(2);
 		}
 	}
 }

@@ -56,6 +56,10 @@ public class SetStatus {
 		this.token = token;
 	}
 	
+	public void resetToken() {
+		this.token = null;		
+	}
+	
 	public boolean hasToken() {
 		return null != token && !token.isEmpty();
 	}
@@ -222,4 +226,6 @@ public class SetStatus {
 				+ size + ", files=" + files + ", records=" + records
 				+ ", milliseconds=" + milliseconds + "]";
 	}
+
+
 }

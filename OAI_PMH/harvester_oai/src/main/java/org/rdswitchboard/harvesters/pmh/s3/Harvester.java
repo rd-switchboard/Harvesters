@@ -279,7 +279,7 @@ public class Harvester {
 	 * @throws IOException 
 	 * @throws Exception 
 	 */
-	public Harvester( final Properties properties ) throws IOException {
+	public Harvester( final Properties properties ) throws Exception {
 		repoUrl = properties.getProperty("url");
 		if (StringUtils.isNullOrEmpty(repoUrl))
 			throw new IllegalArgumentException("The OAI:PMH Repository URL can not be empty");
@@ -336,6 +336,9 @@ public class Harvester {
 		} catch (Exception e) {
 			whiteList = null;
 		}
+		
+		if (null != blackList && !blackList.isEmpty() && null != whiteList && !whiteList.isEmpty())
+			throw new Exception ("The black and the white lists can not be set at the same time. Please disable one in the configuration file"); 
 		
 		maxAttempts = Integer.parseInt(properties.getProperty("max.attempts", "0"));
 		attemptDelay = Integer.parseInt(properties.getProperty("attempt.delay", "0"));
@@ -672,8 +675,10 @@ public class Harvester {
 	 * @throws ParserConfigurationException 
 	 * @throws SAXException 
 	 */
-	public boolean downloadRecords( SetStatus set ) 
-			throws HarvesterException, UnsupportedEncodingException, IOException, InterruptedException, XPathExpressionException, SAXException, ParserConfigurationException {
+	public void downloadRecords( SetStatus set ) throws 
+			HarvesterException, UnsupportedEncodingException, IOException, 
+			InterruptedException, XPathExpressionException, SAXException, 
+			ParserConfigurationException {
 		// Generate the URL of request
 		String url = null; ;
 		if (set.hasToken()) {
@@ -694,51 +699,21 @@ public class Harvester {
 		
 		String xml = null;
 		
-		for (int nAttempt = 0; nAttempt <= maxAttempts; ++nAttempt)
-			try {
-				// Get XML document 
-				URLConnection conn = new URL(url).openConnection();
-				
-			    try (InputStream is = conn.getInputStream()) {
-			    	if (null != is) 
-			    		xml = IOUtils.toString(is, StandardCharsets.UTF_8.name()); 
-			    } 
-			    
-			    break;
-			} catch (IOException e) {
-				if (nAttempt == maxAttempts)
-					throw e;
-				
-				Thread.sleep(attemptDelay);
-			}
-		
+		// Get XML document 
+		URLConnection conn = new URL(url).openConnection();
+		try (InputStream is = conn.getInputStream()) {
+	    	if (null != is) 
+	    		xml = IOUtils.toString(is, StandardCharsets.UTF_8.name()); 
+	    } 			    
 	    
 	    // Check if xml has been returned and check what it had a valid root element
 		if (null == xml) 
 			throw new HarvesterException("The XML document is empty");
-			
-		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getNameSafe() + "/" + set.getFiles() + ".xml";
-		
-		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
-		
-		ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
-        metadata.setContentType("text/xml");
-        metadata.setContentLength(bytes.length);
-
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-
-        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-
-        s3client.putObject(request);
-        set.incFiles();
-        
-        Document doc;
-        
+			       
 		//try {
 			// Parse the xml 
 			// if xml document is mailformed, this will throw an exception
-			doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+        Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
 		/*} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
 			
@@ -766,26 +741,51 @@ public class Harvester {
 		if (null != error && error instanceof Element) {
 			String code = ((Element) error).getAttribute("code");
 			String message = ((Element) error).getTextContent();
-							
-			throw new HarvesterException (code, message);
+			
+			if (ERR_NO_RECORDS_MATCH.equals(code))
+			{
+				System.out.println("Error: The set is empty");
+
+				set.setFiles(0);
+				set.resetToken();
+				
+				return;
+			} else 
+				throw new HarvesterException (code, message);
 		}
 				
 		Node nodeToken = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
 				
 		if (null != nodeToken && nodeToken instanceof Element) {
 			String tokenString = ((Element) nodeToken).getTextContent();
-			if (null != tokenString && !tokenString.isEmpty()) {
-			
+			if (null != tokenString && !tokenString.isEmpty())
 				set.setToken(tokenString);
-				set.setCursor(((Element) nodeToken).getAttribute("cursor"));
-				set.setSize(((Element) nodeToken).getAttribute("completeListSize"));
-				set.dumpToken(System.out);
-				
-				return true;
-			}
-		}
+			else
+				set.resetToken();
+			
+			set.setCursor(((Element) nodeToken).getAttribute("cursor"));
+			set.setSize(((Element) nodeToken).getAttribute("completeListSize"));
+			
+			set.dumpToken(System.out);
+		} else
+			set.resetToken();
 		
-		return false;
+		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getNameSafe() + "/" + set.getFiles() + ".xml";
+		
+		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
+		
+		ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
+        metadata.setContentType("text/xml");
+        metadata.setContentLength(bytes.length);
+
+        InputStream inputStream = new ByteArrayInputStream(bytes);
+
+        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+
+        s3client.putObject(request);
+        
+        set.incFiles();
 	}
 	
 	/*	private static final Pattern  = Pattern.compile(REG_RESUMPTION_TOKEN_START);
@@ -949,7 +949,7 @@ public class Harvester {
 	 * @param prefix A metadata prefix
 	 * @throws Exception
 	 */
-	public void harvest() throws Exception {	
+	public boolean harvest() throws Exception {	
 		if (StringUtils.isNullOrEmpty(metadataPrefix))
 			throw new IllegalArgumentException("The OAI:PMH Metadata Prefix can not be empty");
 		
@@ -960,12 +960,15 @@ public class Harvester {
 		
 		// download all sets in the repository
 		Map<String, String> mapSets = listSets();
+		boolean result;
 		
 		if (null == mapSets || mapSets.isEmpty()) {
 			System.out.println("Processing deafult set");
 
-			harvestSet(new SetStatus(null, "Default"));
+			result = harvestSet(new SetStatus(null, "Default"));
 		} else {
+			
+			result = true;
 			
 			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
 			    
@@ -992,7 +995,7 @@ public class Harvester {
 			    
 			    if (!harvestSet(set)) {
 			    	System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
-			    	
+			    	result = false;
 			    	break;
 			    }
 			}
@@ -1119,31 +1122,37 @@ public class Harvester {
         PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
 
         s3client.putObject(request);
+        
+        return result;
 	}
 	
 	private boolean harvestSet(SetStatus set) throws Exception {
 		long mark = System.currentTimeMillis();
 		
-		try {
-			while (downloadRecords(set));
-		} catch (HarvesterException e) {
-			// if server has return noRecodsMatch, just abort the download and ignore this error
-			if (ERR_NO_RECORDS_MATCH.equals(e.getCode()))
-			{
-				System.out.println("Error: The set is empty");
+		do {
+			for (int nAttempt = 0; nAttempt <= maxAttempts; ++nAttempt)
+				try {
+					downloadRecords(set);
+					
+					break;
+				} catch (Exception e) {
+					// only for debug!
+					e.printStackTrace();
+					
+					if (nAttempt == maxAttempts) {
+						
+						System.err.println("Error: " + e.getMessage());
+						
+						set.setError(e.getMessage());
+						set.resetToken();
+						
+						break;
+					}
+					
+					Thread.sleep(attemptDelay);
+				}
+		} while (set.hasToken());		
 
-				set.setFiles(0);
-			} else {
-				System.err.println("Error: " + e.getMessage());
-			
-				set.setError(e.getMessage());
-			}
-		} catch (Exception e) {
-			e.printStackTrace(System.err);
-			
-			set.setError(e.getMessage());
-		}
-		
 		set.setMilliseconds(System.currentTimeMillis() - mark);
 		saveSetStats(set);
 
@@ -1153,9 +1162,12 @@ public class Harvester {
 		return true;
 	}
 	
-	public void printStatistics(PrintStream out) {
+	public void printStatistics(boolean result, PrintStream out) {
 		out.println();
-		out.println("The harvesting process has been finished successfully");
+		if (result)
+			out.println("The harvesting process has been finished successfully");
+		else
+			out.println("The harvesting process has been complited with some errors");
 		int errorSets = 0;
 		int harvestedSets = 0;
 		int emptySets = 0;
