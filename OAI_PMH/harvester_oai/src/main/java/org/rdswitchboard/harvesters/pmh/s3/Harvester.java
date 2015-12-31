@@ -261,6 +261,8 @@ public class Harvester {
 	private boolean failOnError;
 	private int maxAttempts;
 	private int attemptDelay;
+	private int connectionTimeout;
+	private int readTimeout;
 	
 	private AmazonS3 s3client;
 	
@@ -340,9 +342,12 @@ public class Harvester {
 		if (null != blackList && !blackList.isEmpty() && null != whiteList && !whiteList.isEmpty())
 			throw new Exception ("The black and the white lists can not be set at the same time. Please disable one in the configuration file"); 
 		
+		connectionTimeout = Integer.parseInt(properties.getProperty("conn.timeout", "0"));
+		readTimeout = Integer.parseInt(properties.getProperty("read.timeout", "0"));
 		maxAttempts = Integer.parseInt(properties.getProperty("max.attempts", "0"));
 		attemptDelay = Integer.parseInt(properties.getProperty("attempt.delay", "0"));
 		failOnError = Boolean.parseBoolean(properties.getProperty("fail.on.error", "true"));
+		
 	}
 	
 	/**
@@ -701,6 +706,10 @@ public class Harvester {
 		
 		// Get XML document 
 		URLConnection conn = new URL(url).openConnection();
+		if (connectionTimeout > 0)
+			conn.setConnectTimeout(connectionTimeout);
+		if (readTimeout > 0)
+			conn.setReadTimeout(readTimeout);
 		try (InputStream is = conn.getInputStream()) {
 	    	if (null != is) 
 	    		xml = IOUtils.toString(is, StandardCharsets.UTF_8.name()); 
