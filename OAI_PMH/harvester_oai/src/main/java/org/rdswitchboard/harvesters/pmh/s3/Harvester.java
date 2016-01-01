@@ -977,7 +977,7 @@ public class Harvester {
 			result = harvestSet(new SetStatus(null, "Default"));
 		} else {
 			
-			result = true;
+			result = false;
 			
 			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
 			    
@@ -1006,7 +1006,8 @@ public class Harvester {
 			    	System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
 			    	result = false;
 			    	break;
-			    }
+			    } else
+			    	result = true;			    
 			}
 			
 		/*if (null == mapSets || mapSets.isEmpty()) {
@@ -1117,21 +1118,24 @@ public class Harvester {
 				*/
 		}	
 		
-		String filePath = repoPrefix + "/" + metadataPrefix + "/latest.txt";
+		if (result)
+		{
+			String filePath = repoPrefix + "/" + metadataPrefix + "/latest.txt";
+			
+			byte[] bytes = harvestDate.getBytes(StandardCharsets.UTF_8);
+			
+			ObjectMetadata metadata = new ObjectMetadata();
+	        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
+	        metadata.setContentType("text/plain");
+	        metadata.setContentLength(bytes.length);
+	
+	        InputStream inputStream = new ByteArrayInputStream(bytes);
+	
+	        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+	
+	        s3client.putObject(request);
+		}
 		
-		byte[] bytes = harvestDate.getBytes(StandardCharsets.UTF_8);
-		
-		ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
-        metadata.setContentType("text/xml");
-        metadata.setContentLength(bytes.length);
-
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-
-        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-
-        s3client.putObject(request);
-        
         return result;
 	}
 	
