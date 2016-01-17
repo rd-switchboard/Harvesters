@@ -185,6 +185,7 @@ public class Harvester {
 	private String repoUrl;
 	
 	private String bucketName;
+	private String folderName;
 	
 	private String repoPrefix;
 	
@@ -243,9 +244,11 @@ public class Harvester {
 			s3client = new AmazonS3Client(new BasicAWSCredentials(accessKey, secretKey)); 
 		
 		bucketName = properties.getProperty("s3.bucket");
-		if (StringUtils.isNullOrEmpty(bucketName))
-			throw new IllegalArgumentException("The AWS S3 Bucket name can not be empty");
-	
+		folderName = properties.getProperty("folder");
+		
+		if (StringUtils.isNullOrEmpty(bucketName) && StringUtils.isNullOrEmpty(folderName))
+			throw new IllegalArgumentException("Please enter either local folder name or AWS S3 Bucket name to store the harvested files");
+		
 		try {
 			File fileBlackList = new File(properties.getProperty("black.list"));
 			if (fileBlackList.isFile()) {
@@ -492,21 +495,28 @@ public class Harvester {
 		} else
 			set.resetToken();
 		
+		
 		String filePath = repoPrefix + "/" + metadataPrefix + "/" + harvestDate + "/" + set.getNameSafe() + "/" + set.getFiles() + ".xml";
 		
-		byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
+		if (StringUtils.isNullOrEmpty(bucketName)) {
+			
+			FileUtils.writeStringToFile(new File(folderName, filePath), xml);
+			
+		} else {
+			byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
+			
+			ObjectMetadata metadata = new ObjectMetadata();
+	        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
+	        metadata.setContentType("text/xml");
+	        metadata.setContentLength(bytes.length);
+	
+	        InputStream inputStream = new ByteArrayInputStream(bytes);
+	
+	        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+	
+	        s3client.putObject(request);
+		}
 		
-		ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
-        metadata.setContentType("text/xml");
-        metadata.setContentLength(bytes.length);
-
-        InputStream inputStream = new ByteArrayInputStream(bytes);
-
-        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-
-        s3client.putObject(request);
-        
         set.incFiles();
 	}
 	
@@ -591,18 +601,25 @@ public class Harvester {
 		{
 			String filePath = repoPrefix + "/" + metadataPrefix + "/latest.txt";
 			
-			byte[] bytes = harvestDate.getBytes(StandardCharsets.UTF_8);
+			if (StringUtils.isNullOrEmpty(bucketName)) {
+				
+				FileUtils.writeStringToFile(new File(folderName, filePath), harvestDate);
 			
-			ObjectMetadata metadata = new ObjectMetadata();
-	        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
-	        metadata.setContentType("text/plain");
-	        metadata.setContentLength(bytes.length);
-	
-	        InputStream inputStream = new ByteArrayInputStream(bytes);
-	
-	        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
-	
-	        s3client.putObject(request);
+			} else {				
+				
+				byte[] bytes = harvestDate.getBytes(StandardCharsets.UTF_8);
+				
+				ObjectMetadata metadata = new ObjectMetadata();
+		        metadata.setContentEncoding(StandardCharsets.UTF_8.name());
+		        metadata.setContentType("text/plain");
+		        metadata.setContentLength(bytes.length);
+		
+		        InputStream inputStream = new ByteArrayInputStream(bytes);
+		
+		        PutObjectRequest request = new PutObjectRequest(bucketName, filePath, inputStream, metadata);
+		
+		        s3client.putObject(request);
+			}
 		}
 		
         return result;
