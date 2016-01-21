@@ -59,6 +59,8 @@ public class App {
 			
 			
 		} catch (Exception e) {
+			System.err.println("Error [" + e.getClass().getName() + "]:" + e.getMessage());
+			
 			e.printStackTrace();
 					
 			System.exit(2);

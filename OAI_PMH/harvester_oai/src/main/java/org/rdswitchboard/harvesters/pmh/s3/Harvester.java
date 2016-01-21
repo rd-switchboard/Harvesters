@@ -226,7 +226,7 @@ public class Harvester {
 	 */
 	public Harvester( final Properties properties ) throws Exception {
 		repoUrl = properties.getProperty("url");
-		if (StringUtils.isNullOrEmpty(repoUrl))
+		if (StringUtils.isNullOrEmpty(repoUrl)) 
 			throw new IllegalArgumentException("The OAI:PMH Repository URL can not be empty");
 
 		repoPrefix = properties.getProperty("name");
@@ -248,6 +248,8 @@ public class Harvester {
 		
 		if (StringUtils.isNullOrEmpty(bucketName) && StringUtils.isNullOrEmpty(folderName))
 			throw new IllegalArgumentException("Please enter either local folder name or AWS S3 Bucket name to store the harvested files");
+		if (!StringUtils.isNullOrEmpty(bucketName) && !StringUtils.isNullOrEmpty(folderName))
+			throw new IllegalArgumentException("S3 bucket and local folder parameters can not be used at the same time. Please disable one in the configuration file.");
 		
 		try {
 			File fileBlackList = new File(properties.getProperty("black.list"));
@@ -280,7 +282,7 @@ public class Harvester {
 		}
 		
 		if (null != blackList && !blackList.isEmpty() && null != whiteList && !whiteList.isEmpty())
-			throw new Exception ("The BLACK and the WHITE lists can not be set at the same time. Please disable one in the configuration file"); 
+			throw new Exception ("The black and the withe list parameters can not be set at the same time. Please disable one in the configuration file."); 
 		
 		connectionTimeout = Integer.parseInt(properties.getProperty("conn.timeout", "0"));
 		readTimeout = Integer.parseInt(properties.getProperty("read.timeout", "0"));
