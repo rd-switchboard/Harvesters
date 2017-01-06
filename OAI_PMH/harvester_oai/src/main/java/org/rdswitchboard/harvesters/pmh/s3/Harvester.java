@@ -329,22 +329,7 @@ public class Harvester {
 	public String getAdminEmail() { return adminEmail; }	
 	
 	public String getMetadataPrefix() { return metadataPrefix; }
-	
-	/**
-	 * Return encoding (if null, the default UTF-8 encoding will be used)
-	 * @return String - encoding
-	 */
-	/*public String getEncoding() {
-		return encoding;
-	}*/
 
-	/**
-	 * Set encoding (UTF-8 is by default)
-	 * @param encoding String
-	 */
-	/*public void setEncoding(String encoding) {
-		this.encoding = encoding;
-	}*/
 	
 	/**
 	 * Function to indentify on OAI:PMH Server. Could be used to test connection with the server.
@@ -423,6 +408,7 @@ public class Harvester {
 			HarvesterException, UnsupportedEncodingException, IOException, 
 			InterruptedException, XPathExpressionException, SAXException, 
 			ParserConfigurationException {
+
 		// Generate the URL of request
 		String url = null; ;
 		if (set.hasToken()) {
@@ -458,6 +444,7 @@ public class Harvester {
 		if (null == xml) 
 			throw new HarvesterException("The XML document is empty");
         		Document doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+
 		// Extract root node
 		Node root = (Node) XPATH_OAI_PMH.evaluate(doc, XPathConstants.NODE);
 		if (null == root)
@@ -755,14 +742,6 @@ public class Harvester {
 	public String getRepoUrl() {
 		return repoUrl;
 	}
-
-	/**
-	 * Function to get base folder path
-	 * @return String - base folder
-	 */
-	/*public String getFolderBase() {
-		return folderBase;
-	}*/
 
 	/**
 	 * Function to set Repo URL
