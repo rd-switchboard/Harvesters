@@ -402,7 +402,7 @@ public class Harvester {
 					String setGroup = (String) XPATH_SET_SPEC.evaluate(set, XPathConstants.STRING);
 
 					if (mapSets.put(setGroup, setName) != null) {
-						System.out.println("The group already exists in the set: " + setGroup + " | " + setName);
+						System.out.println("Warning, the group already exists in the set: " + setGroup + " | " + setName);
 					}
 				}
 
