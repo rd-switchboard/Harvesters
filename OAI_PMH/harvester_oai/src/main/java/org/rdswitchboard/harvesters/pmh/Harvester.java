@@ -22,13 +22,13 @@ import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Warnings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.DateTime;
@@ -136,6 +136,7 @@ public class Harvester {
 	private static final String URL_LIST_RECORDS = "?verb=ListRecords&set=%s&metadataPrefix=%s";
 	private static final String URL_LIST_DEFAULT_RECORDS = "?verb=ListRecords&metadataPrefix=%s";
 	private static final String URL_LIST_RECORDS_RESUMPTION_TOKEN = "?verb=ListRecords&resumptionToken=%s";
+	private static final String URL_LIST_SETS_RESUMPTION_TOKEN = "?verb=ListSets&resumptionToken=%s";
 	
 	private static final String ERR_NO_RECORDS_MATCH = "noRecordsMatch";
 	
@@ -150,7 +151,8 @@ public class Harvester {
 	private static XPathExpression XPATH_LIST_SETS;
 	private static XPathExpression XPATH_SET_NAME;
 	private static XPathExpression XPATH_SET_SPEC;
-	private static XPathExpression XPATH_RESUMPTION_TOKEN; 
+	private static XPathExpression XPATH_RECORDS_RESUMPTION_TOKEN;
+	private static XPathExpression XPATH_SETS_RESUMPTION_TOKEN;
 	
 	private static String harvestDate;
 	
@@ -170,7 +172,8 @@ public class Harvester {
 
 			XPATH_OAI_PMH = xPath.compile("/OAI-PMH");
 			XPATH_ERROR = xPath.compile("./error");
-			XPATH_RESUMPTION_TOKEN = xPath.compile("./ListRecords/resumptionToken");
+			XPATH_RECORDS_RESUMPTION_TOKEN = xPath.compile("./ListRecords/resumptionToken");
+			XPATH_SETS_RESUMPTION_TOKEN = xPath.compile("/OAI-PMH/ListSets/resumptionToken");
 			
 			harvestDate = new SimpleDateFormat("yyyy-MM-dd").format(DateTime.now().toDate());
 			
@@ -380,22 +383,35 @@ public class Harvester {
 	 * @return Map<String, String> where Key is set name and Value is set specification
 	 */
 	public Map<String, String> listSets() {
-		String url =  repoUrl + URL_LIST_SETS;
-		
+		String url =  null;
+		String tokenString = null;
 		try {
-			Document doc = dbf.newDocumentBuilder().parse(url);
-			
 			Map<String, String> mapSets = new HashMap<String, String>();
-			NodeList sets = (NodeList) XPATH_LIST_SETS.evaluate(doc, XPathConstants.NODESET);
-			for (int i = 0; i < sets.getLength(); i++) {
-				Node set = sets.item(i);
-				String setName = (String) XPATH_SET_NAME.evaluate(set, XPathConstants.STRING);
-				String setGroup = (String) XPATH_SET_SPEC.evaluate(set, XPathConstants.STRING);
-				
-				if (mapSets.put(setGroup, setName) != null)
-					throw new Exception("The group already exists in the set");
-			}
-						
+
+			do {
+				if (tokenString==null){
+					url =  repoUrl + URL_LIST_SETS;
+				}else{
+					url = repoUrl + String.format(URL_LIST_SETS_RESUMPTION_TOKEN, URLEncoder.encode(tokenString, "UTF-8"));
+				}
+				Document doc = dbf.newDocumentBuilder().parse(url);
+				NodeList sets = (NodeList) XPATH_LIST_SETS.evaluate(doc, XPathConstants.NODESET);
+				for (int i = 0; i < sets.getLength(); i++) {
+					Node set = sets.item(i);
+					String setName = (String) XPATH_SET_NAME.evaluate(set, XPathConstants.STRING);
+					String setGroup = (String) XPATH_SET_SPEC.evaluate(set, XPathConstants.STRING);
+
+					if (mapSets.put(setGroup, setName) != null) {
+						System.out.println("The group already exists in the set: " + setGroup + " | " + setName);
+					}
+				}
+
+				Node nodeToken = (Node)  XPATH_SETS_RESUMPTION_TOKEN.evaluate(doc, XPathConstants.NODE);
+				if (null != nodeToken && nodeToken instanceof Element) {
+					 tokenString = ((Element) nodeToken).getTextContent();
+				}
+			}while(null != tokenString && !tokenString.isEmpty());
+
 			return mapSets;						
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -468,7 +484,7 @@ public class Harvester {
 				throw new HarvesterException (code, message);
 		}
 				
-		Node nodeToken = (Node) XPATH_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
+		Node nodeToken = (Node) XPATH_RECORDS_RESUMPTION_TOKEN.evaluate(root, XPathConstants.NODE);
 				
 		if (null != nodeToken && nodeToken instanceof Element) {
 			String tokenString = ((Element) nodeToken).getTextContent();
