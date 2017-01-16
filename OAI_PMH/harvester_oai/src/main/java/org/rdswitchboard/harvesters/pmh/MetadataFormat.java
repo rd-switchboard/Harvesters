@@ -1,4 +1,4 @@
-package org.rdswitchboard.harvesters.pmh.s3;
+package org.rdswitchboard.harvesters.pmh;
 
 import java.util.ArrayList;
 import java.util.List;

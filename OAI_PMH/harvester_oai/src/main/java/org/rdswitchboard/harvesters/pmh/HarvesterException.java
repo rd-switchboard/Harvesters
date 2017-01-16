@@ -1,4 +1,4 @@
-package org.rdswitchboard.harvesters.pmh.s3;
+package org.rdswitchboard.harvesters.pmh;
 
 public class HarvesterException extends Exception {
 

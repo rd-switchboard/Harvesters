@@ -1,4 +1,4 @@
-package org.rdswitchboard.harvesters.pmh.s3;
+package org.rdswitchboard.harvesters.pmh;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
