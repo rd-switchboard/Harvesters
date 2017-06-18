@@ -9,7 +9,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <main.class>org.rdswitchboard.harvesters.pmh.s3.App</main.class>
     <class.path>jars/</class.path>
-    <jdk.version>1.7</jdk.version>
+    <jdk.version>1.8</jdk.version>
     <junit.version>4.11</junit.version> 
     <commons.io.version>2.4</commons.io.version>
     <aws-java-sdk.version>1.9.39</aws-java-sdk.version>

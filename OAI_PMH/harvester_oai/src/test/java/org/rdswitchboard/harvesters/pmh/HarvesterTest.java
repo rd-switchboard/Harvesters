@@ -34,21 +34,5 @@ public class HarvesterTest {
         //nothing to do
     }
 
-    @org.junit.Test
-    public void testListSetsFromFigshare() throws Exception {
-        //nothing to do
-        Harvester harvester = new Harvester(figshareProperties);
-        harvester.identify();
-        Map<String, String> mapSets = harvester.listSets();
-
-        System.out.println("Number of sets: " + mapSets.size());
-
-        for (Map.Entry<String, String> entry : mapSets.entrySet()) {
-                System.out.println(entry);
-        }
-
-        if (mapSets.size()==10) Assert.fail("Only 10 sets have been listed. Most likely, Harvester only loaded the first page, and the resume token does not work");
-
-    }
 
 }
