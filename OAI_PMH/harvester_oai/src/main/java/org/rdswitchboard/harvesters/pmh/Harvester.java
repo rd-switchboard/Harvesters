@@ -294,7 +294,13 @@ public class Harvester {
 		failOnError = Boolean.parseBoolean(properties.getProperty("fail.on.error", "true"));
 		
 	}
-	
+
+
+	public void setWhiteList(Set<String> set){
+        whiteList=new HashSet<String>();
+        whiteList.addAll(set);
+	}
+
 	/**
 	 * Return the repository name (available after calling identify() function).
 	 * @return String - Repository name
@@ -551,57 +557,61 @@ public class Harvester {
 	 * @param prefix A metadata prefix
 	 * @throws Exception
 	 */
-	public boolean harvest() throws Exception {	
+	public boolean harvest() throws Exception {
 		if (StringUtils.isNullOrEmpty(metadataPrefix))
 			throw new IllegalArgumentException("The OAI:PMH Metadata Prefix can not be empty");
 
 		System.out.println("Downloading set list");
-		
-		// download all sets in the repository
-		Map<String, String> mapSets = listSets();
-		boolean result;
-		
-		if (null == mapSets || mapSets.isEmpty()) {
-			System.out.println("Processing deafult set");
 
-			result = harvestSet(new SetStatus(null, "Default"));
-		} else {
-			
-			result = false;
-			
-			for (Map.Entry<String, String> entry : mapSets.entrySet()) {
-			    
-				SetStatus set = new SetStatus(entry.getKey().trim(), URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
-			    
-			    // if black list exists and item is blacklisted, continue
-				if (null != whiteList && !whiteList.isEmpty()) {
-				    if (!whiteList.contains(set.getName())) {
-				    	
-				    	set.setFiles(-1);
-				    	
-				    	saveSetStats(set); // set was ignored
-				    	continue;					
-				    }
-				} else if (null != blackList && blackList.contains(set)) {
-				
-					set.setFiles(-2);
-					
-					saveSetStats(set); // set was ignored
-					continue;
-				}
-			    
-			    System.out.println("Processing set: " +  URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
-			    
-			    if (!harvestSet(set)) {
-			    	System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
-			    	result = false;
-			    	break;
-			    } else
-			    	result = true;			    
-			}
-			
-		}	
-		
+        boolean result=false;
+
+        if (null == whiteList || whiteList.isEmpty()) {
+
+            // download all sets in the repository
+            Map<String, String> mapSets = listSets();
+
+            if (null == mapSets || mapSets.isEmpty()) {
+                System.out.println("Processing default set");
+
+                result = harvestSet(new SetStatus(null, "Default"));
+            } else {
+
+                result = false;
+
+                for (Map.Entry<String, String> entry : mapSets.entrySet()) {
+
+                    SetStatus set = new SetStatus(entry.getKey().trim(), URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
+
+                    // if black list exists and item is blacklisted, continue
+                    if (null != blackList && blackList.contains(set)) {
+                        set.setFiles(-2);
+                        saveSetStats(set); // set was ignored
+                        continue;
+                    }
+
+                    System.out.println("Processing set: " + URLDecoder.decode(entry.getValue(), StandardCharsets.UTF_8.name()));
+
+                    if (!harvestSet(set)) {
+                        System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
+                        result = false;
+                        break;
+                    } else
+                        result = true;
+                }
+
+            }
+        }else{
+            for (String item:whiteList
+                 ) {
+                if (!harvestSet(new SetStatus(item,item))) {
+                    System.err.println("The harvesting job has been aborted due to an error. If you want harvesting to be continued, please set option 'fail.on.error' to 'false' in the configuration file");
+                    result = false;
+                    break;
+                } else
+                    result = true;
+            }
+
+        }
 		if (result)
 		{
 			String filePath = repoPrefix + "/" + metadataPrefix + "/latest.txt";

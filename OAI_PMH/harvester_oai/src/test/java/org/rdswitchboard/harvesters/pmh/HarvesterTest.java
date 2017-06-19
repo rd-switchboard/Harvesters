@@ -5,11 +5,14 @@ import org.junit.Assert;
 import java.io.File;
 import java.io.IOException;
 import java.io.FileInputStream;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.*;
+import java.util.Set;
 
 
 public class HarvesterTest {
@@ -34,5 +37,18 @@ public class HarvesterTest {
         //nothing to do
     }
 
+    @org.junit.Test
+    public void testWhiteList() throws Exception {
+        //nothing to do
+        Harvester harvester = new Harvester(figshareProperties);
+        harvester.identify();
 
+        //set whitelist
+        Set<String> whiteList=new HashSet<String>();
+        whiteList.add("portal_21");
+        harvester.setWhiteList(whiteList);
+
+        harvester.harvest();
+
+    }
 }
