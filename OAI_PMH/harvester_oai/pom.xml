@@ -7,7 +7,7 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <main.class>org.rdswitchboard.harvesters.pmh.s3.App</main.class>
+    <main.class>org.rdswitchboard.harvesters.pmh.App</main.class>
     <class.path>jars/</class.path>
     <jdk.version>1.8</jdk.version>
     <junit.version>4.11</junit.version> 
