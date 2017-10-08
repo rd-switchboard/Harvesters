@@ -567,6 +567,9 @@ public class Harvester {
 
         if (null == whiteList || whiteList.isEmpty()) {
 
+
+            System.out.println("There is no whitelist found. Proceeding with downloading the list of all available sets.");
+
             // download all sets in the repository
             Map<String, String> mapSets = listSets();
 

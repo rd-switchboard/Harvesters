@@ -42,20 +42,7 @@ public class App {
 				if (!result)
 					System.exit(1);
 			}
-			
-			// Set default encoding for MARC21
-			//harvester.setEncoding(ENCODING);
-			
-			/*
-			try {
-				// harvest OAI:DC
-				harvester.harvest(MetadataPrefix.oai_dc);
-				// harvest MARC21 
-				harvester.harvest(MetadataPrefix.marcxml);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}*/
-			
+
 			
 			
 		} catch (Exception e) {
